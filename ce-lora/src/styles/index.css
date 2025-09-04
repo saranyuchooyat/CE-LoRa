@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@font-face{
+    font-family: Mitr;
+    src: url("../assets/fonts/Mitr-Regular.ttf");
+}
+
+@theme{
+    --color-main-green: #40916C;
+    --color-main-red: #FF4043;
+    --color-main-card: #b7e4c7;
+}
+
+@layer components {
+
+    .menu-btn{
+        @apply bg-main-green/50 px-[20px] rounded-md mr-3 text-[16px] font-bold text-white/50 hover:bg-main-green hover:text-white
+    }
+
+    .card01{
+        @apply flex justify-between  items-center bg-linear-to-bl from-main-green via-[#95d5b2] to-main-card h-[120px] text-center mb-4 rounded-[15px]
+    }
+
+    .card02{
+        @apply flex flex-col justify-center items-center text-center bg-linear-to-bl from-main-green via-[#95d5b2] to-main-card h-[120px]  rounded-[15px] h-full w-[250px] 
+    }
+
+    .add-btn{
+        @apply bg-red-300 mr-3 py-5 px-6 rounded-[10px] font-bold hover:text-white hover:bg-main-red
+    }
+
+    .dropdown-btn{
+        @apply flex justify-start bg-gray-200 px-5 py-2 rounded-[5px] w-[200px] cursor-pointer
+    }
+
+    .dropdown-menu{
+        @apply absolute top-full mt-1 bg-white w-[300px] top-[45px] border-[1px] shadow-md text-start
+    }
+
+}
+
+body{
+    font-family: Mitr;
+    background-color: #D8F3DC;
+}
+
+.background{
+    background-color: #EFF9F7;
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    margin-left: 20px;
+    margin-right: 20px;
+    overflow: hidden;
+
+}
