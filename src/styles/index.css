@@ -26,7 +26,7 @@
     }
 
     .add-btn{
-        @apply bg-red-300 mr-3 py-5 px-6 rounded-[10px] font-bold hover:text-white hover:bg-main-red
+        @apply bg-red-300 mr-3 py-5 px-6 rounded-[10px] font-bold hover:text-white hover:bg-main-red cursor-pointer
     }
 
     .dropdown-btn{
