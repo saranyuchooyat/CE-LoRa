@@ -22,7 +22,11 @@
     }
 
     .card02{
-        @apply flex flex-col justify-center items-center text-center bg-linear-to-bl from-main-green via-[#95d5b2] to-main-card h-[120px]  rounded-[15px] h-full w-[250px] 
+        @apply flex flex-col justify-center items-center text-center bg-linear-to-bl from-main-green via-[#95d5b2] to-main-card h-[120px]  rounded-[15px] h-full w-[250px]
+    }
+
+    .card03{
+        @apply flex flex-col justify-start items-center text-center bg-linear-to-bl from-main-green via-[#95d5b2] to-main-card h-full  rounded-[15px] h-full w-[650px]
     }
 
     .add-btn{

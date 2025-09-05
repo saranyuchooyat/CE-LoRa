@@ -1,7 +1,7 @@
 function Cardno2(){
     return(
         <>
-            <div className="flex justify-between h-[180px] text-center">
+            <div className="flex justify-between h-[180px] text-center mb-4">
                 <div className="card02">
                     <div className="w-12 h-12 bg-zinc-400 rounded-full"></div>
                     <p className="text-[40px] font-bold">??/??</p>
@@ -21,7 +21,7 @@ function Cardno2(){
                     <div className="w-12 h-12 bg-zinc-400 rounded-full"></div>
                     <p className="text-[40px] font-bold">??/??</p>
                     <p className="">name</p>
-                </div>                
+                </div>            
             </div>
         </>
     )

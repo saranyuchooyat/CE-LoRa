@@ -5,10 +5,13 @@ import Contents from "./components/Contents";
 function App() {
   return(
     <>
-      
-      <Header/>
-      <Menu/>
-      <Contents/>
+      <div className="flex flex-col h-screen">
+        <Header/>
+        <Menu/>
+        <div className="mt-4 flex-1 overflow-y-scroll">
+          <Contents/>
+        </div>
+      </div>
       
     </>
   );
