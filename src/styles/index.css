@@ -7,30 +7,43 @@
 
 @theme{
     --color-main-green: #40916C;
+    
     --color-main-red: #FF4043;
+    --color-alert-bg: #FFE2E2;
+
+    --color-main-yellow: #FFB74D;
+    --color-warn-bg: #FFFFE2;
+
+    --color-main-blue: #0088FF;
+    --color-complete-bg: #B3E5FC;
+
     --color-main-card: #b7e4c7;
 }
 
 @layer components {
 
+    .card{
+        @apply bg-linear-to-bl from-main-green via-[#95d5b2] to-main-card h-full w-full text-center mb-4 rounded-[15px] p-4
+    }
+
+    .card-noti{
+        @apply w-fit h-fit text-start pl-3 rounded-[15px] border-l-[10px] cursor-pointer
+    }
+
+    .color-alert{
+        @apply border-main-red bg-alert-bg 
+    }
+
+    .color-warn{
+        @apply border-main-yellow bg-warn-bg
+    }
+
+    .color-complete{
+        @apply border-main-blue bg-complete-bg
+    }
+
     .menu-btn{
         @apply bg-main-green/50 px-[20px] rounded-md mr-3 text-[16px] font-bold text-white/50 hover:bg-main-green hover:text-white
-    }
-
-    .cardBig{
-        @apply bg-linear-to-bl from-main-green via-[#95d5b2] to-main-card h-full w-full text-center mb-4 rounded-[15px]
-    }
-
-    .card01{
-        @apply flex justify-between  items-center bg-linear-to-bl from-main-green via-[#95d5b2] to-main-card h-[120px] text-center mb-4 rounded-[15px]
-    }
-
-    .card02{
-        @apply flex flex-col justify-center items-center text-center bg-linear-to-bl from-main-green via-[#95d5b2] to-main-card h-[120px]  rounded-[15px] h-full w-[250px]
-    }
-
-    .card03{
-        @apply flex flex-col justify-start items-center text-center bg-linear-to-bl from-main-green via-[#95d5b2] to-main-card h-full  rounded-[15px] h-full w-[650px]
     }
 
     .add-btn{
@@ -60,4 +73,8 @@ body{
     margin-right: 20px;
     overflow: hidden;
 
+}
+
+.custom-scrollbar::-webkit-scrollbar{
+  display: none;
 }

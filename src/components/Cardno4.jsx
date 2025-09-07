@@ -3,9 +3,9 @@ import ServerUsage from "./ServerUsageStatus";
 function Cardno4(){
     return(
         <>
-            <div className="h-fit mb-4">
+            <div className="h-fit">
 
-                <div className="cardBig">
+                <div className="card">
                     <div className="flex flex-rows justify-between mx-3 mb-3">
                         <div className="mt-3 text-start">
                             <p className="font-bold text-[18px]" >Server name</p>
