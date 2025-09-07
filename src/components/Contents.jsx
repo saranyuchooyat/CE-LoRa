@@ -2,6 +2,7 @@ import Cardno2 from "./Cardno2";
 import Cardno3 from "./Cardno3";
 import CardFilter from "./CardFilter";
 import CardnStatus from "./CardStatus";
+import Cardno4 from "./Cardno4";
 
 function Contents(){
     return(
@@ -11,7 +12,7 @@ function Contents(){
                 <CardFilter/>
                 <Cardno2/>
                 <Cardno3/>
-                <Cardno2/>
+                <Cardno4/>
             </div>
         </>
     )

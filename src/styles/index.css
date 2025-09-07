@@ -17,6 +17,10 @@
         @apply bg-main-green/50 px-[20px] rounded-md mr-3 text-[16px] font-bold text-white/50 hover:bg-main-green hover:text-white
     }
 
+    .cardBig{
+        @apply bg-linear-to-bl from-main-green via-[#95d5b2] to-main-card h-full w-full text-center mb-4 rounded-[15px]
+    }
+
     .card01{
         @apply flex justify-between  items-center bg-linear-to-bl from-main-green via-[#95d5b2] to-main-card h-[120px] text-center mb-4 rounded-[15px]
     }
