@@ -8,11 +8,11 @@ function CardFilter(){
 
     return(
         <>
-            <div className="card01">
+            <div className="card flex justify-between items-center">
                 <div className="ml-3">
                     <form>
                         <p className="text-start">ค้นหา Zone</p>
-                        <input className="w-[400px] h-auto bg-gray-200" type="seach" placeholder=" ชื่อ zone, รหัส zone, หรือที่อยู่"></input>
+                        <input className="w-[400px] bg-gray-200" type="seach" placeholder=" ชื่อ zone, รหัส zone, หรือที่อยู่"></input>
                     </form>
                 </div>
 
