@@ -1,32 +1,44 @@
 import { useState } from "react";
+import { Link } from 'react-router-dom';
 
-function Menu(){
-    // ใช้ชื่อตัวแปรตาม convention: 'btnActive' และ 'setBtnActive'
-    const [btnActive, setBtnActive] = useState(false);
-    const [role, setRole] = useState({
-    SystemAdmin: ["System Overview Dashboard","Zone Management","User Management","System Health Monitoring"],
-    ZoneAdmin: ["Zone Dashboard","Device Management","System Health Monitoring"],
-    ZoneStaff: ["Elderly Monitoring","Alert Management","Reports","Zone Map Overview","System Health Monitoring"],
-    ElderyCaregiver: ["System Overview Dashboard","System Health Monitoring"],
-  });
+function Menu() {
+    const [currentRole, setCurrentRole] = useState("System Admin");
+    const [activeButton, setActiveButton] = useState("System Overview Dashboard");
 
-    // ฟังก์ชันสำหรับสลับค่า state ให้สั้นลง
-    function activeBtn(){
-        setBtnActive(!btnActive);
-    }
+    const roleRoutes = {
+        "System Admin": {
+            "System Overview Dashboard": "/system-overview-dashboard",
+            "Zone Management": "/zone-management",
+            "User Management": "/user-management",
+            "System Health Monitoring": "/health-monitoring"
+        }
+    };
 
-    return(
+    const handleButtonClick = (buttonTitle) => {
+        setActiveButton(buttonTitle);
+    };
+
+    const renderMenuButtons = (role) => {
+        const buttons = roleRoutes[role];
+        return Object.keys(buttons).map((buttonTitle) => (
+            <Link
+                key={buttonTitle}
+                to={buttons[buttonTitle]}
+                onClick={() => handleButtonClick(buttonTitle)}
+                className={`menu-btn ${activeButton === buttonTitle ? 'bg-main-green text-white' : ''}`}
+            >
+                {buttonTitle}
+            </Link>
+        ));
+    };
+
+    return (
         <>
             <div className="mt-3 mx-5">
                 <div>
-                    <p className="text-[22px] font-bold">System Admin Menu </p>
+                    <p className="text-[22px] font-bold">{currentRole} Menu</p>
                     <div className="flex justify-start mt-1">
-                        <button className={`menu-btn ${btnActive ? 'bg-main-green text-white' : ''}`} onClick={activeBtn}>
-                            System Overview Dashboard
-                        </button>
-                        <button className="menu-btn">Zone Management</button>
-                        <button className="menu-btn">User Management</button>
-                        <button className="menu-btn">System Health Monitoring</button>
+                        {renderMenuButtons(currentRole)}
                     </div>
                 </div>
             </div>

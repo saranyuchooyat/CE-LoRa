@@ -1,4 +1,4 @@
-function CardnStatus(){
+function CardStatus(){
     return(
         <>
             <div className="card flex justify-between items-center">
@@ -12,4 +12,4 @@ function CardnStatus(){
     )
 }
 
-export default CardnStatus;
+export default CardStatus;
