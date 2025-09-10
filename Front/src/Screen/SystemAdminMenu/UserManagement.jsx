@@ -1,9 +1,8 @@
-import Contents from "../components/Contents";
+import Contents from "../../components/Contents";
 
 function UserManagement(){
     return(
         <>
-            <Contents/>
         </>
     );
 }

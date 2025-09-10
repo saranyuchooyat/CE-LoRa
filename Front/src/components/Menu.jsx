@@ -11,7 +11,25 @@ function Menu() {
             "Zone Management": "/zone-management",
             "User Management": "/user-management",
             "System Health Monitoring": "/health-monitoring"
-        }
+        },
+
+        "Zone Admin": {
+            "Zone Dashboard": "/zone-dashboard",
+            "Device Management": "/device-management",
+            "Zone Staff Management": "/zone-staff-management",
+            "System Health Monitoring": "/health-monitoring"
+        },
+
+        "Zone Staff": {
+            "Eldery Monitoring": "/eldery-monitoring",
+            "Alert Management": "/alert-management",
+            "Reports": "/reports",
+            "Zone Map Overview": "/zone-map-overview",
+            "System Health Monitoring": "/health-monitoring"
+        },
+
+        "Elderly Caregiver":{}
+
     };
 
     const handleButtonClick = (buttonTitle) => {

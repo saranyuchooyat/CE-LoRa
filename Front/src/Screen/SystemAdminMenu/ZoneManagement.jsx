@@ -1,5 +1,5 @@
-import CardStatus from "../components/CardStatus";
-import CardFilter from "../components/CardFilter";
+import CardStatus from "../../components/CardStatus";
+import CardFilter from "../../components/CardFilter";
 
 function ZoneManagement(){
     return(
