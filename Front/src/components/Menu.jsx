@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from 'react-router-dom';
 
 function Menu() {
-    const [currentRole, setCurrentRole] = useState("System Admin");
+    const [currentRole, setCurrentRole] = useState("Zone Admin");
     const [activeButton, setActiveButton] = useState("System Overview Dashboard");
 
     const roleRoutes = {
