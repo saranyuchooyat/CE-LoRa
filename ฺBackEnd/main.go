@@ -4,29 +4,27 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type User struct {
-	ID       int    `json:"id"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Role     string `json:"role"`
-}
-
-var users []User
-
 func main() {
 	app := fiber.New()
 
-	users = append(users, User{ID: 1, Username: "yu", Password: "1234", Role: "Systemadmin"})
-	users = append(users, User{ID: 2, Username: "ink", Password: "5678", Role: "Zoneadmin"})
-	users = append(users, User{ID: 3, Username: "eak", Password: "9999", Role: "Zonestaff"})
+	app.Get("/users", getAllUser)
+	app.Get("/elders", getAllElderly)
+	app.Get("/zones", getAllZone)
 
-	app.Get("/User", getUser)
 	app.Post("/auth/login", login)
 	app.Listen(":8080")
 }
 
-func getUser(c *fiber.Ctx) error {
+func getAllUser(c *fiber.Ctx) error {
 	return c.JSON(users)
+}
+
+func getAllElderly(c *fiber.Ctx) error {
+	return c.JSON(elderlys)
+}
+
+func getAllZone(c *fiber.Ctx) error {
+	return c.JSON(zones)
 }
 
 func login(c *fiber.Ctx) error {
