@@ -34,6 +34,18 @@ type Elderly struct {
 	LastUpdated string `json:"last_updated"`
 }
 
+type Device struct {
+	DeviceID     string   `json:"device_id"`
+	SerialNumber string   `json:"serial_number"`
+	Type         string   `json:"type"`
+	Model        string   `json:"model"`
+	Battery      int      `json:"battery"`
+	LastUpdate   string   `json:"last_update"`
+	Status       string   `json:"status"`
+	AssignedTo   string   `json:"assigned_to"`
+	Features     []string `json:"features"`
+}
+
 // ---------------- Mock Data ----------------
 
 var users = []User{
@@ -77,5 +89,63 @@ var elderlys = []Elderly{
 		ID: "E005", Name: "นายมานพ อดทน", Age: 80, Gender: "ชาย", Status: "critical",
 		Vitals:   Vitals{HeartRate: 130, BloodPressure: "170/100", SpO2: 88, Temperature: 39.2},
 		DeviceID: "SW-2024-005", Battery: 12, LastUpdated: "2025-08-20T14:45:00Z",
+	},
+}
+
+var devices = []Device{
+	{
+		DeviceID:     "SW-2024-001",
+		SerialNumber: "JSW240001",
+		Type:         "SmartWatch",
+		Model:        "J3 iSmart Watch",
+		Battery:      78,
+		LastUpdate:   "2025-08-20T14:30:00Z",
+		Status:       "online",
+		AssignedTo:   "นายสมชาย มั่นคง",
+		Features:     []string{"SpO2", "Heart Rate", "Body Temp", "Blood Pressure"},
+	},
+	{
+		DeviceID:     "SW-2024-002",
+		SerialNumber: "JSW240002",
+		Type:         "SmartWatch",
+		Model:        "J3 iSmart Watch",
+		Battery:      55,
+		LastUpdate:   "2025-08-20T14:32:00Z",
+		Status:       "online",
+		AssignedTo:   "นางสมศรี ใจดี",
+		Features:     []string{"SpO2", "Heart Rate", "Body Temp", "Blood Pressure"},
+	},
+	{
+		DeviceID:     "SW-2024-003",
+		SerialNumber: "JSW240003",
+		Type:         "SmartWatch",
+		Model:        "J3 iSmart Watch",
+		Battery:      22,
+		LastUpdate:   "2025-08-20T14:35:00Z",
+		Status:       "offline",
+		AssignedTo:   "นายบุญเลิศ ขยัน",
+		Features:     []string{"SpO2", "Heart Rate", "Body Temp"},
+	},
+	{
+		DeviceID:     "SW-2024-004",
+		SerialNumber: "JSW240004",
+		Type:         "SmartWatch",
+		Model:        "J3 iSmart Watch",
+		Battery:      90,
+		LastUpdate:   "2025-08-20T14:40:00Z",
+		Status:       "online",
+		AssignedTo:   "นางละไม สุขใจ",
+		Features:     []string{"SpO2", "Heart Rate", "Body Temp", "Blood Pressure"},
+	},
+	{
+		DeviceID:     "SW-2024-005",
+		SerialNumber: "JSW240005",
+		Type:         "SmartWatch",
+		Model:        "J3 iSmart Watch",
+		Battery:      12,
+		LastUpdate:   "2025-08-20T14:45:00Z",
+		Status:       "offline",
+		AssignedTo:   "นายมานพ อดทน",
+		Features:     []string{"SpO2", "Heart Rate", "Body Temp", "Blood Pressure"},
 	},
 }
