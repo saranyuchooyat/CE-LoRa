@@ -1,9 +1,19 @@
-import { useState } from "react";
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from "react"; // เพิ่ม useEffect
+import { Link, useLocation } from 'react-router-dom'; // เพิ่ม useLocation
 
 function Menu() {
-    const [currentRole, setCurrentRole] = useState("Zone Staff");
+    // กำหนด initial state ให้เป็นค่าเริ่มต้น หรือ null
+    const [currentRole, setCurrentRole] = useState(null); 
     const [activeButton, setActiveButton] = useState("System Overview Dashboard");
+    const location = useLocation(); // เรียกใช้ useLocation
+
+    console.log(location)
+    // ใช้ useEffect เพื่อรับค่า role จาก state
+    useEffect(() => {
+        if (location.state?.role) {
+            setCurrentRole(location.state.role);
+        }
+    }, [location.state]); // Dependency array: ให้ useEffect ทำงานเมื่อ location.state เปลี่ยน
 
     const roleRoutes = {
         "System Admin": {
@@ -12,14 +22,12 @@ function Menu() {
             "User Management": "/user-management",
             "System Health Monitoring": "/health-monitoring"
         },
-
         "Zone Admin": {
             "Zone Dashboard": "/zone-dashboard",
             "Device Management": "/device-management",
             "Zone Staff Management": "/zone-staff-management",
             "System Health Monitoring": "/health-monitoring"
         },
-
         "Zone Staff": {
             "Eldery Monitoring": "/eldery-monitoring",
             "Alert Management": "/alert-management",
@@ -27,9 +35,7 @@ function Menu() {
             "Zone Map Overview": "/zone-map-overview",
             "System Health Monitoring": "/health-monitoring"
         },
-
-        "Elderly Caregiver":{}
-
+        "Elderly Caregiver": {}
     };
 
     const handleButtonClick = (buttonTitle) => {
@@ -37,6 +43,11 @@ function Menu() {
     };
 
     const renderMenuButtons = (role) => {
+        // ตรวจสอบว่า role มีอยู่ใน roleRoutes หรือไม่ก่อนจะเข้าถึง
+        if (!role || !roleRoutes[role]) {
+            return null; // หรือแสดงข้อความ/component ที่เหมาะสม
+        }
+        
         const buttons = roleRoutes[role];
         return Object.keys(buttons).map((buttonTitle) => (
             <Link
@@ -54,8 +65,10 @@ function Menu() {
         <>
             <div className="mt-3 mx-5">
                 <div>
-                    <p className="text-[22px] font-bold">{currentRole} Menu</p>
+                    {/* แสดง role ที่ได้รับมา หรือข้อความเริ่มต้น */}
+                    <p className="text-[22px] font-bold">{currentRole ? `${currentRole} Menu` : 'Loading Menu...'}</p>
                     <div className="flex justify-start mt-1">
+                        {/* ส่ง currentRole ที่อัปเดตแล้วไปที่ renderMenuButtons */}
                         {renderMenuButtons(currentRole)}
                     </div>
                 </div>

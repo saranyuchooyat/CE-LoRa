@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 type User struct {
@@ -16,9 +17,15 @@ var users []User
 func main() {
 	app := fiber.New()
 
-	users = append(users, User{ID: 1, Username: "yu", Password: "1234", Role: "Systemadmin"})
-	users = append(users, User{ID: 2, Username: "ink", Password: "5678", Role: "Zoneadmin"})
-	users = append(users, User{ID: 3, Username: "eak", Password: "9999", Role: "Zonestaff"})
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "http://localhost:5173",
+		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
+		AllowHeaders: "Origin, Content-Type, Accept",
+	}))
+
+	users = append(users, User{ID: 1, Username: "yu", Password: "1234", Role: "System Admin"})
+	users = append(users, User{ID: 2, Username: "ink", Password: "5678", Role: "Zone Admin"})
+	users = append(users, User{ID: 3, Username: "eak", Password: "9999", Role: "Zone Staff"})
 
 	app.Get("/User", getUser)
 	app.Post("/auth/login", login)
