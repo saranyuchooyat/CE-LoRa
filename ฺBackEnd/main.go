@@ -1,6 +1,7 @@
 package main
 
 import (
+	"sort"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -9,19 +10,33 @@ import (
 func main() {
 	app := fiber.New()
 
-	app.Get("/user", getAllUser)
-	app.Get("/user/:id", getUserByID)
-	app.Get("/elder", getAllElderly)
-	app.Get("/zone", getAllZone)
-	app.Get("/device", getAllDevice)
+	app.Get("/users", getAllUser)
+	app.Get("/users/:id", getUserByID)
+	app.Get("/elders", getAllElderly)
+	app.Get("/zones", getAllZone)
+	app.Get("/devices", getAllDevice)
 	app.Get("/dashboard/summary", getDashSum)
+	app.Get("/dashboard/top-zones", getTopZones)
 
+	app.Post("/users", createUser)
+	app.Post("/zones", createZone)
 	app.Post("/auth/login", login)
 	app.Listen(":8080")
 }
 
 func getAllUser(c *fiber.Ctx) error {
 	return c.JSON(users)
+}
+
+func createUser(c *fiber.Ctx) error {
+	user := new(User)
+
+	if err := c.BodyParser(user); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	users = append(users, *user)
+	return c.JSON(user)
 }
 
 func getUserByID(c *fiber.Ctx) error {
@@ -43,6 +58,35 @@ func getAllElderly(c *fiber.Ctx) error {
 
 func getAllZone(c *fiber.Ctx) error {
 	return c.JSON(zones)
+}
+
+func getTopZones(c *fiber.Ctx) error {
+	limit := c.QueryInt("limit", 5)
+
+	zonescopy := make([]Zone, len(zones))
+	copy(zonescopy, zones)
+
+	sort.Slice(zonescopy, func(i, j int) bool {
+		return zonescopy[i].ActiveUser > zonescopy[j].ActiveUser
+	})
+
+	if limit > len(zonescopy) {
+		limit = len(zonescopy)
+	}
+	return c.JSON(fiber.Map{
+		"topzones": zonescopy[:limit],
+	})
+
+}
+
+func createZone(c *fiber.Ctx) error {
+	zone := new(Zone)
+	if err := c.BodyParser(zone); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	zones = append(zones, *zone)
+	return c.JSON(zone)
 }
 
 func getAllDevice(c *fiber.Ctx) error {
