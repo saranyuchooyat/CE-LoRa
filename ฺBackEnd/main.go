@@ -5,22 +5,35 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
 	app := fiber.New()
-
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "*",
+		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
+		AllowHeaders: "Origin, Content-Type, Accept",
+	}))
 	app.Get("/users", getAllUser)
 	app.Get("/users/:id", getUserByID)
-	app.Get("/elders", getAllElderly)
+	app.Post("/users", createUser)
+	app.Put("/users/:id", updateUser)
+	app.Delete("/users/:id", deleteUser)
+
 	app.Get("/zones", getAllZone)
+	app.Post("/zones", createZone)
+	app.Put("/zones/:id", updateZone)
+	app.Delete("/zones/:id", deleteZone)
+
+	app.Post("/auth/login", login)
+
+	app.Get("/elders", getAllElderly)
+
 	app.Get("/devices", getAllDevice)
 	app.Get("/dashboard/summary", getDashSum)
 	app.Get("/dashboard/top-zones", getTopZones)
-
-	app.Post("/users", createUser)
-	app.Post("/zones", createZone)
-	app.Post("/auth/login", login)
 	app.Listen(":8080")
 }
 
@@ -37,6 +50,52 @@ func createUser(c *fiber.Ctx) error {
 
 	users = append(users, *user)
 	return c.JSON(user)
+}
+
+func updateUser(c *fiber.Ctx) error {
+	userID, err := strconv.Atoi(c.Params("id"))
+
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	userUpdate := new(User)
+	if err := c.BodyParser(userUpdate); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	for i, u := range users {
+		if u.ID == userID {
+			if userUpdate.Username != "" {
+				users[i].Username = userUpdate.Username
+			}
+			if userUpdate.Password != "" {
+				users[i].Password = userUpdate.Password
+			}
+			if userUpdate.Role != "" {
+				users[i].Role = userUpdate.Role
+			}
+			return c.JSON(users[i])
+		}
+	}
+
+	return c.SendStatus(fiber.StatusNotFound)
+}
+
+func deleteUser(c *fiber.Ctx) error {
+	userID, err := strconv.Atoi(c.Params("id"))
+
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	for i, u := range users {
+		if u.ID == userID {
+			users = append(users[:i], users[i+1:]...)
+			return c.SendStatus(fiber.StatusNoContent)
+		}
+	}
+	return c.SendStatus(fiber.StatusNotFound)
 }
 
 func getUserByID(c *fiber.Ctx) error {
@@ -60,6 +119,66 @@ func getAllZone(c *fiber.Ctx) error {
 	return c.JSON(zones)
 }
 
+func createZone(c *fiber.Ctx) error {
+	zone := new(Zone)
+	if err := c.BodyParser(zone); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	zones = append(zones, *zone)
+	return c.JSON(zone)
+}
+
+func updateZone(c *fiber.Ctx) error {
+	zoneID, err := strconv.Atoi(c.Params("id"))
+
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	zoneUpdate := new(Zone)
+	if err := c.BodyParser(zoneUpdate); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	for i, z := range zones {
+		if z.ZoneID == zoneID {
+			if zoneUpdate.ZoneName != "" {
+				zones[i].ZoneName = zoneUpdate.ZoneName
+			}
+			if zoneUpdate.Address != "" {
+				zones[i].Address = zoneUpdate.Address
+			}
+			if zoneUpdate.Description != "" {
+				zones[i].Description = zoneUpdate.Description
+			}
+			if zoneUpdate.Status != "" {
+				zones[i].Status = zoneUpdate.Status
+			}
+
+			return c.JSON(zones[i])
+		}
+	}
+
+	return c.SendStatus(fiber.StatusNotFound)
+}
+
+func deleteZone(c *fiber.Ctx) error {
+	zoneID, err := strconv.Atoi(c.Params("id"))
+
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	for i, z := range zones {
+		if z.ZoneID == zoneID {
+			zones = append(zones[:i], zones[i+1:]...)
+			return c.SendStatus(fiber.StatusNoContent)
+		}
+	}
+	return c.SendStatus(fiber.StatusNotFound)
+}
+
 func getTopZones(c *fiber.Ctx) error {
 	limit := c.QueryInt("limit", 5)
 
@@ -77,16 +196,6 @@ func getTopZones(c *fiber.Ctx) error {
 		"topzones": zonescopy[:limit],
 	})
 
-}
-
-func createZone(c *fiber.Ctx) error {
-	zone := new(Zone)
-	if err := c.BodyParser(zone); err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
-	}
-
-	zones = append(zones, *zone)
-	return c.JSON(zone)
 }
 
 func getAllDevice(c *fiber.Ctx) error {

@@ -8,8 +8,8 @@ type User struct {
 }
 
 type Zone struct {
-	ZoneID      int    `json:"zone_id"`
-	ZoneName    string `json:"zone_name"`
+	ZoneID      int    `json:"zoneid"`
+	ZoneName    string `json:"zonename"`
 	Address     string `json:"address"`
 	Description string `json:"description"`
 	Status      string `json:"status"`
