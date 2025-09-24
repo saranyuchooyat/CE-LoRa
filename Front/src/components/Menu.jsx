@@ -8,6 +8,7 @@ function Menu() {
 
     console.log(location)
     useEffect(() => {
+        console.log(location.state)
         if (location.state?.role) {
             setCurrentRole(location.state.role);
         }

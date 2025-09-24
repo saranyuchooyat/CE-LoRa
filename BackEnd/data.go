@@ -78,9 +78,9 @@ type UsageTrend struct {
 // ---------------- Mock Data ----------------
 
 var users = []User{
-	{UserID: 1, Username: "yu", Password: "1234", Name: "Sarunyu Chooyat", Phone: "0123456789", Role: "Systemadmin", Email: "66015172@kmitl.ac.th"},
-	{UserID: 2, Username: "ink", Password: "5678", Name: "Pruettinan Limlertvaree", Phone: "0996291914", Role: "Zoneadmin", Email: "66015134@kmitl.ac.th"},
-	{UserID: 3, Username: "eak", Password: "9999", Name: "Detsukmongkol Bunta", Phone: "0987654321", Role: "Zonestaff", Email: "66015072@kmitl.ac.th"},
+	{UserID: 1, Username: "yu", Password: "1234", Name: "Sarunyu Chooyat", Phone: "0123456789", Role: "System Admin", Email: "66015172@kmitl.ac.th"},
+	{UserID: 2, Username: "ink", Password: "5678", Name: "Pruettinan Limlertvaree", Phone: "0996291914", Role: "Zone Admin", Email: "66015134@kmitl.ac.th"},
+	{UserID: 3, Username: "eak", Password: "9999", Name: "Detsukmongkol Bunta", Phone: "0987654321", Role: "Zone Staff", Email: "66015072@kmitl.ac.th"},
 }
 
 var zones = []Zone{
