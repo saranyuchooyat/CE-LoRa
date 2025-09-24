@@ -47,6 +47,27 @@ type Device struct {
 	Features     []string `json:"features"`
 }
 
+type Server struct {
+	Name        string `json:"name"`
+	CPUUsage    int    `json:"cpuUsage"`
+	MemoryUsed  string `json:"memoryUsed"`
+	MemoryTotal string `json:"memoryTotal"`
+	DiskUsed    string `json:"diskUsed"`
+	DiskTotal   string `json:"diskTotal"`
+}
+
+type Alert struct {
+	ID          int    `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	CreatedAt   string `json:"createdAt"`
+}
+
+type UsageTrend struct {
+	Date        string `json:"date"`
+	ActiveUsers int    `json:"activeUsers"`
+}
+
 // ---------------- Mock Data ----------------
 
 var users = []User{
@@ -149,4 +170,68 @@ var devices = []Device{
 		AssignedTo:   "นายมานพ อดทน",
 		Features:     []string{"SpO2", "Heart Rate", "Body Temp", "Blood Pressure"},
 	},
+}
+
+var servers = []Server{
+	{
+		Name:        "LoRaWAN Network Server",
+		CPUUsage:    45,
+		MemoryUsed:  "12.8GB",
+		MemoryTotal: "16GB",
+		DiskUsed:    "456GB",
+		DiskTotal:   "1TB",
+	},
+	{
+		Name:        "Database Server",
+		CPUUsage:    67,
+		MemoryUsed:  "28.4GB",
+		MemoryTotal: "32GB",
+		DiskUsed:    "1.2TB",
+		DiskTotal:   "2TB",
+	},
+	{
+		Name:        "Analytics Server",
+		CPUUsage:    88,
+		MemoryUsed:  "30.1GB",
+		MemoryTotal: "32GB",
+		DiskUsed:    "1.8TB",
+		DiskTotal:   "2TB",
+	},
+	{
+		Name:        "Web Application Server",
+		CPUUsage:    34,
+		MemoryUsed:  "8.2GB",
+		MemoryTotal: "16GB",
+		DiskUsed:    "234GB",
+		DiskTotal:   "1TB",
+	},
+}
+
+var alerts = []Alert{
+	{
+		ID:          1,
+		Title:       "Analytics Server High Memory Usage",
+		Description: "Memory usage reached 94% - immediate attention required",
+		CreatedAt:   "2025-08-19T10:25:00Z",
+	},
+	{
+		ID:          2,
+		Title:       "3 อุปกรณ์ใน Zone ลาดกระบัง ไม่ส่งสัญญาณ",
+		Description: "Device offline เกิน 30 นาที - ตรวจสอบการเชื่อมต่อ",
+		CreatedAt:   "2025-08-19T10:10:00Z",
+	},
+	{
+		ID:          3,
+		Title:       "Database Backup Completed",
+		Description: "Nightly backup finished successfully",
+		CreatedAt:   "2025-08-19T00:30:00Z",
+	},
+}
+
+var usageTrends = []UsageTrend{ //mock up ไปก่อน จริงๆ ต้องมีการบันทึก date เก็บลงฐานข้อมูล ว่ามี user เข้าใช้งานกี่คนในเว็บ แต่ละวัน
+	{Date: "2025-07-20", ActiveUsers: 120},
+	{Date: "2025-07-21", ActiveUsers: 134},
+	{Date: "2025-07-22", ActiveUsers: 140},
+	{Date: "2025-07-23", ActiveUsers: 110},
+	{Date: "2025-07-24", ActiveUsers: 150},
 }
