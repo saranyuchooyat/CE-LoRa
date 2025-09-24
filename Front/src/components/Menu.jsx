@@ -1,9 +1,17 @@
-import { useState } from "react";
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { Link, useLocation } from 'react-router-dom';
 
 function Menu() {
-    const [currentRole, setCurrentRole] = useState("Zone Staff");
+    const [currentRole, setCurrentRole] = useState(null); 
     const [activeButton, setActiveButton] = useState("System Overview Dashboard");
+    const location = useLocation();
+
+    console.log(location)
+    useEffect(() => {
+        if (location.state?.role) {
+            setCurrentRole(location.state.role);
+        }
+    }, [location.state]);
 
     const roleRoutes = {
         "System Admin": {
@@ -12,14 +20,12 @@ function Menu() {
             "User Management": "/user-management",
             "System Health Monitoring": "/health-monitoring"
         },
-
         "Zone Admin": {
             "Zone Dashboard": "/zone-dashboard",
             "Device Management": "/device-management",
             "Zone Staff Management": "/zone-staff-management",
             "System Health Monitoring": "/health-monitoring"
         },
-
         "Zone Staff": {
             "Eldery Monitoring": "/eldery-monitoring",
             "Alert Management": "/alert-management",
@@ -27,9 +33,7 @@ function Menu() {
             "Zone Map Overview": "/zone-map-overview",
             "System Health Monitoring": "/health-monitoring"
         },
-
-        "Elderly Caregiver":{}
-
+        "Elderly Caregiver": {}
     };
 
     const handleButtonClick = (buttonTitle) => {
@@ -37,6 +41,10 @@ function Menu() {
     };
 
     const renderMenuButtons = (role) => {
+        if (!role || !roleRoutes[role]) {
+            return null;
+        }
+        
         const buttons = roleRoutes[role];
         return Object.keys(buttons).map((buttonTitle) => (
             <Link
@@ -54,7 +62,7 @@ function Menu() {
         <>
             <div className="mt-3 mx-5">
                 <div>
-                    <p className="text-[22px] font-bold">{currentRole} Menu</p>
+                    <p className="text-[22px] font-bold">{currentRole ? `${currentRole} Menu` : 'Loading Menu...'}</p>
                     <div className="flex justify-start mt-1">
                         {renderMenuButtons(currentRole)}
                     </div>

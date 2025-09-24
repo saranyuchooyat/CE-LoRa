@@ -1,27 +1,14 @@
-function Cardno2(){
+function Cardno2({data}){
+
     return(
         <>
             <div className="flex justify-between h-fit text-center gap-4">
-                <div className="card flex flex-col justify-center items-center">
-                    <div className="w-12 h-12 bg-zinc-400 rounded-full"></div>
-                    <p className="text-[40px] font-bold">??/??</p>
-                    <p className="">name</p>
-                </div>
-                <div className="card flex flex-col justify-center items-center">
-                    <div className="w-12 h-12 bg-zinc-400 rounded-full"></div>
-                    <p className="text-[40px] font-bold">??/??</p>
-                    <p className="">name</p>
-                </div>
-                <div className="card flex flex-col justify-center items-center">
-                    <div className="w-12 h-12 bg-zinc-400 rounded-full"></div>
-                    <p className="text-[40px] font-bold">??/??</p>
-                    <p className="">name</p>
-                </div>
-                <div className="card flex flex-col justify-center items-center">
-                    <div className="w-12 h-12 bg-zinc-400 rounded-full"></div>
-                    <p className="text-[40px] font-bold">??/??</p>
-                    <p className="">name</p>
-                </div>            
+                {data.map((card, index) => (
+                <div key={index} className="card flex flex-col justify-center items-center">
+                    <p className="text-[40px] font-bold">{card.value}</p>
+                    <p className="">{card.name}</p>
+                </div>  
+                ))}
             </div>
         </>
     )
