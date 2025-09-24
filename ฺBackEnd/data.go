@@ -1,10 +1,17 @@
 package main
 
 type User struct {
-	ID       int    `json:"id"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Role     string `json:"role"`
+	UserID    int    `json:"userId"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	Phone     string `json:"phone"`
+	Role      string `json:"role"`
+	Zone      string `json:"zone"`
+	Status    string `json:"status"`
+	LastLogin string `json:"lastLogin"`
+	CreatedAt string `json:"createdAt"`
+	Username  string `json:"username,omitempty"`
+	Password  string `json:"password,omitempty"`
 }
 
 type Zone struct {
@@ -71,9 +78,9 @@ type UsageTrend struct {
 // ---------------- Mock Data ----------------
 
 var users = []User{
-	{ID: 1, Username: "yu", Password: "1234", Role: "Systemadmin"},
-	{ID: 2, Username: "ink", Password: "5678", Role: "Zoneadmin"},
-	{ID: 3, Username: "eak", Password: "9999", Role: "Zonestaff"},
+	{UserID: 1, Username: "yu", Password: "1234", Name: "Sarunyu Chooyat", Phone: "0123456789", Role: "Systemadmin", Email: "66015172@kmitl.ac.th"},
+	{UserID: 2, Username: "ink", Password: "5678", Name: "Pruettinan Limlertvaree", Phone: "0996291914", Role: "Zoneadmin", Email: "66015134@kmitl.ac.th"},
+	{UserID: 3, Username: "eak", Password: "9999", Name: "Detsukmongkol Bunta", Phone: "0987654321", Role: "Zonestaff", Email: "66015072@kmitl.ac.th"},
 }
 
 var zones = []Zone{

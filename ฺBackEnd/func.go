@@ -35,7 +35,7 @@ func updateUser(c *fiber.Ctx) error {
 	}
 
 	for i, u := range users {
-		if u.ID == userID {
+		if u.UserID == userID {
 			if userUpdate.Username != "" {
 				users[i].Username = userUpdate.Username
 			}
@@ -60,7 +60,7 @@ func deleteUser(c *fiber.Ctx) error {
 	}
 
 	for i, u := range users {
-		if u.ID == userID {
+		if u.UserID == userID {
 			users = append(users[:i], users[i+1:]...)
 			return c.SendStatus(fiber.StatusNoContent)
 		}
@@ -75,7 +75,7 @@ func getUserByID(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
 	for _, u := range users {
-		if u.ID == userID {
+		if u.UserID == userID {
 			return c.JSON(u)
 		}
 	}
@@ -219,7 +219,7 @@ func login(c *fiber.Ctx) error {
 		if u.Username == req.Username && u.Password == req.Password {
 			return c.JSON(fiber.Map{
 				"message":  "Login success",
-				"id":       u.ID,
+				"id":       u.UserID,
 				"username": u.Username,
 				"role":     u.Role,
 			})
