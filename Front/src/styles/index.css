@@ -27,7 +27,7 @@
     }
 
     .card-noti{
-        @apply w-fit h-fit text-start pl-3 rounded-[15px] border-l-[10px] cursor-pointer
+        @apply w-full h-fit text-start pl-3 rounded-[15px] border-l-[10px] cursor-pointer
     }
 
     .color-alert{
