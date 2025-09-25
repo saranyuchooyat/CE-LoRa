@@ -22,8 +22,17 @@ function LoginPage() {
       localStorage.setItem("user", JSON.stringify(res.data));
 
       setError("");
-      // เมื่อ login สำเร็จ ให้ navigate ไปที่ /menu พร้อมส่งค่า role ไปด้วย
-      navigate('/menu', { state: { role: res.data.role } }); 
+
+    
+      if (res.data.role == "System Admin"){
+        navigate('/system-overview-dashboard', {state: { user:res.data.username ,role: res.data.role } }); 
+      }
+      else if (res.data.role == "Zone Admin"){
+        navigate('/zone-dashboard', {state: { user:res.data.username ,role: res.data.role } }); 
+      }
+      else if (res.data.role == "Zone Staff"){
+        navigate('/eldery-monitoring', {state: { user:res.data.username ,role: res.data.role } }); 
+      }
 
     } catch (err) {
       console.error("Login error:", err);

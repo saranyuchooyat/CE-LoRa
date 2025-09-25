@@ -6,9 +6,8 @@ function Menu() {
     const [activeButton, setActiveButton] = useState("System Overview Dashboard");
     const location = useLocation();
 
-    console.log(location)
     useEffect(() => {
-        console.log(location.state)
+        console.log("menu",location.state)
         if (location.state?.role) {
             setCurrentRole(location.state.role);
         }
