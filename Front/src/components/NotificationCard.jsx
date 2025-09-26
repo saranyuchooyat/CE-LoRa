@@ -1,6 +1,4 @@
-function CardNotification({ notidata }){
-
-    console.log("notidata",notidata[0])
+function CardNotification({ data }){
     return(
         <>
             <div className="flex flex-col gap-3">
@@ -34,7 +32,7 @@ function CardNotification({ notidata }){
                     <p className="text-gray-500">time</p>
                 </button> */}
 
-                {notidata.map((card, index) => {
+                {data.map((card, index) => {
                     return(
                     <button key={index} className="card-noti color-alert">
                         <p className="font-bold">{card.title}</p>
