@@ -27,7 +27,7 @@
     }
 
     .card-noti{
-        @apply w-fit h-fit text-start pl-3 rounded-[15px] border-l-[10px] cursor-pointer
+        @apply w-full h-fit text-start pl-3 rounded-[15px] border-l-[10px] cursor-pointer
     }
 
     .color-alert{
@@ -43,7 +43,7 @@
     }
 
     .menu-btn{
-        @apply bg-main-green/50 px-[20px] rounded-md mr-3 text-[16px] font-bold text-white/50 hover:bg-main-green hover:text-white
+        @apply bg-main-green/50 px-[20px] rounded-md mr-3 text-[16px] font-bold text-white/50 hover:bg-main-green hover:text-white cursor-pointer
     }
 
     .add-btn{
@@ -58,6 +58,21 @@
         @apply absolute top-full mt-1 bg-white w-[300px] top-[45px] border-[1px] shadow-md text-start
     }
 
+    .table-header{
+        @apply p-2 text-sm font-semibold tracking-wide text-left w-fit
+    }
+
+    .table-data{
+        @apply p-3 text-sm text-gray-700 text-left
+    }
+
+    .table-status{
+        @apply p-1.5 text-xs uppercase tracking-wider rounded-lg
+    }
+
+    .table-btn{
+        @apply cursor-pointer p-1 m-2 ml-0 text-gray-700 tracking-wider bg-gray-300 rounded-lg whitespace-nowrap
+    }
 }
 
 body{

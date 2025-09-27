@@ -6,13 +6,42 @@ function Menu() {
     const [activeButton, setActiveButton] = useState("System Overview Dashboard");
     const location = useLocation();
 
-    console.log(location)
+    // useEffect(() => {
+    //     console.log("menu",location.state)
+    //     if (location.state?.role) {
+    //         setCurrentRole(location.state.role);
+    //     }
+    // }, [location.state]);
+
     useEffect(() => {
-        console.log(location.state)
+        let userRole = null;
+        
+        // ก. พยายามดึง Role จาก Route State (ใช้ได้เฉพาะตอนเปลี่ยนหน้าจาก Login)
         if (location.state?.role) {
-            setCurrentRole(location.state.role);
+            userRole = location.state.role;
+        } 
+        
+        // ข. หากไม่มีใน Route State ให้พยายามดึงจาก Local Storage (กรณี Refresh)
+        else {
+            const storedUser = localStorage.getItem("user");
+            if (storedUser) {
+                try {
+                    const userData = JSON.parse(storedUser);
+                    userRole = userData.role;
+                } catch (e) {
+                    // จัดการหากข้อมูล Local Storage เสียหาย
+                    console.error("Failed to parse user data from localStorage:", e);
+                }
+            }
         }
+
+        // ค. ถ้าพบ Role ให้ตั้งค่า State
+        if (userRole) {
+            setCurrentRole(userRole);
+        }
+
     }, [location.state]);
+
 
     const roleRoutes = {
         "System Admin": {
