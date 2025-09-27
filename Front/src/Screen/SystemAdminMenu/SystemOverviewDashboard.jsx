@@ -59,8 +59,8 @@ function SystemOverviewDashboard(){
     // console.log("elderlyData: ",elderlyData)
     // console.log("deviceData: ",deviceData)
     // console.log("zoneData: ",zoneData)
-    console.log("serverData: ",serverData)
-    console.log("alertData: ",alertData)
+    // console.log("serverData: ",serverData)
+    // console.log("alertData: ",alertData)
 
     const SystemData = 
     [
@@ -69,27 +69,6 @@ function SystemOverviewDashboard(){
         {value: elderlyData.length ,name:"จำนวนผู้สูงอายุที่ลงทะเบียน"},
         {value: deviceData.length,name:"จำนวนอุปกรณ์ที่ลงทะเบียน"},
     ]
-
-    const serverUsageData = serverData.map(server => {
-        return {
-            name: server.name, 
-            cpu: `${server.cpuUsage}%`,
-            mem: `${server.memoryUsed} / ${server.memoryTotal}`, 
-            disk: `${server.diskUsed} / ${server.diskTotal}` 
-        };
-    });
-
-    const alertNoti = alertData.map(alert => {
-        return {
-            id: alert.id,
-            title: alert.title, 
-            des: alert.description,
-            time: alert.createdAt, 
-        };
-    });
-
-    console.log("serverusage", serverUsageData)
-    console.log("alertusage", alertNoti)
 
     if (loading) {
         return <div className="mx-5 mt-10 text-center text-xl">Loading Dashboard...</div>;
@@ -100,8 +79,8 @@ function SystemOverviewDashboard(){
             <div className="mx-5">
                 <Cardno2 data={SystemData}/>
                 <Cardno3/>
-                <Cardno7 data={serverUsageData}/>
-                <Cardno5 data={alertNoti}/>
+                <Cardno7 data={serverData}/>
+                <Cardno5 data={alertData}/>
             </div>
         </>
     );
