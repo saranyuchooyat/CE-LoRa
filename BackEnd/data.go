@@ -1,17 +1,19 @@
 package main
 
 type User struct {
-	UserID    int    `json:"userId"`
-	Name      string `json:"name"`
-	Email     string `json:"email"`
-	Phone     string `json:"phone"`
-	Role      string `json:"role"`
-	Zone      string `json:"zone"`
+	UserID    string `json:"user_id" bson:"user_id"`
+	ZoneID    string `json:"zone_id" bson:"zone_id"`
+	Role      string `json:"role" bson:"role"`
+	Username  string `json:"username" bson:"username"`
+	Password  string `json:"password" bson:"password"`
+	FirstName string `json:"first_name" bson:"first_name"`
+	LastName  string `json:"last_name" bson:"last_name"`
+	Age       int    `json:"age" bson:"age"`
+	Phone     string `json:"phone" bson:"phone"`
+	Email     string `json:"email" bson:"email"`
 	Status    string `json:"status"`
 	LastLogin string `json:"lastLogin"`
 	CreatedAt string `json:"createdAt"`
-	Username  string `json:"username,omitempty"`
-	Password  string `json:"password,omitempty"`
 }
 
 type Zone struct {
@@ -77,11 +79,11 @@ type UsageTrend struct {
 
 // ---------------- Mock Data ----------------
 
-var users = []User{
-	{UserID: 1, Username: "yu", Password: "1234", Name: "Sarunyu Chooyat", Phone: "0123456789", Role: "System Admin", Email: "66015172@kmitl.ac.th"},
-	{UserID: 2, Username: "ink", Password: "5678", Name: "Pruettinan Limlertvaree", Phone: "0996291914", Role: "Zone Admin", Email: "66015134@kmitl.ac.th"},
-	{UserID: 3, Username: "eak", Password: "9999", Name: "Detsukmongkol Bunta", Phone: "0987654321", Role: "Zone Staff", Email: "66015072@kmitl.ac.th"},
-}
+// var users = []User{
+// 	{UserID: 1, Username: "yu", Password: "1234", Name: "Sarunyu Chooyat", Phone: "0123456789", Role: "System Admin", Email: "66015172@kmitl.ac.th"},
+// 	{UserID: 2, Username: "ink", Password: "5678", Name: "Pruettinan Limlertvaree", Phone: "0996291914", Role: "Zone Admin", Email: "66015134@kmitl.ac.th"},
+// 	{UserID: 3, Username: "eak", Password: "9999", Name: "Detsukmongkol Bunta", Phone: "0987654321", Role: "Zone Staff", Email: "66015072@kmitl.ac.th"},
+// }
 
 var zones = []Zone{
 	{ZoneID: 1, ZoneName: "Lat Krabang", Address: "Chalong Krung Road, Lat Krabang", Description: "พื้นที่โซนด้านตะวันออกของกรุงเทพมหานคร ใกล้มหาวิทยาลัยและสนามบินสุวรรณภูมิ", Status: "Active", ActiveUser: 500},
