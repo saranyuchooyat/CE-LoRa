@@ -68,6 +68,7 @@ type Alert struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	CreatedAt   string `json:"createdAt"`
+	Type        string `json:"type"`
 }
 
 type UsageTrend struct {
@@ -220,18 +221,21 @@ var alerts = []Alert{
 		Title:       "Analytics Server High Memory Usage",
 		Description: "Memory usage reached 94% - immediate attention required",
 		CreatedAt:   "2025-08-19T10:25:00Z",
+		Type:        "critical",
 	},
 	{
 		ID:          2,
 		Title:       "3 อุปกรณ์ใน Zone ลาดกระบัง ไม่ส่งสัญญาณ",
 		Description: "Device offline เกิน 30 นาที - ตรวจสอบการเชื่อมต่อ",
 		CreatedAt:   "2025-08-19T10:10:00Z",
+		Type:        "warning",
 	},
 	{
 		ID:          3,
 		Title:       "Database Backup Completed",
 		Description: "Nightly backup finished successfully",
 		CreatedAt:   "2025-08-19T00:30:00Z",
+		Type:        "info",
 	},
 }
 
