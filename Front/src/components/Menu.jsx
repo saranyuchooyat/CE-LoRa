@@ -36,7 +36,6 @@ function Menu() {
 
     }, [location.state]);
 
-
     const roleRoutes = {
         "System Admin": {
             "System Overview Dashboard": "/system-overview-dashboard",
@@ -60,9 +59,30 @@ function Menu() {
         "Elderly Caregiver": {}
     };
 
-    const handleButtonClick = (buttonTitle) => {
-        setActiveButton(buttonTitle);
-    };
+    useEffect(() => {
+        // ตรวจสอบเมื่อ Role และ Path มีการเปลี่ยนแปลง
+        if (currentRole && roleRoutes[currentRole]) {
+            const currentPath = location.pathname;
+            const buttons = roleRoutes[currentRole];
+            
+            // วนลูปในเมนูสำหรับ Role ปัจจุบัน
+            for (const buttonTitle in buttons) {
+                // ถ้า Path ของปุ่มตรงกับ Path ปัจจุบัน
+                if (buttons[buttonTitle] === currentPath) {
+                    setActiveButton(buttonTitle);
+                    return; // พบแล้ว ออกจากฟังก์ชัน
+                }
+            }
+            
+            // กรณีไม่พบปุ่มที่ตรงกับ Path (เช่น อยู่ที่หน้า Home หรือ 404)
+            // คุณสามารถตั้งค่า activeButton(null) หรือตั้งค่าปุ่มเริ่มต้นที่นี่
+            setActiveButton(null); 
+        }
+    }, [location.pathname, currentRole, roleRoutes]); 
+
+    // const handleButtonClick = (buttonTitle) => {
+    //     setActiveButton(buttonTitle);
+    // };
 
     const renderMenuButtons = (role) => {
         if (!role || !roleRoutes[role]) {
@@ -74,13 +94,14 @@ function Menu() {
             <Link
                 key={buttonTitle}
                 to={buttons[buttonTitle]}
-                onClick={() => handleButtonClick(buttonTitle)}
                 className={`menu-btn ${activeButton === buttonTitle ? 'bg-main-green text-white' : ''}`}
             >
                 {buttonTitle}
             </Link>
         ));
     };
+
+    
 
     return (
         <>
