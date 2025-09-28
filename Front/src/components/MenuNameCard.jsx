@@ -1,4 +1,4 @@
-function MenuNameCard({title, description, buttonText}){
+function MenuNameCard({title, description, buttonText, onButtonClick}){
     return(
         <>
             <div className="card flex justify-between items-center">
@@ -6,7 +6,7 @@ function MenuNameCard({title, description, buttonText}){
                     <p className="text-[22px] font-bold text-start">{title}</p>
                     <p>{description}</p>
                 </div>
-                <button className="add-btn">{buttonText}</button>
+                <button className="add-btn" onClick={onButtonClick}>{buttonText}</button>
             </div>
         </>
     )

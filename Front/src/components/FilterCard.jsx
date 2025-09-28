@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import {useState} from "react";
 import StatusDropdown from "./StatusDropdown";
 import ProvinceDropdown from "./ProvinceDropdown";
 
