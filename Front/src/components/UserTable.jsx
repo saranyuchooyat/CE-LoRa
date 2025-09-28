@@ -11,6 +11,13 @@ function UserTable({ data }){
         return zoneData; 
     };
 
+    const getStatus = (status) => {
+        if (!status) {
+            return "N/A"; 
+        }
+        return status; 
+    };
+
     if (!Array.isArray(data) || data.length === 0) {
         return (
             <div className="p-4 text-center text-gray-500">
@@ -29,6 +36,8 @@ function UserTable({ data }){
                             <th className="table-header">User Name</th>
                             <th className="table-header">Role</th>
                             <th className="table-header">Zone</th>
+                            <th className="table-header">Tel</th>
+                            <th className="table-header">Status</th>
                             <th className="table-header">Menu</th>
                         </tr>
                     </thead>
@@ -38,10 +47,12 @@ function UserTable({ data }){
                             const rowBgClass = isOddRow ? 'bg-gray-100' : 'bg-gray-200';                             
                             return(
                                 <tr key={index} className={rowBgClass}>
-                                    <td className="table-data whitespace-nowrap">{card.username}</td>
+                                    <td className="table-data whitespace-nowrap">{card.name}</td>
                                     <td className="table-data whitespace-nowrap">{card.role}</td>
                                     {/* **สำคัญ:** ใช้ card.ZoneName หรือ card.Zone ถ้ามี Key นี้ในข้อมูล */}
                                     <td className="table-data whitespace-wrap w-[200px]">{getZoneName(card.Zone)}</td>
+                                    <td className="table-data whitespace-nowrap">{card.phone}</td>
+                                    <td className="table-data whitespace-nowrap">{getStatus(card.status)}</td>
                                     
                                     {/* Un-commented และแก้ไขส่วนของปุ่ม Menu */}
                                     <td className="p-3 text-sm text-left whitespace-nowrap w-fit">
