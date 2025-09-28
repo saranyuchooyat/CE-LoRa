@@ -8,7 +8,9 @@ function AddUserForm({ onClose, onSaveSuccess }){
         lastName: '',
         email: '',
         phone: '',
-        role: 'เลือกบทบาท', // ค่าเริ่มต้นสำหรับแสดงใน Dropdown
+        role: 'เลือกบทบาท',
+        username: '',
+        password:''
     });
 
     const [openRole, setOpenRole] = useState(false);
@@ -112,18 +114,51 @@ function AddUserForm({ onClose, onSaveSuccess }){
                     />
                 </div>
 
+                {/* username */}
+                <div className="mb-4">
+                    <label className="block text-gray-700">ตั้งชื่อ Username</label>
+                    <input 
+                        type="text" 
+                        name="username" 
+                        value={formData.username} 
+                        onChange={handleChange} 
+                        className="border rounded w-full p-2 bg-white" 
+                    />
+                </div>
+
+                {/* password */}
+                <div className="mb-4">
+                    <label className="block text-gray-700">ตั้งรหัสผ่านเข้าใช้งาน</label>
+                    <input 
+                        type="text" 
+                        name="password" 
+                        value={formData.password} 
+                        onChange={handleChange} 
+                        className="border rounded w-full p-2 bg-white" 
+                    />
+                </div>
+
                 {/* เลือกบทบาท */}
                 <div className="relative mr-3">
                     <p className="block text-gray-700">เลือกบทบาท</p>
                     <button 
-                        className="border rounded w-full p-2 bg-white text-start" 
+                        className="border rounded w-35 p-2 bg-white text-start flex justify-between items-center" 
                         onClick={() => setOpenRole((prev) => !prev)} 
-                        type="button"
-                    >
-                        {formData.role} {/* 💡 แสดงค่าจาก formData */}
+                        type="button">
+                        <span className="truncate">{formData.role}</span>
+                        <svg 
+                            className={`w-4 h-4 text-gray-700 transform transition-transform duration-200 ${openRole? 'rotate-180' : ''}`} 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            viewBox="0 0 20 20" 
+                            fill="currentColor">
+                                <path 
+                                    fillRule="evenodd" 
+                                    d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z" 
+                                    clipRule="evenodd"/>
+                            </svg>
                     </button>
                     {openRole &&
-                        <div className="dropdown-menu border rounded ">
+                        <div className="dropdown-menu border rounded w-35">
                             <div className="cursor-pointer hover:bg-gray-300 p-2" onClick={() => selectRole("System Admin")}>System Admin</div>
                             <div className="cursor-pointer hover:bg-gray-300 p-2" onClick={() => selectRole("Zone Admin")}>Zone Admin</div>
                             <div className="cursor-pointer hover:bg-gray-300 p-2" onClick={() => selectRole("Zone Staff")}>Zone staff</div>

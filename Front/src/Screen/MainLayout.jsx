@@ -6,6 +6,9 @@ import SystemOverviewDashboard from './SystemAdminMenu/SystemOverviewDashboard';
 import ZoneManagement from './SystemAdminMenu/ZoneManagement';
 import UserManagement from './SystemAdminMenu/UserManagement';
 import HealthMonitoring from './HealthMonitoring';
+import ZoneDashboard from './ZoneAdminMenu/ZoneDashboard';
+import DeviceManagement from './ZoneAdminMenu/DeviceManagement';
+import ZoneStaffManagement from './ZoneAdminMenu/ZoneStaffManagement';
 import NotFoundPage from './NotFound';
 
 function MainLayout() {
@@ -21,6 +24,11 @@ function MainLayout() {
           <Route path="/system-overview-dashboard" element={<SystemOverviewDashboard/>} />
           <Route path="/zone-management" element={<ZoneManagement/>} />
           <Route path="/user-management" element={<UserManagement/>} />
+
+          {/*Zone Staff Menu*/}
+          <Route path="/zone-dashboard" element={<ZoneDashboard/>}/>
+          <Route path="/device-management" element={<DeviceManagement/>}/>
+          <Route path="/zone-staff-management" element={<ZoneStaffManagement/>}/>
           
           {/* ... ส่วนที่เหลือ ... */}
 

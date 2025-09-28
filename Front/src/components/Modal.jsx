@@ -15,8 +15,7 @@ function Modal({ title, isOpen, onClose, children }) {
                     <h2 className="text-xl font-bold text-gray-800">{title}</h2>
                     <button 
                         className="text-gray-400 hover:text-gray-600 text-2xl font-semibold"
-                        onClick={onClose}
-                    >
+                        onClick={onClose}>
                         &times; {/* สัญลักษณ์ 'x' */}
                     </button>
                 </div>

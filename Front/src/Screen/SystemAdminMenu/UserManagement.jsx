@@ -26,31 +26,6 @@ function UserManagement(){
 
     const [loading, setLoading] = useState(true);
 
-
-    // ดึงข้อมูลจากหลังบ้าน
-    // useEffect(() => {
-    //     const fetchUserData = async () => {
-    //         try {
-    //             const userPromise = await axios.get("http://localhost:8080/users");
-
-    //             const [userRes] = await Promise.all([
-    //                 userPromise, 
-
-                    
-    //             ]);
-    //             setUserData(userRes.data)
-
-    //         } catch (error) {
-    //             console.error("Error fetching user data:", error);
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     };
-
-    //     fetchUserData();
-    // }, []);
-
-
     const fetchUserData = async () => {
         try {
             const userPromise = await axios.get("http://localhost:8080/users");
@@ -68,15 +43,9 @@ function UserManagement(){
     };
 
     useEffect(() => {
-        // 💡 เรียกใช้ฟังก์ชันที่ประกาศไว้ด้านบน
         fetchUserData();
-        
-        // 🛑 NOTE: หากคุณต้องการให้ Loading แสดงเฉพาะครั้งแรก
-        //    คุณอาจจะต้องจัดการ set Loading ให้ถูกต้องกว่านี้
     }, []); 
     // ดึงข้อมูลจากหลังบ้าน
-
-
 
 
     // ระบบ filter
@@ -99,10 +68,15 @@ function UserManagement(){
         if (search) {
             const lowerSearch = search.toLowerCase();
             data = data.filter(user => (
-                user.username.toLowerCase().includes(lowerSearch) ||
-                (user.email && user.email.toLowerCase().includes(lowerSearch)) ||
-                (user.phone && user.phone.includes(lowerSearch))
-            ));
+                // 💡 FIX 1: ตรวจสอบ user.username ก่อนเรียก .toLowerCase()
+            (user.name && user.name.toLowerCase().includes(lowerSearch)) ||
+                // ส่วนนี้ดีอยู่แล้ว: ตรวจสอบ email
+            (user.email && user.email.toLowerCase().includes(lowerSearch)) ||
+
+                // ส่วนนี้ควรตรวจสอบ phone ด้วย หาก phone เป็น string
+                // (user.phone && user.phone.includes(lowerSearch))
+                // หาก user.phone เป็นตัวเลขและคุณแน่ใจว่ามันจะไม่ใช่ undefined/null ก็ใช้ได้
+            (user.phone && String(user.phone).includes(lowerSearch))));
         }
 
         // กรองตามบทบาท (Role)

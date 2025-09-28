@@ -13,7 +13,7 @@ const initialFilters = {
     status: 'ทั้งหมด' // สำหรับ Status (option1Name)
 };
 
-function ZoneManagement(){
+function ZoneDashboard(){
 
     const [zoneData, setZoneData] = useState([]);
 
@@ -134,4 +134,4 @@ function ZoneManagement(){
     );
 }
 
-export default ZoneManagement;
+export default ZoneDashboard;
