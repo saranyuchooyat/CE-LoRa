@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"math/rand"
+	"net/smtp"
 	"sort"
 	"strconv"
 
@@ -229,4 +232,79 @@ func login(c *fiber.Ctx) error {
 		"message": "Login Failed",
 		"error":   "invalid username or password",
 	})
+}
+
+func resetPassword(c *fiber.Ctx) error {
+	userId, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+	var Resetuser *User
+
+	for i, u := range users {
+		fmt.Println(userId, u.UserID)
+		if u.UserID == userId {
+			Resetuser = &users[i]
+			break
+		}
+	}
+	fmt.Println(Resetuser)
+	if Resetuser == nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "ไม่พบผู้ใช้งาน",
+		})
+	}
+
+	newPass := generateRandomPassword(10)
+	Resetuser.Password = newPass
+
+	to := Resetuser.Email
+	subject := "รีเซ็ทรหัสผ่านใหม่"
+	body := "สวัสดีครับ นี่คือรหัสผ่านใหม่ของคุณ: " + newPass
+
+	mailErr := sendEmail(to, subject, body)
+	if mailErr != nil {
+		fmt.Println("ส่งเมลล้มเหลว:", err)
+	} else {
+		fmt.Println("ส่งเมลสำเร็จ!")
+	}
+
+	fmt.Printf("ส่งรหัสใหม่ไปที่ %s: %s\n", Resetuser.Email, newPass)
+
+	return c.JSON(fiber.Map{
+		"message": "รหัสผ่านได้ถูกรีเซ็ทและส่งไปทางเมลแล้ว",
+		"userId":  Resetuser.UserID,
+		"email":   Resetuser.Email,
+	})
+}
+
+func generateRandomPassword(length int) string {
+	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+	b := make([]rune, length)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
+}
+
+func sendEmail(to, subject, body string) error {
+
+	from := "legazink@gmail.com"
+	password := "kwrp owck otsh ozab" //App password
+
+	smtpHost := "smtp.gmail.com"
+	smtpPort := "587"
+
+	msg := "From: " + from + "\n" +
+		"To: " + to + "\n" +
+		"Subject: " + subject + "\n\n" +
+		body
+
+	auth := smtp.PlainAuth("", from, password, smtpHost)
+
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, []byte(msg))
+	if err != nil {
+		return err
+	}
+	return nil
 }

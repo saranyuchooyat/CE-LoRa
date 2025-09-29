@@ -18,6 +18,7 @@ func main() {
 	app.Post("/users", createUser)
 	app.Put("/users/:id", updateUser)
 	app.Delete("/users/:id", deleteUser)
+	app.Post("/users/:id/reset-password", resetPassword)
 
 	app.Get("/zones", getAllZone)
 	app.Post("/zones", createZone)
