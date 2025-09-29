@@ -1,9 +1,12 @@
 package main
 
 import (
+	"os"
+
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	jwtware "github.com/gofiber/jwt/v2"
 )
 
 func main() {
@@ -13,6 +16,14 @@ func main() {
 		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
 		AllowHeaders: "Origin, Content-Type, Accept",
 	}))
+
+	app.Post("/auth/login", login)
+
+	app.Use(checkMiddleWare)
+
+	app.Use(jwtware.New(jwtware.Config{
+		SigningKey: []byte(os.Getenv("JWT_SECRET")),
+	}))
 	app.Get("/users", getAllUser)
 	app.Get("/users/:id", getUserByID)
 	app.Post("/users", createUser)
@@ -21,11 +32,10 @@ func main() {
 	app.Post("/users/:id/reset-password", resetPassword)
 
 	app.Get("/zones", getAllZone)
+	app.Get("/zones/my-zones", getMyZone)
 	app.Post("/zones", createZone)
 	app.Put("/zones/:id", updateZone)
 	app.Delete("/zones/:id", deleteZone)
-
-	app.Post("/auth/login", login)
 
 	app.Get("/elders", getAllElderly)
 

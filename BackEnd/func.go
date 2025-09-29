@@ -4,12 +4,22 @@ import (
 	"fmt"
 	"math/rand"
 	"net/smtp"
+	"os"
 	"sort"
 	"strconv"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v4"
 )
 
+func checkMiddleWare(c *fiber.Ctx) error {
+	start := time.Now()
+
+	fmt.Printf("URL = %s,Method =%s, Time =%s\n", c.OriginalURL(), c.Method(), start)
+
+	return c.Next()
+}
 func getAllUser(c *fiber.Ctx) error {
 	return c.JSON(users)
 }
@@ -89,6 +99,10 @@ func getAllElderly(c *fiber.Ctx) error {
 }
 
 func getAllZone(c *fiber.Ctx) error {
+	return c.JSON(zones)
+}
+
+func getMyZone(c *fiber.Ctx) error {
 	return c.JSON(zones)
 }
 
@@ -204,35 +218,6 @@ func getUserTrend(c *fiber.Ctx) error {
 		"trend": usageTrends,
 	})
 }
-func login(c *fiber.Ctx) error {
-	type LoginRequest struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-	}
-
-	req := new(LoginRequest)
-
-	if err := c.BodyParser(req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "ไม่เจอข้อมูล JSON",
-		})
-	}
-
-	for _, u := range users {
-		if u.Username == req.Username && u.Password == req.Password {
-			return c.JSON(fiber.Map{
-				"message":  "Login success",
-				"id":       u.UserID,
-				"username": u.Username,
-				"role":     u.Role,
-			})
-		}
-	}
-	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-		"message": "Login Failed",
-		"error":   "invalid username or password",
-	})
-}
 
 func resetPassword(c *fiber.Ctx) error {
 	userId, err := strconv.Atoi(c.Params("id"))
@@ -305,4 +290,49 @@ func sendEmail(to, subject, body string) error {
 		return err
 	}
 	return nil
+}
+
+func login(c *fiber.Ctx) error {
+	type LoginRequest struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	req := new(LoginRequest)
+
+	if err := c.BodyParser(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "ไม่เจอข้อมูล JSON",
+		})
+	}
+
+	for _, u := range users {
+		if u.Username == req.Username && u.Password == req.Password {
+			// Create token
+			token := jwt.New(jwt.SigningMethodHS256)
+
+			// Set claims
+			claims := token.Claims.(jwt.MapClaims)
+			claims["name"] = req.Username
+			claims["role"] = "admin" //u.Role
+			claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+
+			// Generate encoded token
+			t, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+			if err != nil {
+				return c.SendStatus(fiber.StatusInternalServerError)
+			}
+			return c.JSON(fiber.Map{
+				"message":  "Login success",
+				"id":       u.UserID,
+				"username": u.Username,
+				"role":     u.Role,
+				"token":    t,
+			})
+		}
+	}
+	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+		"message": "Login Failed",
+		"error":   "invalid username or password",
+	})
 }
