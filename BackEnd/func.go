@@ -242,13 +242,11 @@ func resetPassword(c *fiber.Ctx) error {
 	var Resetuser *User
 
 	for i, u := range users {
-		fmt.Println(userId, u.UserID)
 		if u.UserID == userId {
 			Resetuser = &users[i]
 			break
 		}
 	}
-	fmt.Println(Resetuser)
 	if Resetuser == nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"error": "ไม่พบผู้ใช้งาน",
