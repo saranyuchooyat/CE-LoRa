@@ -108,7 +108,7 @@ function UserManagement(){
         };
     })
 
-    const totalStaffObjects= {name:"จำนวนทั้งหหมด", value:userData.length}
+    const totalStaffObjects= {name:"จำนวนทั้งหมด", value:userData.length}
 
     const staffData=[
         totalStaffObjects,

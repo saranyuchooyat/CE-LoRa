@@ -117,9 +117,9 @@ function DeviceManagement(){
                 <MenuNameCard
                 title="จัดการอุปกรณ์ Smart Healthcare ภายในพื้นที่"
                 description=""
-                onButtonClick={false}
-                detail="2/2"
-                buttonText="จำนวนพื้นที่ที่ผู้ใช้งานดูแล"/>
+                onButtonClick={true}
+                detail={false}
+                buttonText="เพิ่มอุปกรณ์ใหม่"/>
                 
                 <Cardno2 data={deviceStatusData}/>
 
@@ -137,7 +137,7 @@ function DeviceManagement(){
                 option2Key="province"
                 />
 
-                <CardLayouts/>
+                <CardLayouts data="device"/>
 
             </div>
 
