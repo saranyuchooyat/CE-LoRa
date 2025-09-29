@@ -2,6 +2,14 @@ function ZoneTable({ data }){
 
     console.log("table",data);
 
+    const activeUserCheck = (data) =>{
+        if(data == 0){
+            return 'N/A'
+        }
+        else
+            return data
+    }
+
     const statusCheck = (status) =>{
         console.log("status",status)
         switch (status) {
@@ -55,7 +63,7 @@ function ZoneTable({ data }){
                                     <td className="table-data whitespace-nowrap">
                                         <span className={`table-status ${statusClass}`}>{card.status}</span>
                                     </td>
-                                    <td className="table-data whitespace-nowrap">{card.activeuser}</td> 
+                                    <td className="table-data whitespace-nowrap">{activeUserCheck(card.activeuser)}</td> 
                                     {/* ... Menu Buttons ... */}
                                     <td className="p-3 text-sm text-left hitespace-nowrap w-fit">
                                         <button className="table-btn hover:bg-main-yellow hover:text-white">Edit</button>
