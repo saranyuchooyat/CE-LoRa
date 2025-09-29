@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import Contents from "../../components/Contents";
 import Cardno2 from "../../components/Cardno2";
 import Cardno3 from "../../components/Cardno3";
 import Cardno5 from "../../components/Cardno5";

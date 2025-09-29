@@ -1,7 +1,6 @@
-import { Routes, Route } from 'react-router-dom'; // เพิ่ม Routes, Route กลับเข้ามา
+import { Routes, Route } from 'react-router-dom';
 import Header from "../components/Header";
 import Menu from "../components/Menu";
-import Contents from "../components/Contents";
 import SystemOverviewDashboard from './SystemAdminMenu/SystemOverviewDashboard';
 import ZoneManagement from './SystemAdminMenu/ZoneManagement';
 import UserManagement from './SystemAdminMenu/UserManagement';
@@ -10,6 +9,7 @@ import ZoneDashboard from './ZoneAdminMenu/ZoneDashboard';
 import DeviceManagement from './ZoneAdminMenu/DeviceManagement';
 import ZoneStaffManagement from './ZoneAdminMenu/ZoneStaffManagement';
 import NotFoundPage from './NotFound';
+import LoginPage from './Login';
 
 function MainLayout() {
   return (
@@ -18,7 +18,7 @@ function MainLayout() {
       <Menu />
       <div className="mt-4 flex-1 overflow-y-scroll">
         <Routes>
-          <Route path="/" element={<Contents/>} />
+          <Route path="/" element={<LoginPage/>} />
           
           {/*System Admin Menu*/}
           <Route path="/system-overview-dashboard" element={<SystemOverviewDashboard/>} />

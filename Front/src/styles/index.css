@@ -18,6 +18,10 @@
     --color-complete-bg: #B3E5FC;
 
     --color-main-card: #b7e4c7;
+
+    --color-device-card: #EFEFEF;
+
+    --color-test-color: #F2F0EF;
 }
 
 @layer components {

@@ -1,9 +1,8 @@
 import { useState, useEffect, useMemo } from "react"; 
-import MenuNameCard from "../../components/MenuNameCard";
+import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
 import FilterCard from "../../components/FilterCard";
 import Cardno5 from "../../components/Cardno5";
-import Modal from "../../components/Modal";
-import AddZoneForm from "../../components/AddZoneForm";
+import CardLayouts from "../../components/CardLayouts";
 import axios from "axios";
 
 
@@ -16,13 +15,7 @@ const initialFilters = {
 function ZoneDashboard(){
 
     const [zoneData, setZoneData] = useState([]);
-
     const [filters, setFilters] = useState(initialFilters);
-
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const handleOpenModal = () => setIsModalOpen(true);
-    const handleCloseModal = () => setIsModalOpen(false);
-
     const [loading, setLoading] = useState(true);
 
     //ดึงข้อมูลหลังบ้าน
@@ -102,10 +95,11 @@ function ZoneDashboard(){
         <>
             <div className="mx-5">
                 <MenuNameCard
-                title="จัดการ zone พื้นที่"
-                description="ระบบจัดการพื้นที่ใช้งาน Smart Healthcare System"
-                onButtonClick={handleOpenModal}
-                buttonText="เพิ่ม Zone"/>
+                title="ภาพรวม  Zone (พื้นที่)"
+                description="ระบบดูข้อมูลภาพรวมพื้นที่ใช้งาน Smart Healthcare System"
+                onButtonClick={false}
+                detail="2/2"
+                buttonText="จำนวนพื้นที่ที่ผู้ใช้งานดูแล"/>
 
                 <FilterCard
                 name="Zone"
@@ -119,17 +113,6 @@ function ZoneDashboard(){
                 />
                 <Cardno5 data={filteredZones}/>
             </div>
-
-             <Modal 
-                title="เพิ่ม Zone ใหม่" 
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}>
-
-                <AddZoneForm
-                onClose={handleCloseModal} 
-                onSaveSuccess={fetchZoneData}/>
-            </Modal>
-
         </>
     );
 }

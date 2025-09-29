@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo } from "react"; 
-import MenuNameCard from "../../components/MenuNameCard";
+import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
 import FilterCard from "../../components/FilterCard";
 import Cardno2 from "../../components/Cardno2";
 import Cardno5 from "../../components/Cardno5";
-import Modal from "../../components/Modal";
-import AddUserForm from "../../components/AddUserForm";
+import Modal from "../../components/ModalForm/Modal";
+import AddUserForm from "../../components/ModalForm/AddUserForm";
 import axios from "axios";
 
 const initialFilters = {
@@ -94,20 +94,28 @@ function UserManagement(){
     }, [userData, filters]);
     // ระบบ filter
 
-    // ระบบแสดงผล user บนตาราง
+    // ระบบกรองจำวน Role
         const roleCountsObject = userData.reduce((acc, user) => {
         const role = user.role;
         acc[role] = (acc[role] || 0) + 1;
         return acc;
     }, {});
 
-    const staffData = Object.entries(roleCountsObject).map(([roleName, count]) => {
+    const staffDataList = Object.entries(roleCountsObject).map(([roleName, count]) => {
         return {
             name: roleName,
             value: count
         };
     })
-    // ระบบแสดงผล user บนตาราง
+
+    const totalStaffObjects= {name:"จำนวนทั้งหหมด", value:userData.length}
+
+    const staffData=[
+        totalStaffObjects,
+        ...staffDataList
+    ]
+
+    // ระบบกรองจำวน Role
     
     if (loading) {
         return <div className="mx-5 mt-10 text-center text-xl">Loading Dashboard...</div>;
@@ -120,6 +128,7 @@ function UserManagement(){
                 title="จัดการผู้ใช้งาน"
                 description="ระบบจัดการบัญชีผู้ใช้และสิทธิ์การเข้าถึง"
                 onButtonClick={handleOpenModal} // ต้องเพิ่ม Prop นี้ใน MenuNameCard
+                detail={false}
                 buttonText="เพิ่มผู้ใช้งานใหม่"/>
 
                 <Cardno2 data={staffData}/>

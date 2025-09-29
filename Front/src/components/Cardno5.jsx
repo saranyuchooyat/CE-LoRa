@@ -1,6 +1,7 @@
 import CardNotification from "./NotificationCard";
-import ZoneTable from "./ZoneTable";
-import UserTable from "./UserTable";
+import ZoneTable from "./Table/ZoneTable";
+import ZoneAdminTable from "./Table/ZoneAdminTable";
+import UserTable from "./Table/UserTable";
 
 function Cardno5({ data }){
     console.log("data",data)

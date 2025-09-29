@@ -1,137 +1,134 @@
-import { useState, useEffect, useMemo } from "react"; 
-import MenuNameCard from "../../components/MenuNameCard";
+import { useState, useEffect, useMemo } from "react";
+import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
 import FilterCard from "../../components/FilterCard";
 import Cardno5 from "../../components/Cardno5";
-import Modal from "../../components/Modal";
-import AddZoneForm from "../../components/AddZoneForm";
+import Modal from "../../components/ModalForm/Modal";
+import AddZoneForm from "../../components/ModalForm/AddZoneForm";
 import axios from "axios";
 
-
 const initialFilters = {
-    search: '', // สำหรับช่องค้นหา ชื่อ, อีเมล, เบอร์โทร
-    province: 'ทั้งหมด', // สำหรับ Role (option2Name)
-    status: 'ทั้งหมด' // สำหรับ Status (option1Name)
+  search: "", // สำหรับช่องค้นหา ชื่อ, อีเมล, เบอร์โทร
+  province: "ทั้งหมด", // สำหรับ Role (option2Name)
+  status: "ทั้งหมด", // สำหรับ Status (option1Name)
 };
 
-function ZoneManagement(){
+function ZoneManagement() {
+  const [zoneData, setZoneData] = useState([]);
 
-    const [zoneData, setZoneData] = useState([]);
+  const [filters, setFilters] = useState(initialFilters);
 
-    const [filters, setFilters] = useState(initialFilters);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const handleOpenModal = () => setIsModalOpen(true);
-    const handleCloseModal = () => setIsModalOpen(false);
+  const [loading, setLoading] = useState(true);
 
-    const [loading, setLoading] = useState(true);
+  //ดึงข้อมูลหลังบ้าน
+  const fetchZoneData = async () => {
+    try {
+      const zonePromise = await axios.get("http://localhost:8080/zones");
 
-    //ดึงข้อมูลหลังบ้าน
-    const fetchZoneData = async () => {
-            try {
-                const zonePromise = await axios.get("http://localhost:8080/zones");
+      const [zoneRes] = await Promise.all([zonePromise]);
+      setZoneData(zoneRes.data);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-                const [zoneRes] = await Promise.all([
+  useEffect(() => {
+    fetchZoneData();
+  }, []);
+  //ดึงข้อมูลหลังบ้าน
 
-                    zonePromise,
-                ]);
-                setZoneData(zoneRes.data)
+  //ระบบ filter
+  const handleFilterChange = (key, value) => {
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
 
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+  const handleClearFilters = () => {
+    setFilters(initialFilters);
+  };
 
-    useEffect(() => {
-        fetchZoneData();
-    }, []);
-    //ดึงข้อมูลหลังบ้าน
+  const filteredZones = useMemo(() => {
+    const { search, province, status } = filters;
+    let data = zoneData;
 
+    // กรองตามช่องค้นหา (Search)
+    if (search) {
+      const lowerSearch = search.toLowerCase();
+      data = data.filter((zone) => {
+        // 1. การค้นหาด้วย ID (ต้องแปลงเป็น String ก่อน)
+        const zoneIdSearch = zone.zoneid
+          ? String(zone.zoneid).includes(lowerSearch)
+          : false;
 
-    //ระบบ filter
-    const handleFilterChange = (key, value) => {
-        setFilters(prev => ({
-            ...prev,
-            [key]: value
-        }));
-    };
+        // 2. การค้นหาด้วยชื่อและรหัส (ป้องกันค่าเป็น null/undefined ก่อนเรียก toLowerCase)
+        const nameSearch =
+          zone.zonename && zone.zonename.toLowerCase().includes(lowerSearch);
+        const addressSearch =
+          zone.address && zone.address.toLowerCase().includes(lowerSearch);
 
-    const handleClearFilters = () => {
-        setFilters(initialFilters);
-    };
-
-    const filteredZones = useMemo(() => {
-        const { search, province, status } = filters;
-        let data = zoneData;
-
-        // กรองตามช่องค้นหา (Search)
-        if (search) {
-            const lowerSearch = search.toLowerCase();
-            data = data.filter(zone => {
-                
-                // 1. การค้นหาด้วย ID (ต้องแปลงเป็น String ก่อน)
-                const zoneIdSearch = zone.zoneid ? String(zone.zoneid).includes(lowerSearch) : false;
-                
-                // 2. การค้นหาด้วยชื่อและรหัส (ป้องกันค่าเป็น null/undefined ก่อนเรียก toLowerCase)
-                const nameSearch = zone.zonename && zone.zonename.toLowerCase().includes(lowerSearch);
-                const addressSearch = zone.address && zone.address.toLowerCase().includes(lowerSearch);
-
-                // รวมผลลัพธ์การค้นหาทั้งหมด
-                return zoneIdSearch || nameSearch || addressSearch;
-            });
-        }
-
-        if (province && province !== 'ทั้งหมด') {
-            data = data.filter(zone => zone.Province === province);
-        }
-
-        if (status && status !== 'ทั้งหมด') {
-            data = data.filter(zone => zone.Status === status);
-        }  
-
-        return data;
-    }, [zoneData, filters]);
-    //ระบบ filter
-
-    if (loading) {
-        return <div className="mx-5 mt-10 text-center text-xl">Loading Dashboard...</div>;
+        // รวมผลลัพธ์การค้นหาทั้งหมด
+        return zoneIdSearch || nameSearch || addressSearch;
+      });
     }
 
-    return(
-        <>
-            <div className="mx-5">
-                <MenuNameCard
-                title="จัดการ zone พื้นที่"
-                description="ระบบจัดการพื้นที่ใช้งาน Smart Healthcare System"
-                onButtonClick={handleOpenModal}
-                buttonText="เพิ่ม Zone"/>
+    if (province && province !== "ทั้งหมด") {
+      data = data.filter((zone) => zone.Province === province);
+    }
 
-                <FilterCard
-                name="Zone"
-                placeholderName=" ชื่อ zone, รหัส zone, หรือที่อยู่"
-                option1Name="สถานะ"
-                option2Name="จังหวัด"
-                filters={filters}
-                onFilterChange={handleFilterChange}
-                onClear={handleClearFilters}
-                option2Key="province"
-                />
-                <Cardno5 data={filteredZones}/>
-            </div>
+    if (status && status !== "ทั้งหมด") {
+      data = data.filter((zone) => zone.Status === status);
+    }
 
-             <Modal 
-                title="เพิ่ม Zone ใหม่" 
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}>
+    return data;
+  }, [zoneData, filters]);
+  //ระบบ filter
 
-                <AddZoneForm
-                onClose={handleCloseModal} 
-                onSaveSuccess={fetchZoneData}/>
-            </Modal>
-
-        </>
+  if (loading) {
+    return (
+      <div className="mx-5 mt-10 text-center text-xl">Loading Dashboard...</div>
     );
+  }
+
+  return (
+    <>
+      <div className="mx-5">
+        <MenuNameCard
+          title="จัดการ zone พื้นที่"
+          description="ระบบจัดการพื้นที่ใช้งาน Smart Healthcare System"
+          onButtonClick={handleOpenModal}
+          detail={false}
+          buttonText="เพิ่ม Zone"
+        />
+
+        <FilterCard
+          name="Zone"
+          placeholderName=" ชื่อ zone, รหัส zone, หรือที่อยู่"
+          option1Name="สถานะ"
+          option2Name="จังหวัด"
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onClear={handleClearFilters}
+          option2Key="province"
+        />
+        <Cardno5 data={filteredZones} />
+      </div>
+
+      <Modal
+        title="เพิ่ม Zone ใหม่"
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      >
+        <AddZoneForm onClose={handleCloseModal} onSaveSuccess={fetchZoneData} />
+      </Modal>
+    </>
+  );
 }
 
 export default ZoneManagement;
