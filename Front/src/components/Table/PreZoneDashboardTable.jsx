@@ -1,14 +1,6 @@
-import { Link, useNavigate } from 'react-router-dom';
-
 function ZoneTable({ data }){
 
     console.log("table",data);
-
-    const navigate = useNavigate();
-
-    const handleRowClick = (zoneId) => {
-        navigate(`/zone-details/${zoneId}`); 
-    };
 
     const activeUserCheck = (data) =>{
         if(data == 0){
@@ -61,12 +53,8 @@ function ZoneTable({ data }){
                             const statusClass = statusCheck(card.status);
 
                             return(
-                                <tr 
-                                    key={index} 
-                                    className={`${rowBgClass} hover:bg-main-blue/10 cursor-pointer transition-colors duration-150`} 
-                                    // 💡 4. เพิ่ม onClick สำหรับแถว
-                                    onClick={() => handleRowClick(card.zoneid)}
-                                >
+                                <tr key={index} className={rowBgClass}>
+                                    {/* *** KEY FIXES: แก้ไข Key เป็นตัวพิมพ์ใหญ่ตามข้อมูล *** */}
                                     {console.log(card)}
                                     <td className="table-data whitespace-nowrap">{card.zoneid}</td>
                                     <td className="table-data whitespace-nowrap">{card.zonename}</td>

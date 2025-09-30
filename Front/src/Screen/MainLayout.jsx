@@ -6,6 +6,7 @@ import ZoneManagement from './SystemAdminMenu/ZoneManagement';
 import UserManagement from './SystemAdminMenu/UserManagement';
 import HealthMonitoring from './HealthMonitoring';
 import ZoneDashboard from './ZoneAdminMenu/ZoneDashboard';
+import ZoneDashboardDetail from './ZoneAdminMenu/ZoneDashboardDetail';
 import DeviceManagement from './ZoneAdminMenu/DeviceManagement';
 import ZoneStaffManagement from './ZoneAdminMenu/ZoneStaffManagement';
 import NotFoundPage from './NotFound';
@@ -27,6 +28,7 @@ function MainLayout() {
 
           {/*Zone Staff Menu*/}
           <Route path="/zone-dashboard" element={<ZoneDashboard/>}/>
+          <Route path="/zone-details/:zoneid" element={<ZoneDashboardDetail/>}/>
           <Route path="/device-management" element={<DeviceManagement/>}/>
           <Route path="/zone-staff-management" element={<ZoneStaffManagement/>}/>
           
