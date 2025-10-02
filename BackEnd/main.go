@@ -19,11 +19,11 @@ func main() {
 
 	app.Post("/auth/login", login)
 
-	app.Use(checkMiddleWare)
-
 	app.Use(jwtware.New(jwtware.Config{
 		SigningKey: []byte(os.Getenv("JWT_SECRET")),
 	}))
+
+	app.Use(checkMiddleWare)
 	app.Get("/users", getAllUser)
 	app.Get("/users/:id", getUserByID)
 	app.Post("/users", createUser)

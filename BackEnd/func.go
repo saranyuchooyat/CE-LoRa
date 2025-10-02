@@ -14,11 +14,14 @@ import (
 )
 
 func checkMiddleWare(c *fiber.Ctx) error {
-	start := time.Now()
+	user := c.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	fmt.Println(claims)
+	if claims["role"] == "Zone Admin" || claims["role"] == "System Admin" {
+		return c.Next()
+	}
+	return fiber.ErrUnauthorized
 
-	fmt.Printf("URL = %s,Method =%s, Time =%s\n", c.OriginalURL(), c.Method(), start)
-
-	return c.Next()
 }
 func getAllUser(c *fiber.Ctx) error {
 	return c.JSON(users)
@@ -99,10 +102,6 @@ func getAllElderly(c *fiber.Ctx) error {
 }
 
 func getAllZone(c *fiber.Ctx) error {
-	return c.JSON(zones)
-}
-
-func getMyZone(c *fiber.Ctx) error {
 	return c.JSON(zones)
 }
 
@@ -313,9 +312,10 @@ func login(c *fiber.Ctx) error {
 
 			// Set claims
 			claims := token.Claims.(jwt.MapClaims)
+			claims["userID"] = u.UserID
 			claims["name"] = req.Username
-			claims["role"] = "admin" //u.Role
-			claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+			claims["role"] = u.Role
+			claims["exp"] = time.Now().Add(time.Minute * 15).Unix()
 
 			// Generate encoded token
 			t, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
@@ -335,4 +335,35 @@ func login(c *fiber.Ctx) error {
 		"message": "Login Failed",
 		"error":   "invalid username or password",
 	})
+}
+
+func getMyZone(c *fiber.Ctx) error {
+	token := c.Locals("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+	userID := int(claims["userID"].(float64))
+
+	var currentUser *User
+	for i, u := range users {
+		if u.UserID == userID {
+			currentUser = &users[i]
+			break
+		}
+	}
+
+	if currentUser == nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "User not found",
+		})
+	}
+
+	myzone := []Zone{}
+	for _, zid := range currentUser.ZoneIDs {
+		for _, z := range zones {
+			if z.ZoneID == zid {
+				myzone = append(myzone, z)
+			}
+		}
+	}
+
+	return c.JSON(myzone)
 }

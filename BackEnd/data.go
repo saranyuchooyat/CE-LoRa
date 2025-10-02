@@ -6,7 +6,7 @@ type User struct {
 	Email     string `json:"email"`
 	Phone     string `json:"phone"`
 	Role      string `json:"role"`
-	Zone      string `json:"zone"`
+	ZoneIDs   []int  `json:"zoneids"`
 	Status    string `json:"status"`
 	LastLogin string `json:"lastLogin"`
 	CreatedAt string `json:"createdAt"`
@@ -79,9 +79,36 @@ type UsageTrend struct {
 // ---------------- Mock Data ----------------
 
 var users = []User{
-	{UserID: 1, Username: "yu", Password: "1234", Name: "Sarunyu Chooyat", Phone: "0123456789", Role: "System Admin", Email: "66015172@kmitl.ac.th"},
-	{UserID: 2, Username: "ink", Password: "5678", Name: "Pruettinan Limlertvaree", Phone: "0996291914", Role: "Zone Admin", Email: "66015134@kmitl.ac.th"},
-	{UserID: 3, Username: "eak", Password: "9999", Name: "Detsukmongkol Bunta", Phone: "0987654321", Role: "Zone Staff", Email: "66015072@kmitl.ac.th"},
+	{
+		UserID:   1,
+		Username: "yu",
+		Password: "1234",
+		Name:     "Sarunyu Chooyat",
+		Phone:    "0123456789",
+		Role:     "System Admin",
+		Email:    "66015172@kmitl.ac.th",
+		ZoneIDs:  []int{1, 2, 3, 4, 5, 6, 7},
+	},
+	{
+		UserID:   2,
+		Username: "ink",
+		Password: "5678",
+		Name:     "Pruettinan Limlertvaree",
+		Phone:    "0996291914",
+		Role:     "Zone Admin",
+		Email:    "66015134@kmitl.ac.th",
+		ZoneIDs:  []int{1, 3, 4},
+	},
+	{
+		UserID:   3,
+		Username: "eak",
+		Password: "9999",
+		Name:     "Detsukmongkol Bunta",
+		Phone:    "0987654321",
+		Role:     "Zone Staff",
+		Email:    "66015072@kmitl.ac.th",
+		ZoneIDs:  []int{2, 5},
+	},
 }
 
 var zones = []Zone{
