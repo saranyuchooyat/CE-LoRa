@@ -1,12 +1,28 @@
 package main
 
 import (
+	"fmt"
+	"math/rand"
+	"net/smtp"
+	"os"
 	"sort"
 	"strconv"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v4"
 )
 
+func checkMiddleWare(c *fiber.Ctx) error {
+	user := c.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	fmt.Println(claims)
+	if claims["role"] == "Zone Admin" || claims["role"] == "System Admin" {
+		return c.Next()
+	}
+	return fiber.ErrUnauthorized
+
+}
 func getAllUser(c *fiber.Ctx) error {
 	return c.JSON(users)
 }
@@ -201,6 +217,80 @@ func getUserTrend(c *fiber.Ctx) error {
 		"trend": usageTrends,
 	})
 }
+
+func resetPassword(c *fiber.Ctx) error {
+	userId, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+	var Resetuser *User
+
+	for i, u := range users {
+		if u.UserID == userId {
+			Resetuser = &users[i]
+			break
+		}
+	}
+	if Resetuser == nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "ไม่พบผู้ใช้งาน",
+		})
+	}
+
+	newPass := generateRandomPassword(10)
+	Resetuser.Password = newPass
+
+	to := Resetuser.Email
+	subject := "รีเซ็ทรหัสผ่านใหม่"
+	body := "สวัสดีครับ นี่คือรหัสผ่านใหม่ของคุณ: " + newPass
+
+	mailErr := sendEmail(to, subject, body)
+	if mailErr != nil {
+		fmt.Println("ส่งเมลล้มเหลว:", err)
+	} else {
+		fmt.Println("ส่งเมลสำเร็จ!")
+	}
+
+	fmt.Printf("ส่งรหัสใหม่ไปที่ %s: %s\n", Resetuser.Email, newPass)
+
+	return c.JSON(fiber.Map{
+		"message": "รหัสผ่านได้ถูกรีเซ็ทและส่งไปทางเมลแล้ว",
+		"userId":  Resetuser.UserID,
+		"email":   Resetuser.Email,
+	})
+}
+
+func generateRandomPassword(length int) string {
+	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+	b := make([]rune, length)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
+}
+
+func sendEmail(to, subject, body string) error {
+
+	from := "legazink@gmail.com"
+	password := "kwrp owck otsh ozab" //App password
+
+	smtpHost := "smtp.gmail.com"
+	smtpPort := "587"
+
+	msg := "From: " + from + "\n" +
+		"To: " + to + "\n" +
+		"Subject: " + subject + "\n\n" +
+		body
+
+	auth := smtp.PlainAuth("", from, password, smtpHost)
+
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, []byte(msg))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func login(c *fiber.Ctx) error {
 	type LoginRequest struct {
 		Username string `json:"username"`
@@ -217,11 +307,27 @@ func login(c *fiber.Ctx) error {
 
 	for _, u := range users {
 		if u.Username == req.Username && u.Password == req.Password {
+			// Create token
+			token := jwt.New(jwt.SigningMethodHS256)
+
+			// Set claims
+			claims := token.Claims.(jwt.MapClaims)
+			claims["userID"] = u.UserID
+			claims["name"] = req.Username
+			claims["role"] = u.Role
+			claims["exp"] = time.Now().Add(time.Minute * 15).Unix()
+
+			// Generate encoded token
+			t, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+			if err != nil {
+				return c.SendStatus(fiber.StatusInternalServerError)
+			}
 			return c.JSON(fiber.Map{
 				"message":  "Login success",
 				"id":       u.UserID,
 				"username": u.Username,
 				"role":     u.Role,
+				"token":    t,
 			})
 		}
 	}
@@ -229,4 +335,35 @@ func login(c *fiber.Ctx) error {
 		"message": "Login Failed",
 		"error":   "invalid username or password",
 	})
+}
+
+func getMyZone(c *fiber.Ctx) error {
+	token := c.Locals("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+	userID := int(claims["userID"].(float64))
+
+	var currentUser *User
+	for i, u := range users {
+		if u.UserID == userID {
+			currentUser = &users[i]
+			break
+		}
+	}
+
+	if currentUser == nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "User not found",
+		})
+	}
+
+	myzone := []Zone{}
+	for _, zid := range currentUser.ZoneIDs {
+		for _, z := range zones {
+			if z.ZoneID == zid {
+				myzone = append(myzone, z)
+			}
+		}
+	}
+
+	return c.JSON(myzone)
 }
