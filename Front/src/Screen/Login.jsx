@@ -25,7 +25,7 @@ function LoginPage() {
 
     
       if (res.data.role == "System Admin"){
-        navigate('/system-overview-dashboard', {state: { user:res.data.username ,role: res.data.role } }); 
+        navigate('/system-overview-dashboard', {state: { user:res.data.username ,role: res.data.role, token: res.data.token} }); 
       }
       else if (res.data.role == "Zone Admin"){
         navigate('/zone-dashboard', {state: { user:res.data.username ,role: res.data.role } }); 

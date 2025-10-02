@@ -1,4 +1,6 @@
-import { useState, useEffect, useMemo } from "react"; 
+import { useState, useEffect, useMemo } from "react";
+import { useLocation } from "react-router-dom";
+import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
 import FilterCard from "../../components/FilterCard";
 import Cardno2 from "../../components/Cardno2";
@@ -16,6 +18,7 @@ const initialFilters = {
 
 function UserManagement(){
 
+    const location = useLocation();
     const [userData, setUserData] = useState([]);
 
     const [filters, setFilters] = useState(initialFilters);
@@ -27,14 +30,25 @@ function UserManagement(){
     const [loading, setLoading] = useState(true);
 
     const fetchUserData = async () => {
+        // 1. ตรวจสอบว่า Token พร้อมใน LocalStorage แล้ว
+        const tokenInStorage = localStorage.getItem('token');
+        const tokenInState = location.state?.token;
+
+        if (!tokenInStorage && !tokenInState) {
+            console.error("No authentication context found. Please log in.");
+            setLoading(false);
+            return;
+        }
+
+        // 2. ถ้ามี Token ใน Storage แล้ว (ไม่ว่าจะมาจาก state หรือ Refresh) ให้เริ่มดึงข้อมูล
         try {
-            const userPromise = await axios.get("http://localhost:8080/users");
+            setLoading(true);
             
             const [userRes] = await Promise.all([
-                userPromise, 
+                api.get('/users'),
             ]);
             setUserData(userRes.data);
-            
+
         } catch (error) {
             console.error("Error fetching user data:", error);
         } finally {
@@ -43,8 +57,19 @@ function UserManagement(){
     };
 
     useEffect(() => {
-        fetchUserData();
-    }, []); 
+        const tokenInStorage = localStorage.getItem('token');
+
+        // สำคัญ: บันทึก Token จาก State ลง Storage ถ้าเพิ่งมาจากหน้า Login
+        if (location.state?.token && location.state.token !== tokenInStorage) {
+             localStorage.setItem('token', location.state.token);
+             // 💡 เมื่อบันทึกเสร็จแล้ว ไม่ต้องเรียก fetchZoneData ที่นี่
+             // เราจะให้ Component โหลดซ้ำด้วย dependency (location.state) แล้วค่อยเรียก
+        }
+
+        // 💡 เรียกใช้ฟังก์ชันดึงข้อมูลเมื่อ Component ถูกโหลด หรือเมื่อมีการอัปเดต Token
+        fetchUserData(); 
+        
+    }, [location.state]);
     // ดึงข้อมูลจากหลังบ้าน
 
 
