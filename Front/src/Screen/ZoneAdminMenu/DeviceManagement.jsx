@@ -1,9 +1,9 @@
-import { useState, useEffect, useMemo } from "react"; 
+import { useState, useEffect} from "react"; 
+import { useLocation } from "react-router-dom";
+import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
 import FilterCard from "../../components/FilterCard";
 import Cardno2 from "../../components/Cardno2";
-import Cardno5 from "../../components/Cardno5";
-import axios from "axios";
 import CardLayouts from "../../components/CardLayouts";
 
 function DeviceManagement(){
@@ -14,27 +14,50 @@ function DeviceManagement(){
 
     //ดึงข้อมูลหลังบ้าน
     const fetchDeviceData = async () => {
-            try {
-                const devicePromise = await axios.get("http://localhost:8080/devices");
+        // 1. ตรวจสอบว่า Token พร้อมใน LocalStorage แล้ว
+        const tokenInStorage = localStorage.getItem('token');
+        const tokenInState = location.state?.token;
 
-                const [deviceRes] = await Promise.all([
+        if (!tokenInStorage && !tokenInState) {
+            console.error("No authentication context found. Please log in.");
+            setLoading(false);
+            return;
+        }
 
-                    devicePromise,
-                ]);
-                setDeviceData(deviceRes.data)
+        // 2. ถ้ามี Token ใน Storage แล้ว (ไม่ว่าจะมาจาก state หรือ Refresh) ให้เริ่มดึงข้อมูล
+        try {
+            setLoading(true);
+            
+            // 💡 ถ้าคุณใช้ Promise.all ให้ใช้ตามนี้ (เพื่อความรวดเร็ว)
+            const [deviceRes] = await Promise.all([
+                api.get('/devices'),
+            ]);
+            setDeviceData(deviceRes.data);
 
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+        } catch (error) {
+            console.error("Error fetching device data:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        fetchDeviceData();
-    }, []);
+        const tokenInStorage = localStorage.getItem('token');
+
+        // สำคัญ: บันทึก Token จาก State ลง Storage ถ้าเพิ่งมาจากหน้า Login
+        if (location.state?.token && location.state.token !== tokenInStorage) {
+             localStorage.setItem('token', location.state.token);
+             // 💡 เมื่อบันทึกเสร็จแล้ว ไม่ต้องเรียก fetchZoneData ที่นี่
+             // เราจะให้ Component โหลดซ้ำด้วย dependency (location.state) แล้วค่อยเรียก
+        }
+
+        // 💡 เรียกใช้ฟังก์ชันดึงข้อมูลเมื่อ Component ถูกโหลด หรือเมื่อมีการอัปเดต Token
+        fetchDeviceData(); 
+        
+    }, [location.state]);
     //ดึงข้อมูลหลังบ้าน
 
+    console.log("Device:",deviceData)
 
     // //ระบบ filter
     // const handleFilterChange = (key, value) => {
@@ -117,7 +140,7 @@ function DeviceManagement(){
                 <MenuNameCard
                 title="จัดการอุปกรณ์ Smart Healthcare ภายในพื้นที่"
                 description=""
-                onButtonClick={true}
+                onButtonClick="A"
                 detail={false}
                 buttonText="เพิ่มอุปกรณ์ใหม่"/>
                 
@@ -137,7 +160,9 @@ function DeviceManagement(){
                 option2Key="province"
                 />
 
-                <CardLayouts data="device"/>
+                <CardLayouts
+                name="device"
+                data={deviceData}/>
 
             </div>
 

@@ -1,5 +1,5 @@
 function Addbutton({buttonText, onButtonClick}){
-    console.log(buttonText)
+    // console.log(buttonText)
     return(
     
             <button className="add-btn" onClick={onButtonClick}> {buttonText}</button>

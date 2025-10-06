@@ -6,10 +6,11 @@ function MenuNameCard({title, description, buttonText, onButtonClick, detail}){
 
     const componentCheck = () =>{
 
-        if(onButtonClick != false){
+        if(onButtonClick){
             return <Addbutton buttonText={buttonText} onButtonClick={onButtonClick}/>
         }
-        else if(detail != false){
+
+        if(detail != false){
             return <Banner text={buttonText} detail={detail}/>
         }
 
