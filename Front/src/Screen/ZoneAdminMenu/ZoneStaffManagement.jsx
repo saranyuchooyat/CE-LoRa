@@ -1,9 +1,11 @@
-import { useState, useEffect, useMemo } from "react"; 
+import { useState, useEffect, useMemo } from "react";
+import { useLocation } from "react-router-dom";
+import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
 import CardFilter from "../../components/CardFilter";
 import Cardno2 from "../../components/Cardno2";
-import CardLayouts from "../../components/CardLayouts";
+import Cardno5 from "../../components/Cardno5";
 import Modal from "../../components/ModalForm/Modal";
 import AddUserForm from "../../components/ModalForm/AddUserForm";
 
@@ -13,62 +15,34 @@ const initialFilters = {
     status: 'ทั้งหมด' // สำหรับ Status (option1Name)
 };
 
-
-function ZoneStaffManagement(){
-
-    const [userData, setUserData] = useState([]);
-
+function UserManagement(){
+    
+    const location = useLocation();
     const [filters, setFilters] = useState(initialFilters);
-
     const [isModalOpen, setIsModalOpen] = useState(false);
     const handleOpenModal = () => setIsModalOpen(true);
     const handleCloseModal = () => setIsModalOpen(false);
 
-    const [loading, setLoading] = useState(true);
-
     //ดึงข้อมูลหลังบ้าน
-    const fetchUserData = async () => {
-        // 1. ตรวจสอบว่า Token พร้อมใน LocalStorage แล้ว
-        const tokenInStorage = localStorage.getItem('token');
-        const tokenInState = location.state?.token;
+    const userQueries = useQueries({
+        queries: [
+        { queryKey: ['users'], queryFn: () => api.get('/users').then(res => res.data) },
+        ],
+    });
 
-        if (!tokenInStorage && !tokenInState) {
-            console.error("No authentication context found. Please log in.");
-            setLoading(false);
-            return;
-        }
-
-        // 2. ถ้ามี Token ใน Storage แล้ว (ไม่ว่าจะมาจาก state หรือ Refresh) ให้เริ่มดึงข้อมูล
-        try {
-            setLoading(true);
-            
-            // 💡 ถ้าคุณใช้ Promise.all ให้ใช้ตามนี้ (เพื่อความรวดเร็ว)
-            const [userRes] = await Promise.all([
-                api.get('/zones/my-zones'),
-            ]);
-            setUserData(userRes.data);
-
-        } catch (error) {
-            console.error("Error fetching user data:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const isSystemLoading = userQueries.some(query => query.isLoading);
+    const isSystemError = userQueries.some(query => query.isError);
 
     useEffect(() => {
         const tokenInStorage = localStorage.getItem('token');
-
-        // สำคัญ: บันทึก Token จาก State ลง Storage ถ้าเพิ่งมาจากหน้า Login
         if (location.state?.token && location.state.token !== tokenInStorage) {
-             localStorage.setItem('token', location.state.token);
-             // 💡 เมื่อบันทึกเสร็จแล้ว ไม่ต้องเรียก fetchZoneData ที่นี่
-             // เราจะให้ Component โหลดซ้ำด้วย dependency (location.state) แล้วค่อยเรียก
+            localStorage.setItem('token', location.state.token);
+            // 💡 เมื่อบันทึก Token ใหม่แล้ว React Query จะทำการ Refetch ให้อัตโนมัติ
+            // เนื่องจากทุก Query จะถูก Trigger เมื่อ Token ถูกบันทึกและ Component Rerender
         }
-
-        // 💡 เรียกใช้ฟังก์ชันดึงข้อมูลเมื่อ Component ถูกโหลด หรือเมื่อมีการอัปเดต Token
-        fetchZoneData(); 
-        
     }, [location.state]);
+
+    const userQueryResult = userQueries[0];
     //ดึงข้อมูลหลังบ้าน
 
 
@@ -86,20 +60,17 @@ function ZoneStaffManagement(){
 
     const filteredUsers = useMemo(() => {
         const { search, role, status } = filters;
-        let data = userData;
+        let data = userQueryResult.data || []; 
 
         // กรองตามช่องค้นหา (Search)
         if (search) {
             const lowerSearch = search.toLowerCase();
             data = data.filter(user => (
-                // 💡 FIX 1: ตรวจสอบ user.username ก่อนเรียก .toLowerCase()
+            //ตรวจสอบ user.username
             (user.name && user.name.toLowerCase().includes(lowerSearch)) ||
-                // ส่วนนี้ดีอยู่แล้ว: ตรวจสอบ email
+            //ตรวจสอบ email
             (user.email && user.email.toLowerCase().includes(lowerSearch)) ||
-
-                // ส่วนนี้ควรตรวจสอบ phone ด้วย หาก phone เป็น string
-                // (user.phone && user.phone.includes(lowerSearch))
-                // หาก user.phone เป็นตัวเลขและคุณแน่ใจว่ามันจะไม่ใช่ undefined/null ก็ใช้ได้
+            //ตรวจสอบ phone
             (user.phone && String(user.phone).includes(lowerSearch))));
         }
 
@@ -113,13 +84,12 @@ function ZoneStaffManagement(){
         if (status && status !== 'ทั้งหมด') {
             data = data.filter(user => user.status === status);
         }
-
         return data;
-    }, [userData, filters]);
+    }, [userQueryResult.data, filters]);
     // ระบบ filter
 
     // ระบบกรองจำวน Role
-        const roleCountsObject = userData.reduce((acc, user) => {
+        const roleCountsObject = (userQueryResult.data || []).reduce((acc, user) => {
         const role = user.role;
         acc[role] = (acc[role] || 0) + 1;
         return acc;
@@ -132,28 +102,31 @@ function ZoneStaffManagement(){
         };
     })
 
-    const totalStaffObjects= {name:"zone id", value:"zone name"}
+    const totalStaffObjects= {name:"จำนวนทั้งหมด", value:userQueries.length}
 
     const staffData=[
         totalStaffObjects,
-        staffDataList[2]
+        ...staffDataList
     ]
-
     // ระบบกรองจำวน Role
     
-    if (loading) {
+    if (isSystemLoading) {
         return <div className="mx-5 mt-10 text-center text-xl">Loading Dashboard...</div>;
+    }
+        
+    if (isSystemError) {
+        return <div className="mx-5 mt-10 text-center text-xl text-red-600">Error fetching data!</div>;
     }
 
     return(
         <>
             <div className="mx-5">
                 <MenuNameCard
-                title="จัดการ Zone Staff Smart Healthcare"
-                description=""
+                title="จัดการผู้ใช้งาน"
+                description="ระบบจัดการบัญชีผู้ใช้และสิทธิ์การเข้าถึง"
                 onButtonClick={handleOpenModal} // ต้องเพิ่ม Prop นี้ใน MenuNameCard
                 detail={false}
-                buttonText="เพิ่ม Zone Staff ใหม่"/>
+                buttonText="เพิ่มผู้ใช้งานใหม่"/>
 
                 <Cardno2 data={staffData}/>
 
@@ -168,7 +141,7 @@ function ZoneStaffManagement(){
                     onClear={handleClearFilters}
                     option2Key="role"
                 />
-                <CardLayouts data="staff"/>
+                <Cardno5 data={filteredUsers}/> 
             </div>
 
             <Modal 
@@ -178,7 +151,7 @@ function ZoneStaffManagement(){
 
                 <AddUserForm 
                 onClose={handleCloseModal} 
-                onSaveSuccess={fetchUserData}/>
+                onSaveSuccess={userQueryResult}/>
             </Modal>
 
 
@@ -186,4 +159,4 @@ function ZoneStaffManagement(){
     );
 }
 
-export default ZoneStaffManagement;
+export default UserManagement;

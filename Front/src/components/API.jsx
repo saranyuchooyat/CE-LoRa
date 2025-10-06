@@ -2,9 +2,9 @@ import axios from 'axios';
 
 console.log(localStorage)
 const api = axios.create({
-  // กำหนด Base URL ครั้งเดียวเพื่อความสะดวก (ถ้ามี)
+  // กำหนด Base URL
   baseURL: 'http://localhost:8080', 
-  timeout: 10000, // กำหนด Timeout
+  timeout: 50000, // กำหนด Timeout
 });
 
 // 💡 Interceptor: จะทำงานก่อนที่ Request จะถูกส่งออกไป
