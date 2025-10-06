@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
+import api from '../../components/API';
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
 import MenuNameCard2 from '../../components/MainCardOption/MenuNameCard2';
 import Cardno8 from '../../components/Cardno8';
 import Cardno9 from '../../components/Cardno9';
 import Cardno5 from '../../components/Cardno5';
-import axios from "axios";
 
 
 function ZoneDashboardDetail (){
@@ -16,32 +16,52 @@ function ZoneDashboardDetail (){
     const [zoneDetail, setZoneDetail] = useState(null); // 💡 เปลี่ยนค่าเริ่มต้นเป็น null
     const [loading, setLoading] = useState(true); // 💡 เพิ่ม loading state
     
+    //ดึงข้อมูลหลังบ้าน
     const fetchZoneData = async () => {
-        setLoading(true);
-        try {
-            // 💡 ถ้า API ของคุณรองรับการค้นหาตาม ID ควรใช้:
-            // const zoneRes = await axios.get(`http://localhost:8080/zones/${zoneid}`);
-            // setZoneDetail(zoneRes.data);
-            
-            // 💡 แต่ถ้า API ดึงข้อมูลมาทั้งหมดก่อน (ตามโค้ดเดิม):
-            const zonePromise = await axios.get("http://localhost:8080/zones");
-            const alertPromise = await axios.get("http://localhost:8080/system/alerts");
+        // 1. ตรวจสอบว่า Token พร้อมใน LocalStorage แล้ว
+        const tokenInStorage = localStorage.getItem('token');
+        const tokenInState = location.state?.token;
 
+        if (!tokenInStorage && !tokenInState) {
+            console.error("No authentication context found. Please log in.");
+            setLoading(false);
+            return;
+        }
+
+        // 2. ถ้ามี Token ใน Storage แล้ว (ไม่ว่าจะมาจาก state หรือ Refresh) ให้เริ่มดึงข้อมูล
+        try {
+            setLoading(true);
+            
+            // 💡 ถ้าคุณใช้ Promise.all ให้ใช้ตามนี้ (เพื่อความรวดเร็ว)
             const [zoneRes, alertRes] = await Promise.all([
-                    zonePromise,
-                    alertPromise 
-                    
-                ]);
+                api.get('/zones/my-zones'),
+                api.get('/system/alerts')
+            ]);
             setZoneData(zoneRes.data);
             setAlertData(alertRes.data);
 
         } catch (error) {
-            console.error("Error fetching zone data:", error);
-            setZoneDetail(null); // ตั้งเป็น null หากเกิด Error
+            console.error("Error fetching user data:", error);
         } finally {
-            // 🛑 ลบ setLoading(false) ออกจากที่นี่ เพราะต้องรอ FindZoneDataByzoneid ทำงานก่อน
+            setLoading(false);
         }
     };
+
+    useEffect(() => {
+        const tokenInStorage = localStorage.getItem('token');
+
+        // สำคัญ: บันทึก Token จาก State ลง Storage ถ้าเพิ่งมาจากหน้า Login
+        if (location.state?.token && location.state.token !== tokenInStorage) {
+             localStorage.setItem('token', location.state.token);
+             // 💡 เมื่อบันทึกเสร็จแล้ว ไม่ต้องเรียก fetchZoneData ที่นี่
+             // เราจะให้ Component โหลดซ้ำด้วย dependency (location.state) แล้วค่อยเรียก
+        }
+
+        // 💡 เรียกใช้ฟังก์ชันดึงข้อมูลเมื่อ Component ถูกโหลด หรือเมื่อมีการอัปเดต Token
+        fetchZoneData(); 
+        
+    }, [location.state]);
+    //ดึงข้อมูลหลังบ้าน
     
     console.log("zone",zoneData)
 
