@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
-import FilterCard from "../../components/FilterCard";
+import CardFilter from "../../components/CardFilter";
 import Cardno2 from "../../components/Cardno2";
 import Cardno5 from "../../components/Cardno5";
 import Modal from "../../components/ModalForm/Modal";
@@ -158,7 +158,7 @@ function UserManagement(){
 
                 <Cardno2 data={staffData}/>
 
-                <FilterCard
+                <CardFilter
                     name="ผู้ใช้งาน"
                     placeholderName=" ชื่อ, อีเมล, หรือเบอร์โทรศัพท์"
                     option1Name="สถานะ"

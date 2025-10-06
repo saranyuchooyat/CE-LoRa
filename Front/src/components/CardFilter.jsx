@@ -3,7 +3,7 @@ import StatusDropdown from "./StatusDropdown";
 import ProvinceDropdown from "./ProvinceDropdown";
 
 // รับ props เพิ่ม: filters, onFilterChange, onClear
-function FilterCard({name, placeholderName, option1Name, option2Name, filters, onFilterChange, onClear, option2Key}){
+function CardFilter({name, placeholderName, option1Name, option2Name, filters, onFilterChange, onClear, option2Key}){
 
     console.log("option2",option2Name)
 
@@ -91,4 +91,4 @@ function FilterCard({name, placeholderName, option1Name, option2Name, filters, o
     )
 }
 
-export default FilterCard;
+export default CardFilter;

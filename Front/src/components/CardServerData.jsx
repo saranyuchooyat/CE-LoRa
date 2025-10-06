@@ -1,4 +1,4 @@
-function Cardno7({ data }){
+function CardServerData({ data }){
 
     console.log("usesage", data);
 
@@ -47,7 +47,7 @@ function Cardno7({ data }){
         <>
             <div className="flex justify-between h-fit text-center gap-4">
                 {data.map((card, index) => {
-                    const cpuPercent = parseFloat(card.cpu);
+                    const cpuPercent = parseFloat(card.cpuUsage);
 
                     // คำนวณเปอร์เซ็นต์สำหรับ Memory และ Disk
                     const memoryPercent = calculatePercentage(card.memoryUsed, card.memoryTotal);
@@ -64,7 +64,7 @@ function Cardno7({ data }){
                                 <div className="text-start">
                                     <div className="flex justify-between">
                                         <p className="">CPU Usage</p>
-                                        <p className="">{card.cpu}</p>
+                                        <p className="">{card.cpuUsage}</p>
                                     </div>
                                     <div className="bg-gray-200 rounded-full w-full h-3">
                                         <div 
@@ -114,4 +114,4 @@ function Cardno7({ data }){
     )
 }
 
-export default Cardno7;
+export default CardServerData;

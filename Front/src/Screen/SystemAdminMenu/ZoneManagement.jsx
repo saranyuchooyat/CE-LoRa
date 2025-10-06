@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
-import FilterCard from "../../components/FilterCard";
+import CardFilter from "../../components/CardFilter";
 import Cardno5 from "../../components/Cardno5";
 import Modal from "../../components/ModalForm/Modal";
 import AddZoneForm from "../../components/ModalForm/AddZoneForm";
@@ -144,7 +144,7 @@ function ZoneManagement() {
           buttonText="เพิ่ม Zone"
         />
 
-        <FilterCard
+        <CardFilter
           name="Zone"
           placeholderName=" ชื่อ zone, รหัส zone, หรือที่อยู่"
           option1Name="สถานะ"

@@ -1,14 +1,21 @@
 import J3 from '../assets/picture/J3-Smartwatch.png';
+import { Link, useNavigate } from 'react-router-dom';
 
 function DeviceCard({data}) {
 
     // console.log("device",data)
+    const navigate = useNavigate();
+
+    const handleRowClick = (deviceId) => {
+        navigate(`/deivce-details/${deviceId}`); 
+    };
+
     return(
         <>
             {data.map((card, index) =>{
 
                 return(
-                    <button key={index} className="flex flex-col items-center bg-test-color border-l-0 border-y-5 border-main-green rounded-[15px] gap-4 p-3 drop-shadow-lg hover:bg-main-card/30 cursor-pointer transition-colors duration-150">
+                    <button key={index} className="flex flex-col items-center bg-test-color border-l-0 border-y-5 border-main-green rounded-[15px] gap-4 p-3 drop-shadow-lg hover:bg-main-card/30 cursor-pointer transition-colors duration-150" onClick={() => handleRowClick(card.device_id)}>
                         
                         <div className="bg-main-green font-semibold text-white rounded-full py-1 px-10 w-fit">
                             <p>{card.status}</p>

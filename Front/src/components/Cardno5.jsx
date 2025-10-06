@@ -3,7 +3,7 @@ import ZoneTable from "./Table/ZoneTable";
 import ZoneAdminTable from "./Table/ZoneAdminTable";
 import UserTable from "./Table/UserTable";
 
-function Cardno5({ data }){
+function CardFull({ data }){
     console.log("data",data)
 
     let displayContent = null
@@ -60,4 +60,4 @@ function Cardno5({ data }){
     )
 }
 
-export default Cardno5;
+export default CardFull;

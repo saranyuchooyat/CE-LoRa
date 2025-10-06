@@ -2,8 +2,8 @@ import { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
-import FilterCard from "../../components/FilterCard";
-import Cardno5 from "../../components/Cardno5";
+import CardFilter from "../../components/CardFilter";
+import CardFull from "../../components/Cardno5";
 
 
 const initialFilters = {
@@ -125,7 +125,7 @@ function ZoneDashboard(){
                 detail={zoneData.length}
                 buttonText="จำนวนพื้นที่ที่ผู้ใช้งานดูแล => "/>
 
-                <FilterCard
+                <CardFilter
                 name="Zone"
                 placeholderName=" ชื่อ zone, รหัส zone, หรือที่อยู่"
                 option1Name="สถานะ"
@@ -135,7 +135,7 @@ function ZoneDashboard(){
                 onClear={handleClearFilters}
                 option2Key="province"
                 />
-                <Cardno5 data={filteredZones}/>
+                <CardFull data={filteredZones}/>
             </div>
         </>
     );

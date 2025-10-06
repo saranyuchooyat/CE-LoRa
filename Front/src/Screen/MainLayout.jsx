@@ -11,6 +11,7 @@ import DeviceManagement from './ZoneAdminMenu/DeviceManagement';
 import ZoneStaffManagement from './ZoneAdminMenu/ZoneStaffManagement';
 import NotFoundPage from './NotFound';
 import LoginPage from './Login';
+import DeviceDetail from './DeviceDetail';
 
 function MainLayout() {
   return (
@@ -32,6 +33,7 @@ function MainLayout() {
           <Route path="/device-management" element={<DeviceManagement/>}/>
           <Route path="/zone-staff-management" element={<ZoneStaffManagement/>}/>
           
+          <Route path='/deivce-details/:device_id' element={<DeviceDetail/>}/>
           {/* ... ส่วนที่เหลือ ... */}
 
           <Route path="/health-monitoring" element={<HealthMonitoring/>} />

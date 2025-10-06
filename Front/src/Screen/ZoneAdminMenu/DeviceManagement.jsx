@@ -1,8 +1,7 @@
 import { useState, useEffect} from "react"; 
-import { useLocation } from "react-router-dom";
 import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
-import FilterCard from "../../components/FilterCard";
+import CardFilter from "../../components/CardFilter";
 import Cardno2 from "../../components/Cardno2";
 import CardLayouts from "../../components/CardLayouts";
 
@@ -146,7 +145,7 @@ function DeviceManagement(){
                 
                 <Cardno2 data={deviceStatusData}/>
 
-                <FilterCard
+                <CardFilter
                 name="อุปกรณ์"
                 placeholderName="รหัสอุปกรณ์, ชื่อรุ่นอุปกรณ์"
                 option1Name="สถานะ"
