@@ -1,9 +1,9 @@
-import { useState, useEffect, useMemo } from "react"; 
+import { useState, useEffect, useMemo } from "react";
+import { useLocation } from "react-router-dom";
+import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
 import FilterCard from "../../components/FilterCard";
 import Cardno5 from "../../components/Cardno5";
-import CardLayouts from "../../components/CardLayouts";
-import axios from "axios";
 
 
 const initialFilters = {
@@ -14,33 +14,57 @@ const initialFilters = {
 
 function ZoneDashboard(){
 
+    const location = useLocation();
     const [zoneData, setZoneData] = useState([]);
     const [filters, setFilters] = useState(initialFilters);
     const [loading, setLoading] = useState(true);
 
     //ดึงข้อมูลหลังบ้าน
     const fetchZoneData = async () => {
-            try {
-                const zonePromise = await axios.get("http://localhost:8080/zones");
+        // 1. ตรวจสอบว่า Token พร้อมใน LocalStorage แล้ว
+        const tokenInStorage = localStorage.getItem('token');
+        const tokenInState = location.state?.token;
 
-                const [zoneRes] = await Promise.all([
+        if (!tokenInStorage && !tokenInState) {
+            console.error("No authentication context found. Please log in.");
+            setLoading(false);
+            return;
+        }
 
-                    zonePromise,
-                ]);
-                setZoneData(zoneRes.data)
+        // 2. ถ้ามี Token ใน Storage แล้ว (ไม่ว่าจะมาจาก state หรือ Refresh) ให้เริ่มดึงข้อมูล
+        try {
+            setLoading(true);
+            
+            // 💡 ถ้าคุณใช้ Promise.all ให้ใช้ตามนี้ (เพื่อความรวดเร็ว)
+            const [zoneRes] = await Promise.all([
+                api.get('/zones/my-zones'),
+            ]);
+            setZoneData(zoneRes.data);
 
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+        } catch (error) {
+            console.error("Error fetching user data:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        fetchZoneData();
-    }, []);
+        const tokenInStorage = localStorage.getItem('token');
+
+        // สำคัญ: บันทึก Token จาก State ลง Storage ถ้าเพิ่งมาจากหน้า Login
+        if (location.state?.token && location.state.token !== tokenInStorage) {
+             localStorage.setItem('token', location.state.token);
+             // 💡 เมื่อบันทึกเสร็จแล้ว ไม่ต้องเรียก fetchZoneData ที่นี่
+             // เราจะให้ Component โหลดซ้ำด้วย dependency (location.state) แล้วค่อยเรียก
+        }
+
+        // 💡 เรียกใช้ฟังก์ชันดึงข้อมูลเมื่อ Component ถูกโหลด หรือเมื่อมีการอัปเดต Token
+        fetchZoneData(); 
+        
+    }, [location.state]);
     //ดึงข้อมูลหลังบ้าน
 
+    console.log("my-zone",zoneData)
 
     //ระบบ filter
     const handleFilterChange = (key, value) => {
@@ -98,8 +122,8 @@ function ZoneDashboard(){
                 title="ภาพรวม  Zone (พื้นที่)"
                 description="ระบบดูข้อมูลภาพรวมพื้นที่ใช้งาน Smart Healthcare System"
                 onButtonClick={false}
-                detail="2/2"
-                buttonText="จำนวนพื้นที่ที่ผู้ใช้งานดูแล"/>
+                detail={zoneData.length}
+                buttonText="จำนวนพื้นที่ที่ผู้ใช้งานดูแล => "/>
 
                 <FilterCard
                 name="Zone"

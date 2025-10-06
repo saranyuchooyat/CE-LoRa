@@ -28,10 +28,10 @@ function LoginPage() {
         navigate('/system-overview-dashboard', {state: { user:res.data.username ,role: res.data.role, token: res.data.token} }); 
       }
       else if (res.data.role == "Zone Admin"){
-        navigate('/zone-dashboard', {state: { user:res.data.username ,role: res.data.role } }); 
+        navigate('/zone-dashboard', {state: { user:res.data.username ,role: res.data.role, token: res.data.token} }); 
       }
       else if (res.data.role == "Zone Staff"){
-        navigate('/eldery-monitoring', {state: { user:res.data.username ,role: res.data.role } }); 
+        navigate('/eldery-monitoring', {state: { user:res.data.username ,role: res.data.role, token: res.data.token} }); 
       }
 
     } catch (err) {

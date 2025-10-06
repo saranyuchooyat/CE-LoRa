@@ -81,12 +81,12 @@ function SystemOverviewDashboard(){
     }, [location.state]);
 
 
-    console.log("userData: ",userData)
-    console.log("elderlyData: ",elderlyData)
-    console.log("deviceData: ",deviceData)
-    console.log("zoneData: ",zoneData)
-    console.log("serverData: ",serverData)
-    console.log("alertData: ",alertData)
+    // console.log("userData: ",userData)
+    // console.log("elderlyData: ",elderlyData)
+    // console.log("deviceData: ",deviceData)
+    // console.log("zoneData: ",zoneData)
+    // console.log("serverData: ",serverData)
+    // console.log("alertData: ",alertData)
 
     const SystemData = 
     [
