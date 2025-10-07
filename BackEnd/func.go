@@ -1,9 +1,6 @@
 package main
 
 import (
-	"sort"
-	"strconv"
-
 	"github.com/gofiber/fiber/v2"
 
 	"context"
@@ -180,13 +177,61 @@ func getUserByID(c *fiber.Ctx) error {
 	return c.JSON(user)
 }
 
+// func getAllElderly(c *fiber.Ctx) error {
+// 	return c.JSON(elderlys)
+// }
+
 func getAllElderly(c *fiber.Ctx) error {
-	return c.JSON(elderlys)
+	var elders []Elder
+	collection := db.Collection("elders")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	cursor, err := collection.Find(ctx, bson.M{})
+	if err != nil {
+		return c.Status(500).SendString("Failed to fetch elders: " + err.Error())
+	}
+	defer cursor.Close(ctx)
+
+	if err := cursor.All(ctx, &elders); err != nil {
+		return c.Status(500).SendString("Failed to decode elders: " + err.Error())
+	}
+
+	return c.JSON(elders)
 }
 
+// func getAllZone(c *fiber.Ctx) error {
+// 	return c.JSON(zones)
+// }
+
 func getAllZone(c *fiber.Ctx) error {
+	var zones []Zone
+	collection := db.Collection("zones")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	cursor, err := collection.Find(ctx, bson.M{})
+	if err != nil {
+		return c.Status(500).SendString("Failed to fetch zones: " + err.Error())
+	}
+	defer cursor.Close(ctx)
+
+	if err := cursor.All(ctx, &zones); err != nil {
+		return c.Status(500).SendString("Failed to decode zones: " + err.Error())
+	}
+
 	return c.JSON(zones)
 }
+
+// func createZone(c *fiber.Ctx) error {
+// 	zone := new(Zone)
+// 	if err := c.BodyParser(zone); err != nil {
+// 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+// 	}
+
+// 	zones = append(zones, *zone)
+// 	return c.JSON(zone)
+// }
 
 func createZone(c *fiber.Ctx) error {
 	zone := new(Zone)
@@ -194,91 +239,183 @@ func createZone(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
 
-	zones = append(zones, *zone)
-	return c.JSON(zone)
+	collection := db.Collection("zones")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	_, err := collection.InsertOne(ctx, zone)
+	if err != nil {
+		return c.Status(500).SendString("Failed to insert zone: " + err.Error())
+	}
+
+	return c.Status(201).JSON(zone)
 }
+
+// func updateZone(c *fiber.Ctx) error {
+// 	zoneID, err := strconv.Atoi(c.Params("id"))
+
+// 	if err != nil {
+// 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+// 	}
+
+// 	zoneUpdate := new(Zone)
+// 	if err := c.BodyParser(zoneUpdate); err != nil {
+// 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+// 	}
+
+// 	for i, z := range zones {
+// 		if z.ZoneID == zoneID {
+// 			if zoneUpdate.ZoneName != "" {
+// 				zones[i].ZoneName = zoneUpdate.ZoneName
+// 			}
+// 			if zoneUpdate.Address != "" {
+// 				zones[i].Address = zoneUpdate.Address
+// 			}
+// 			if zoneUpdate.Description != "" {
+// 				zones[i].Description = zoneUpdate.Description
+// 			}
+// 			if zoneUpdate.Status != "" {
+// 				zones[i].Status = zoneUpdate.Status
+// 			}
+
+// 			return c.JSON(zones[i])
+// 		}
+// 	}
+
+// 	return c.SendStatus(fiber.StatusNotFound)
+// }
 
 func updateZone(c *fiber.Ctx) error {
-	zoneID, err := strconv.Atoi(c.Params("id"))
+	id := c.Params("id")
 
-	if err != nil {
+	var zoneUpdate Zone
+	if err := c.BodyParser(&zoneUpdate); err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
 
-	zoneUpdate := new(Zone)
-	if err := c.BodyParser(zoneUpdate); err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	collection := db.Collection("zones")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	update := bson.M{"$set": zoneUpdate}
+	result, err := collection.UpdateOne(ctx, bson.M{"zone_id": id}, update)
+	if err != nil || result.MatchedCount == 0 {
+		return c.Status(404).SendString("Zone not found or update failed")
 	}
 
-	for i, z := range zones {
-		if z.ZoneID == zoneID {
-			if zoneUpdate.ZoneName != "" {
-				zones[i].ZoneName = zoneUpdate.ZoneName
-			}
-			if zoneUpdate.Address != "" {
-				zones[i].Address = zoneUpdate.Address
-			}
-			if zoneUpdate.Description != "" {
-				zones[i].Description = zoneUpdate.Description
-			}
-			if zoneUpdate.Status != "" {
-				zones[i].Status = zoneUpdate.Status
-			}
-
-			return c.JSON(zones[i])
-		}
-	}
-
-	return c.SendStatus(fiber.StatusNotFound)
+	return c.JSON(fiber.Map{"message": "Zone updated successfully"})
 }
+
+// func deleteZone(c *fiber.Ctx) error {
+// 	zoneID, err := strconv.Atoi(c.Params("id"))
+
+// 	if err != nil {
+// 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+// 	}
+
+// 	for i, z := range zones {
+// 		if z.ZoneID == zoneID {
+// 			zones = append(zones[:i], zones[i+1:]...)
+// 			return c.SendStatus(fiber.StatusNoContent)
+// 		}
+// 	}
+// 	return c.SendStatus(fiber.StatusNotFound)
+// }
 
 func deleteZone(c *fiber.Ctx) error {
-	zoneID, err := strconv.Atoi(c.Params("id"))
+	id := c.Params("id")
 
+	collection := db.Collection("zones")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	result, err := collection.DeleteOne(ctx, bson.M{"zone_id": id})
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+		return c.Status(500).SendString("Failed to delete zone: " + err.Error())
+	}
+	if result.DeletedCount == 0 {
+		return c.Status(404).SendString("Zone not found")
 	}
 
-	for i, z := range zones {
-		if z.ZoneID == zoneID {
-			zones = append(zones[:i], zones[i+1:]...)
-			return c.SendStatus(fiber.StatusNoContent)
-		}
-	}
-	return c.SendStatus(fiber.StatusNotFound)
+	return c.SendStatus(fiber.StatusNoContent)
 }
 
-func getTopZones(c *fiber.Ctx) error {
-	limit := c.QueryInt("limit", 5)
+// func getTopZones(c *fiber.Ctx) error {
+// 	limit := c.QueryInt("limit", 5)
 
-	zonescopy := make([]Zone, len(zones))
-	copy(zonescopy, zones)
+// 	zonescopy := make([]Zone, len(zones))
+// 	copy(zonescopy, zones)
 
-	sort.Slice(zonescopy, func(i, j int) bool {
-		return zonescopy[i].ActiveUser > zonescopy[j].ActiveUser
-	})
+// 	sort.Slice(zonescopy, func(i, j int) bool {
+// 		return zonescopy[i].ActiveUser > zonescopy[j].ActiveUser
+// 	})
 
-	if limit > len(zonescopy) {
-		limit = len(zonescopy)
-	}
-	return c.JSON(fiber.Map{
-		"topzones": zonescopy[:limit],
-	})
+// 	if limit > len(zonescopy) {
+// 		limit = len(zonescopy)
+// 	}
+// 	return c.JSON(fiber.Map{
+// 		"topzones": zonescopy[:limit],
+// 	})
 
-}
+// }
+
+// func getAllDevice(c *fiber.Ctx) error {
+// 	return c.JSON(devices)
+// }
 
 func getAllDevice(c *fiber.Ctx) error {
+	var devices []Device
+	collection := db.Collection("devices")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	cursor, err := collection.Find(ctx, bson.M{})
+	if err != nil {
+		return c.Status(500).SendString("Failed to fetch devices: " + err.Error())
+	}
+	defer cursor.Close(ctx)
+
+	if err := cursor.All(ctx, &devices); err != nil {
+		return c.Status(500).SendString("Failed to decode devices: " + err.Error())
+	}
+
 	return c.JSON(devices)
 }
 
-func getDashSum(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{
-		"zonesCount": len(zones),
-		// "usersCount":   len(users),
-		"elderlyCount": len(elderlys),
-		"devicesCount": len(devices),
-	})
+func getDeviceDataByDeviceID(c *fiber.Ctx) error {
+	deviceID := c.Params("device_id")
+
+	var data []DeviceData
+	collection := db.Collection("device_data")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// filter ตาม device_id
+	cursor, err := collection.Find(ctx, bson.M{"device_id": deviceID})
+	if err != nil {
+		return c.Status(500).SendString("Failed to fetch device data: " + err.Error())
+	}
+	defer cursor.Close(ctx)
+
+	if err := cursor.All(ctx, &data); err != nil {
+		return c.Status(500).SendString("Failed to decode device data: " + err.Error())
+	}
+
+	if len(data) == 0 {
+		return c.Status(404).SendString("No data found for device_id: " + deviceID)
+	}
+
+	return c.JSON(data)
 }
+
+// func getDashSum(c *fiber.Ctx) error {
+// 	return c.JSON(fiber.Map{
+// 		"zonesCount": len(zones),
+// 		// "usersCount":   len(users),
+// 		"elderlyCount": len(elderlys),
+// 		"devicesCount": len(devices),
+// 	})
+// }
 
 func getHealthservers(c *fiber.Ctx) error {
 	return c.JSON(servers)

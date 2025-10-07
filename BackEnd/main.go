@@ -32,9 +32,10 @@ func main() {
 	app.Get("/system/health/servers", getHealthservers)
 	app.Get("/system/alerts", getAlert)
 	app.Get("/devices", getAllDevice)
+	app.Get("/device_data/:device_id", getDeviceDataByDeviceID)
 
 	app.Get("/dashboard/usage-trend", getUserTrend)
-	app.Get("/dashboard/summary", getDashSum)
-	app.Get("/dashboard/top-zones", getTopZones)
+	// app.Get("/dashboard/summary", getDashSum)
+	// app.Get("/dashboard/top-zones", getTopZones)
 	app.Listen(":8080")
 }
