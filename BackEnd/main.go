@@ -37,6 +37,7 @@ func main() {
 	app.Put("/zones/:id", updateZone)
 	app.Delete("/zones/:id", deleteZone)
 	app.Get("/zones/:id/dashboard", getZoneDashboard)
+	app.Post("zones/elderlyRegister", addEldertoZone)
 	app.Get("/elders", getAllElderly)
 
 	app.Get("/system/health/servers", getHealthservers)

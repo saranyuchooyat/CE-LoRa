@@ -184,6 +184,119 @@ func getTopZones(c *fiber.Ctx) error {
 
 }
 
+func getMyZone(c *fiber.Ctx) error {
+	token := c.Locals("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+	userID := int(claims["userID"].(float64))
+
+	var currentUser *User
+	for i, u := range users {
+		if u.UserID == userID {
+			currentUser = &users[i]
+			break
+		}
+	}
+
+	if currentUser == nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "User not found",
+		})
+	}
+
+	myzone := []Zone{}
+	for _, zid := range currentUser.ZoneIDs {
+		for _, z := range zones {
+			if z.ZoneID == zid {
+				myzone = append(myzone, z)
+			}
+		}
+	}
+
+	return c.JSON(myzone)
+}
+
+func getZoneDashboard(c *fiber.Ctx) error {
+	zoneID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid Zone ID"})
+	}
+
+	var zone *Zone
+	for i, z := range zones {
+		if z.ZoneID == zoneID {
+			zone = &zones[i]
+			break
+		}
+	}
+	if zone == nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Zone not found"})
+	}
+	var zoneElders []Elderly
+	for _, e := range elderlys {
+		if e.ZoneID == zoneID {
+			zoneElders = append(zoneElders, e)
+		}
+	}
+	deviceStatus := map[string]int{
+		"online":  0,
+		"offline": 0,
+		"total":   0,
+	}
+	var alertsInZone []Alert
+
+	for _, e := range zoneElders {
+		for _, d := range devices {
+			if e.DeviceID == d.DeviceID {
+				deviceStatus["total"]++
+				if d.Status == "online" {
+					deviceStatus["online"]++
+				} else if d.Status == "offline" {
+					deviceStatus["offline"]++
+					alertsInZone = append(alertsInZone, Alert{
+						ID:          len(alertsInZone) + 1,
+						Title:       fmt.Sprintf("อุปกรณ์ของ %s Offline", e.Name),
+						Description: fmt.Sprintf("Device %s ไม่ออนไลน์ตั้งแต่ %s", d.DeviceID, d.LastUpdate),
+						Type:        "warning",
+						CreatedAt:   time.Now().Format(time.RFC3339),
+					})
+				}
+				break
+			}
+		}
+		if e.Status == "critical" {
+			alertsInZone = append(alertsInZone, Alert{
+				ID:          len(alertsInZone) + 1,
+				Title:       fmt.Sprintf("Elder %s มีภาวะวิกฤต", e.Name),
+				Description: fmt.Sprintf("อัตราการเต้นหัวใจ %d bpm, BP %s", e.Vitals.HeartRate, e.Vitals.BloodPressure),
+				Type:        "critical",
+				CreatedAt:   time.Now().Format(time.RFC3339),
+			})
+		} else if e.Status == "warning" {
+			alertsInZone = append(alertsInZone, Alert{
+				ID:          len(alertsInZone) + 1,
+				Title:       fmt.Sprintf("Elder %s มีสัญญาณเตือน", e.Name),
+				Description: fmt.Sprintf("SpO₂ %d%%, อุณหภูมิ %.1f°C", e.Vitals.SpO2, e.Vitals.Temperature),
+				Type:        "warning",
+				CreatedAt:   time.Now().Format(time.RFC3339),
+			})
+		}
+	}
+
+	return c.JSON(fiber.Map{
+		"zone": fiber.Map{
+			"id":          zone.ZoneID,
+			"name":        zone.ZoneName,
+			"status":      zone.Status,
+			"activeUsers": zone.ActiveUser,
+		},
+		"elderlyCount": len(zoneElders),
+		"deviceStatus": deviceStatus,
+		"alerts":       alertsInZone,
+		"elders":       zoneElders,
+	})
+
+}
+
 func getAllDevice(c *fiber.Ctx) error {
 	return c.JSON(devices)
 }
@@ -337,115 +450,56 @@ func login(c *fiber.Ctx) error {
 	})
 }
 
-func getMyZone(c *fiber.Ctx) error {
-	token := c.Locals("user").(*jwt.Token)
-	claims := token.Claims.(jwt.MapClaims)
-	userID := int(claims["userID"].(float64))
-
-	var currentUser *User
-	for i, u := range users {
-		if u.UserID == userID {
-			currentUser = &users[i]
-			break
+func findDeviceByID(id string) *Device {
+	for i := range devices {
+		if devices[i].DeviceID == id {
+			return &devices[i]
 		}
 	}
-
-	if currentUser == nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error": "User not found",
-		})
-	}
-
-	myzone := []Zone{}
-	for _, zid := range currentUser.ZoneIDs {
-		for _, z := range zones {
-			if z.ZoneID == zid {
-				myzone = append(myzone, z)
-			}
-		}
-	}
-
-	return c.JSON(myzone)
+	return nil
 }
+func addEldertoZone(c *fiber.Ctx) error {
+	var req RegisterElderlyRequest
+	fmt.Println(req)
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request"})
+	}
 
-func getZoneDashboard(c *fiber.Ctx) error {
-	zoneID, err := strconv.Atoi(c.Params("id"))
+	device := findDeviceByID(req.Device.DeviceID)
+	if device == nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Device not found"})
+	}
+	if device.AssignedTo != "" || device.ZoneID != 0 {
+		return c.Status(400).JSON(fiber.Map{"error": "Device not available"})
+	}
+	birthDate, err := time.Parse("2006-01-02", req.BirthDate)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid Zone ID"})
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid birthDate format"})
+	}
+	today := time.Now()
+	age := today.Year() - birthDate.Year()
+	if today.YearDay() < birthDate.YearDay() {
+		age -= 1
 	}
 
-	var zone *Zone
-	for i, z := range zones {
-		if z.ZoneID == zoneID {
-			zone = &zones[i]
-			break
-		}
+	newElder := Elderly{
+		Name:      req.Fname + " " + req.Lname,
+		ID:        fmt.Sprintf("E%03d", len(elderlys)+1),
+		CitizenID: req.CitizenID,
+		BirthDate: req.BirthDate,
+		Age:       age,
+		Gender:    req.Gender,
+		Address:   req.Address,
+		Phone:     req.Phone,
+		Status:    "stable",
+		Email:     req.Email,
+		ZoneID:    req.ZoneID,
+		DeviceID:  req.Device.DeviceID,
 	}
-	if zone == nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Zone not found"})
-	}
-	var zoneElders []Elderly
-	for _, e := range elderlys {
-		if e.ZoneID == zoneID {
-			zoneElders = append(zoneElders, e)
-		}
-	}
-	deviceStatus := map[string]int{
-		"online":  0,
-		"offline": 0,
-		"total":   0,
-	}
-	var alertsInZone []Alert
+	elderlys = append(elderlys, newElder)
 
-	for _, e := range zoneElders {
-		for _, d := range devices {
-			if e.DeviceID == d.DeviceID {
-				deviceStatus["total"]++
-				if d.Status == "online" {
-					deviceStatus["online"]++
-				} else if d.Status == "offline" {
-					deviceStatus["offline"]++
-					alertsInZone = append(alertsInZone, Alert{
-						ID:          len(alertsInZone) + 1,
-						Title:       fmt.Sprintf("อุปกรณ์ของ %s Offline", e.Name),
-						Description: fmt.Sprintf("Device %s ไม่ออนไลน์ตั้งแต่ %s", d.DeviceID, d.LastUpdate),
-						Type:        "warning",
-						CreatedAt:   time.Now().Format(time.RFC3339),
-					})
-				}
-				break
-			}
-		}
-		if e.Status == "critical" {
-			alertsInZone = append(alertsInZone, Alert{
-				ID:          len(alertsInZone) + 1,
-				Title:       fmt.Sprintf("Elder %s มีภาวะวิกฤต", e.Name),
-				Description: fmt.Sprintf("อัตราการเต้นหัวใจ %d bpm, BP %s", e.Vitals.HeartRate, e.Vitals.BloodPressure),
-				Type:        "critical",
-				CreatedAt:   time.Now().Format(time.RFC3339),
-			})
-		} else if e.Status == "warning" {
-			alertsInZone = append(alertsInZone, Alert{
-				ID:          len(alertsInZone) + 1,
-				Title:       fmt.Sprintf("Elder %s มีสัญญาณเตือน", e.Name),
-				Description: fmt.Sprintf("SpO₂ %d%%, อุณหภูมิ %.1f°C", e.Vitals.SpO2, e.Vitals.Temperature),
-				Type:        "warning",
-				CreatedAt:   time.Now().Format(time.RFC3339),
-			})
-		}
-	}
+	device.AssignedTo = req.Fname + " " + req.Lname
+	device.ZoneID = req.ZoneID
 
-	return c.JSON(fiber.Map{
-		"zone": fiber.Map{
-			"id":          zone.ZoneID,
-			"name":        zone.ZoneName,
-			"status":      zone.Status,
-			"activeUsers": zone.ActiveUser,
-		},
-		"elderlyCount": len(zoneElders),
-		"deviceStatus": deviceStatus,
-		"alerts":       alertsInZone,
-		"elders":       zoneElders,
-	})
-
+	return c.JSON(fiber.Map{"message": "Elderly registered successfully"})
 }
