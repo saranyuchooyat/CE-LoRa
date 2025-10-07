@@ -367,3 +367,85 @@ func getMyZone(c *fiber.Ctx) error {
 
 	return c.JSON(myzone)
 }
+
+func getZoneDashboard(c *fiber.Ctx) error {
+	zoneID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid Zone ID"})
+	}
+
+	var zone *Zone
+	for i, z := range zones {
+		if z.ZoneID == zoneID {
+			zone = &zones[i]
+			break
+		}
+	}
+	if zone == nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Zone not found"})
+	}
+	var zoneElders []Elderly
+	for _, e := range elderlys {
+		if e.ZoneID == zoneID {
+			zoneElders = append(zoneElders, e)
+		}
+	}
+	deviceStatus := map[string]int{
+		"online":  0,
+		"offline": 0,
+		"total":   0,
+	}
+	var alertsInZone []Alert
+
+	for _, e := range zoneElders {
+		for _, d := range devices {
+			if e.DeviceID == d.DeviceID {
+				deviceStatus["total"]++
+				if d.Status == "online" {
+					deviceStatus["online"]++
+				} else if d.Status == "offline" {
+					deviceStatus["offline"]++
+					alertsInZone = append(alertsInZone, Alert{
+						ID:          len(alertsInZone) + 1,
+						Title:       fmt.Sprintf("อุปกรณ์ของ %s Offline", e.Name),
+						Description: fmt.Sprintf("Device %s ไม่ออนไลน์ตั้งแต่ %s", d.DeviceID, d.LastUpdate),
+						Type:        "warning",
+						CreatedAt:   time.Now().Format(time.RFC3339),
+					})
+				}
+				break
+			}
+		}
+		if e.Status == "critical" {
+			alertsInZone = append(alertsInZone, Alert{
+				ID:          len(alertsInZone) + 1,
+				Title:       fmt.Sprintf("Elder %s มีภาวะวิกฤต", e.Name),
+				Description: fmt.Sprintf("อัตราการเต้นหัวใจ %d bpm, BP %s", e.Vitals.HeartRate, e.Vitals.BloodPressure),
+				Type:        "critical",
+				CreatedAt:   time.Now().Format(time.RFC3339),
+			})
+		} else if e.Status == "warning" {
+			alertsInZone = append(alertsInZone, Alert{
+				ID:          len(alertsInZone) + 1,
+				Title:       fmt.Sprintf("Elder %s มีสัญญาณเตือน", e.Name),
+				Description: fmt.Sprintf("SpO₂ %d%%, อุณหภูมิ %.1f°C", e.Vitals.SpO2, e.Vitals.Temperature),
+				Type:        "warning",
+				CreatedAt:   time.Now().Format(time.RFC3339),
+			})
+		}
+	}
+
+	return c.JSON(fiber.Map{
+		"zone": fiber.Map{
+			"id":          zone.ZoneID,
+			"name":        zone.ZoneName,
+			"status":      zone.Status,
+			"activeUsers": zone.ActiveUser,
+		},
+		"elderlyCount": len(zoneElders),
+		"deviceStatus": deviceStatus,
+		"alerts":       alertsInZone,
+		"elders":       zoneElders,
+	})
+
+}
