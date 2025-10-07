@@ -34,12 +34,32 @@ type Elderly struct {
 	ID          string `json:"id"`
 	Name        string `json:"name"`
 	Age         int    `json:"age"`
+	CitizenID   string `json:"citizenId"`
+	BirthDate   string `json:"birthDate"`
 	Gender      string `json:"gender"`
 	Status      string `json:"status"`
+	Address     string `json:"address"`
 	Vitals      Vitals `json:"vitals"`
 	DeviceID    string `json:"device_id"`
+	Phone       string `json:"phone"`
+	Email       string `json:"email"`
 	Battery     int    `json:"battery"`
 	LastUpdated string `json:"last_updated"`
+	ZoneID      int    `json:"zone_id"`
+}
+type RegisterElderlyRequest struct {
+	Fname     string `json:"Fname"`
+	Lname     string `json:"Lname"`
+	CitizenID string `json:"citizenId"`
+	BirthDate string `json:"birthDate"`
+	Gender    string `json:"gender"`
+	Address   string `json:"address"`
+	Phone     string `json:"phone"`
+	Email     string `json:"email"`
+	ZoneID    int    `json:"zoneId"`
+	Device    struct {
+		DeviceID string `json:"deviceId"`
+	} `json:"device"`
 }
 
 type Device struct {
@@ -52,6 +72,7 @@ type Device struct {
 	Status       string   `json:"status"`
 	AssignedTo   string   `json:"assigned_to"`
 	Features     []string `json:"features"`
+	ZoneID       int      `json:"zone_id"`
 }
 
 type Server struct {
@@ -123,29 +144,29 @@ var zones = []Zone{
 
 var elderlys = []Elderly{
 	{
-		ID: "E001", Name: "นายสมชาย มั่นคง", Age: 72, Gender: "ชาย", Status: "critical",
+		ID: "E001", Name: "นายสมชาย มั่นคง", Age: 72, Gender: "ชาย", Status: "critical", CitizenID: "1309903050900",
 		Vitals:   Vitals{HeartRate: 125, BloodPressure: "160/95", SpO2: 94, Temperature: 37.1},
-		DeviceID: "SW-2024-001", Battery: 78, LastUpdated: "2025-08-20T14:30:00Z",
+		DeviceID: "SW-2024-001", Battery: 78, LastUpdated: "2025-08-20T14:30:00Z", ZoneID: 1,
 	},
 	{
-		ID: "E002", Name: "นางสมศรี ใจดี", Age: 68, Gender: "หญิง", Status: "stable",
+		ID: "E002", Name: "นางสมศรี ใจดี", Age: 68, Gender: "หญิง", Status: "stable", CitizenID: "1309903050901",
 		Vitals:   Vitals{HeartRate: 82, BloodPressure: "125/80", SpO2: 97, Temperature: 36.7},
-		DeviceID: "SW-2024-002", Battery: 55, LastUpdated: "2025-08-20T14:32:00Z",
+		DeviceID: "SW-2024-002", Battery: 55, LastUpdated: "2025-08-20T14:32:00Z", ZoneID: 1,
 	},
 	{
-		ID: "E003", Name: "นายบุญเลิศ ขยัน", Age: 75, Gender: "ชาย", Status: "warning",
+		ID: "E003", Name: "นายบุญเลิศ ขยัน", Age: 75, Gender: "ชาย", Status: "warning", CitizenID: "1309903050902",
 		Vitals:   Vitals{HeartRate: 102, BloodPressure: "150/92", SpO2: 93, Temperature: 38.0},
-		DeviceID: "SW-2024-003", Battery: 22, LastUpdated: "2025-08-20T14:35:00Z",
+		DeviceID: "SW-2024-003", Battery: 22, LastUpdated: "2025-08-20T14:35:00Z", ZoneID: 2,
 	},
 	{
-		ID: "E004", Name: "นางละไม สุขใจ", Age: 70, Gender: "หญิง", Status: "stable",
+		ID: "E004", Name: "นางละไม สุขใจ", Age: 70, Gender: "หญิง", Status: "stable", CitizenID: "1309903050903",
 		Vitals:   Vitals{HeartRate: 76, BloodPressure: "118/76", SpO2: 99, Temperature: 36.5},
-		DeviceID: "SW-2024-004", Battery: 90, LastUpdated: "2025-08-20T14:40:00Z",
+		DeviceID: "SW-2024-004", Battery: 90, LastUpdated: "2025-08-20T14:40:00Z", ZoneID: 2,
 	},
 	{
-		ID: "E005", Name: "นายมานพ อดทน", Age: 80, Gender: "ชาย", Status: "critical",
+		ID: "E005", Name: "นายมานพ อดทน", Age: 80, Gender: "ชาย", Status: "critical", CitizenID: "1309903050904",
 		Vitals:   Vitals{HeartRate: 130, BloodPressure: "170/100", SpO2: 88, Temperature: 39.2},
-		DeviceID: "SW-2024-005", Battery: 12, LastUpdated: "2025-08-20T14:45:00Z",
+		DeviceID: "SW-2024-005", Battery: 12, LastUpdated: "2025-08-20T14:45:00Z", ZoneID: 3,
 	},
 }
 
@@ -160,6 +181,7 @@ var devices = []Device{
 		Status:       "online",
 		AssignedTo:   "นายสมชาย มั่นคง",
 		Features:     []string{"SpO2", "Heart Rate", "Body Temp", "Blood Pressure"},
+		ZoneID:       1,
 	},
 	{
 		DeviceID:     "SW-2024-002",
@@ -168,9 +190,10 @@ var devices = []Device{
 		Model:        "J3 iSmart Watch",
 		Battery:      55,
 		LastUpdate:   "2025-08-20T14:32:00Z",
-		Status:       "online",
+		Status:       "offline",
 		AssignedTo:   "นางสมศรี ใจดี",
 		Features:     []string{"SpO2", "Heart Rate", "Body Temp", "Blood Pressure"},
+		ZoneID:       1,
 	},
 	{
 		DeviceID:     "SW-2024-003",
@@ -182,6 +205,7 @@ var devices = []Device{
 		Status:       "offline",
 		AssignedTo:   "นายบุญเลิศ ขยัน",
 		Features:     []string{"SpO2", "Heart Rate", "Body Temp"},
+		ZoneID:       2,
 	},
 	{
 		DeviceID:     "SW-2024-004",
@@ -193,6 +217,7 @@ var devices = []Device{
 		Status:       "online",
 		AssignedTo:   "นางละไม สุขใจ",
 		Features:     []string{"SpO2", "Heart Rate", "Body Temp", "Blood Pressure"},
+		ZoneID:       2,
 	},
 	{
 		DeviceID:     "SW-2024-005",
@@ -204,6 +229,31 @@ var devices = []Device{
 		Status:       "offline",
 		AssignedTo:   "นายมานพ อดทน",
 		Features:     []string{"SpO2", "Heart Rate", "Body Temp", "Blood Pressure"},
+		ZoneID:       3,
+	},
+	{
+		DeviceID:     "SW-2024-006",
+		SerialNumber: "JSW240006",
+		Type:         "SmartWatch",
+		Model:        "J3 iSmart Watch",
+		Battery:      50,
+		LastUpdate:   "2025-08-20T14:45:00Z",
+		Status:       "online",
+		AssignedTo:   "",
+		Features:     []string{"SpO2", "Heart Rate", "Body Temp", "Blood Pressure"},
+		ZoneID:       0,
+	},
+	{
+		DeviceID:     "SW-2024-007",
+		SerialNumber: "JSW240007",
+		Type:         "SmartWatch",
+		Model:        "J3 iSmart Watch",
+		Battery:      42,
+		LastUpdate:   "2025-08-20T14:45:00Z",
+		Status:       "online",
+		AssignedTo:   "",
+		Features:     []string{"SpO2", "Heart Rate", "Body Temp", "Blood Pressure"},
+		ZoneID:       0,
 	},
 }
 
