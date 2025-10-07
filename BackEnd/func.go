@@ -503,3 +503,17 @@ func addEldertoZone(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{"message": "Elderly registered successfully"})
 }
+
+func getElderinZone(c *fiber.Ctx) error {
+	zoneID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.ErrBadRequest.Code).JSON(fiber.Map{"error": "Invalid Zone ID"})
+	}
+	var elderlyinZone []Elderly
+	for _, e := range elderlys {
+		if e.ZoneID == zoneID {
+			elderlyinZone = append(elderlyinZone, e)
+		}
+	}
+	return c.JSON(elderlyinZone)
+}
