@@ -39,11 +39,16 @@ func main() {
 	app.Get("/zones/:id/dashboard", getZoneDashboard)
 	app.Post("zones/elderlyRegister", addEldertoZone)
 	app.Get("/zones/:id/elder", getElderinZone)
+
 	app.Get("/elders", getAllElderly)
 
 	app.Get("/system/health/servers", getHealthservers)
 	app.Get("/system/alerts", getAlert)
+
 	app.Get("/devices", getAllDevice)
+	app.Post("/devices", createDevice)
+	app.Put("/devices/:id", updateDevice)
+	app.Delete("/devices/:id", deleteDevice)
 
 	app.Get("/dashboard/usage-trend", getUserTrend)
 	app.Get("/dashboard/summary", getDashSum)

@@ -517,3 +517,74 @@ func getElderinZone(c *fiber.Ctx) error {
 	}
 	return c.JSON(elderlyinZone)
 }
+
+func createDevice(c *fiber.Ctx) error {
+	device := new(Device)
+
+	if err := c.BodyParser(device); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	device.AssignedTo = ""
+	device.ZoneID = 0
+	devices = append(devices, *device)
+	return c.JSON(device)
+}
+
+func updateDevice(c *fiber.Ctx) error {
+	deviceID := c.Params("id")
+
+	updatedDevice := new(Device)
+	if err := c.BodyParser(updatedDevice); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	for i, d := range devices {
+		if d.DeviceID == deviceID {
+
+			if updatedDevice.SerialNumber != "" {
+				devices[i].SerialNumber = updatedDevice.SerialNumber
+			}
+			if updatedDevice.Type != "" {
+				devices[i].Type = updatedDevice.Type
+			}
+			if updatedDevice.Model != "" {
+				devices[i].Model = updatedDevice.Model
+			}
+			if updatedDevice.Status != "" {
+				devices[i].Status = updatedDevice.Status
+			}
+			if updatedDevice.AssignedTo != "" {
+				devices[i].AssignedTo = updatedDevice.AssignedTo
+			}
+			if updatedDevice.ZoneID != 0 {
+				devices[i].ZoneID = updatedDevice.ZoneID
+			}
+			if updatedDevice.Battery != 0 {
+				devices[i].Battery = updatedDevice.Battery
+			}
+			if len(updatedDevice.Features) > 0 {
+				devices[i].Features = updatedDevice.Features
+			}
+			if updatedDevice.LastUpdate != "" {
+				devices[i].LastUpdate = updatedDevice.LastUpdate
+			}
+
+			return c.JSON(devices[i])
+		}
+	}
+	return c.SendStatus(fiber.StatusNotFound)
+}
+
+func deleteDevice(c *fiber.Ctx) error {
+	deviceID := c.Params("id")
+
+	for i, d := range devices {
+		if d.DeviceID == deviceID {
+			fmt.Println(d.DeviceID)
+			devices = append(devices[:i], devices[i+1:]...)
+			return c.SendStatus(fiber.StatusNoContent)
+		}
+	}
+	return c.SendStatus(fiber.StatusNotFound)
+}
