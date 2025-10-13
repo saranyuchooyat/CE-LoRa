@@ -29,7 +29,7 @@ function Cardno8({data}){
                     </div>
                 </div>
 
-                <Cardno8Info/>
+                <Cardno8Info data={data}/>
             </div>
         </>
     )
