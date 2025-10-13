@@ -24,7 +24,7 @@ function ZoneDashboard(){
     //ดึงข้อมูลหลังบ้าน
     const ZoneQueries = useQueries({
         queries: [
-        { queryKey: ['zones'], queryFn: () => api.get('/zones').then(res => res.data) },
+        { queryKey: ['zones'], queryFn: () => api.get('/zones/my-zones').then(res => res.data) },
         ],
     });
 
