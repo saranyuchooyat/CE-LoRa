@@ -4,7 +4,7 @@ import ZoneAdminTable from "./Table/ZoneAdminTable";
 import UserTable from "./Table/UserTable";
 
 function CardFull({ data }){
-    console.log("data",data)
+    // console.log("data",data)
 
     let displayContent = null
     let displayHeader = null

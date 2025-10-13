@@ -42,7 +42,7 @@ function UserManagement(){
         }
     }, [location.state]);
 
-    const userQueryResult = userQueries[0];
+    const userData = userQueries[0];
     //ดึงข้อมูลหลังบ้าน
 
 
@@ -60,7 +60,7 @@ function UserManagement(){
 
     const filteredUsers = useMemo(() => {
         const { search, role, status } = filters;
-        let data = userQueryResult.data || []; 
+        let data = userData.data || []; 
 
         // กรองตามช่องค้นหา (Search)
         if (search) {
@@ -85,11 +85,11 @@ function UserManagement(){
             data = data.filter(user => user.status === status);
         }
         return data;
-    }, [userQueryResult.data, filters]);
+    }, [userData.data, filters]);
     // ระบบ filter
 
     // ระบบกรองจำวน Role
-        const roleCountsObject = (userQueryResult.data || []).reduce((acc, user) => {
+        const roleCountsObject = (userData.data || []).reduce((acc, user) => {
         const role = user.role;
         acc[role] = (acc[role] || 0) + 1;
         return acc;
@@ -117,6 +117,8 @@ function UserManagement(){
     if (isSystemError) {
         return <div className="mx-5 mt-10 text-center text-xl text-red-600">Error fetching data!</div>;
     }
+
+    // console.log("userData",userData.data)
 
     return(
         <>
@@ -151,7 +153,7 @@ function UserManagement(){
 
                 <AddUserForm 
                 onClose={handleCloseModal} 
-                onSaveSuccess={userQueryResult}/>
+                onSaveSuccess={userData}/>
             </Modal>
 
 

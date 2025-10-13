@@ -11,7 +11,7 @@ function AddZoneForm({ onClose, onSaveSuccess }){
         status:'เลือกสถานะ'
     });
 
-    const [openStatus, setOpenStatus] = useState(false);
+    // const [openStatus, setOpenStatus] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleChange = (e) => {
@@ -22,12 +22,12 @@ function AddZoneForm({ onClose, onSaveSuccess }){
         }));
     };
 
-    // ระบบเลือก Status
-    const selectStatus = (selectedStatus) => {
-        setFormData(prev => ({ ...prev, status: selectedStatus })); // เก็บค่า Status จริง
-        setOpenStatus(false);
-    };
-    // ระบบเลือก Status
+    // // ระบบเลือก Status
+    // const selectStatus = (selectedStatus) => {
+    //     setFormData(prev => ({ ...prev, status: selectedStatus })); // เก็บค่า Status จริง
+    //     setOpenStatus(false);
+    // };
+    // // ระบบเลือก Status
 
     const handleSubmit = async (e) => {
         e.preventDefault(); 
@@ -90,7 +90,7 @@ function AddZoneForm({ onClose, onSaveSuccess }){
                     />
                 </div>
 
-                {/* เลือกสถานะ */}
+                {/* เลือกสถานะ
                 <div className="relative mr-3">
                     <p className="block text-gray-700">เลือกสถานะ</p>
                     <button 
@@ -114,13 +114,15 @@ function AddZoneForm({ onClose, onSaveSuccess }){
                             <div className="cursor-pointer hover:bg-gray-300 p-2" onClick={() => selectStatus("Active")}>Active</div>
                             <div className="cursor-pointer hover:bg-gray-300 p-2" onClick={() => selectStatus("InActive")}>InActive</div>
                         </div>}
-                </div>
+                </div> */}
+
             </div>
 
             <div className="mt-4">
-                {/*ที่อยู่*/}
+
+                {/*เบอร์โทรศัพท์*/}
                 <div className="mb-4">
-                    <label className="block text-gray-700">ที่อยู่</label>
+                    <label className="block text-gray-700">เบอร์โทรศัพท์</label>
                     <input 
                         type="text" 
                         name="address" 
@@ -130,9 +132,9 @@ function AddZoneForm({ onClose, onSaveSuccess }){
                     />
                 </div>
 
-                {/*คำอธิบาย*/}
+                {/*ที่อยู่*/}
                 <div className="mb-4">
-                    <label className="block text-gray-700">คำอธิบาย</label>
+                    <label className="block text-gray-700">ที่อยู่</label>
                     <textarea
                         type="text" 
                         name="description" 

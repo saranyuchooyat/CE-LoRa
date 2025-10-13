@@ -21,7 +21,7 @@ function SystemOverviewDashboard(){
             { queryKey: ['devices'], queryFn: () => api.get('/devices').then(res => res.data) },
             { queryKey: ['zones'], queryFn: () => api.get('/zones').then(res => res.data) },
             { queryKey: ['servers'], queryFn: () => api.get('/system/health/servers').then(res => res.data) },
-            { queryKey: ['alerts'], queryFn: () => api.get('/system/alerts').then(res => res.data) },
+            { queryKey: ['topZone'], queryFn:() => api.get('dashboard/top-zones').then(res => res.data)}
         ],
     });
 
@@ -33,7 +33,7 @@ function SystemOverviewDashboard(){
     const deviceData = systemQueries[2].data || [];
     const zoneData = systemQueries[3].data || [];
     const serverData = systemQueries[4].data || [];
-    const alertData = systemQueries[5].data || [];
+    const TopZoneData = systemQueries[5].data || [];
 
     useEffect(() => {
         const tokenInStorage = localStorage.getItem('token');
@@ -61,13 +61,13 @@ function SystemOverviewDashboard(){
         return <div className="mx-5 mt-10 text-center text-xl text-red-600">Error fetching data!</div>;
     }
 
+    console.log("topzone",TopZoneData)
     return(
         <>
             <div className="mx-5">
                 <Cardno2 data={SystemData}/>
                 <Cardno3/>
                 <CardServerData data={serverData}/>
-                <CardFull data={alertData}/>
             </div>
         </>
     );

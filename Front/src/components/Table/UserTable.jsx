@@ -1,14 +1,48 @@
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { useQueries } from "@tanstack/react-query";
+import api from "../../components/API";
+
 function UserTable({ data }){
 
-    console.log("table data:", data);
+    console.log("table data", data);
+    const location = useLocation();
 
-    const getZoneName = (zoneData) => {
-        if (!zoneData) {
+    //ดึงข้อมูลหลังบ้าน
+    const userQueries = useQueries({
+        queries: [
+        { queryKey: ['zone'], queryFn: () => api.get('/zones').then(res => res.data) },
+        ],
+    });
+
+    const isSystemLoading = userQueries.some(query => query.isLoading);
+    const isSystemError = userQueries.some(query => query.isError);
+
+    useEffect(() => {
+        const tokenInStorage = localStorage.getItem('token');
+        if (location.state?.token && location.state.token !== tokenInStorage) {
+            localStorage.setItem('token', location.state.token);
+            // 💡 เมื่อบันทึก Token ใหม่แล้ว React Query จะทำการ Refetch ให้อัตโนมัติ
+            // เนื่องจากทุก Query จะถูก Trigger เมื่อ Token ถูกบันทึกและ Component Rerender
+        }
+    }, [location.state]);
+
+    const zoneData = userQueries[0].data || [];
+    //ดึงข้อมูลหลังบ้าน
+
+    
+
+    const getZoneName = (userZone,zoneData) => {
+        if (!userZone) {
             return "N/A"; 
         }
-        // ถ้าข้อมูล Zone เป็น Object/Array, อาจจะต้องเขียน Logic เพื่อดึงชื่อ Zone ออกมา
-        // แต่ถ้า card.zone คือชื่อ Zone อยู่แล้ว ให้ return ค่าเดิม
-        return zoneData; 
+
+        const matchedZones = zoneData.filter(zone => userZone.includes(zone.zoneid));
+
+        if(matchedZones.length > 0){
+            return matchedZones.map(zone => zone.zonename).join(', ');
+        } 
+        return "N/A";
     };
 
     const getStatus = (status) => {
@@ -26,6 +60,14 @@ function UserTable({ data }){
         );
     }
 
+    if (isSystemLoading) {
+        return <div className="mx-5 mt-10 text-center text-xl">Loading Dashboard...</div>;
+    }
+        
+    if (isSystemError) {
+        return <div className="mx-5 mt-10 text-center text-xl text-red-600">Error fetching data!</div>;
+    }
+
     return(
         <>
             <div className="overflow-auto rounded-lg shadow">
@@ -35,7 +77,7 @@ function UserTable({ data }){
                             {/* Thead ใช้ Role และ Zone เป็น Header */}
                             <th className="table-header">User Name</th>
                             <th className="table-header">Role</th>
-                            <th className="table-header">Zone</th>
+                            <th className="table-header">Zone ID</th>
                             <th className="table-header">Tel</th>
                             <th className="table-header">Status</th>
                             <th className="table-header">Menu</th>
@@ -50,7 +92,7 @@ function UserTable({ data }){
                                     <td className="table-data whitespace-nowrap">{card.name}</td>
                                     <td className="table-data whitespace-nowrap">{card.role}</td>
                                     {/* **สำคัญ:** ใช้ card.ZoneName หรือ card.Zone ถ้ามี Key นี้ในข้อมูล */}
-                                    <td className="table-data whitespace-wrap w-[200px]">{getZoneName(card.Zone)}</td>
+                                    <td className="table-data whitespace-wrap w-[200px]">{getZoneName(card.zoneids,zoneData)}</td>
                                     <td className="table-data whitespace-nowrap">{card.phone}</td>
                                     <td className="table-data whitespace-nowrap">{getStatus(card.status)}</td>
                                     
