@@ -30,10 +30,21 @@ func getAllUser(c *fiber.Ctx) error {
 func createUser(c *fiber.Ctx) error {
 	user := new(User)
 
+	var rolePermissions = map[string][]string{
+		"System Admin": {"manage_zones", "manage_users", "view_all"},
+		"Zone Admin":   {"manage_elderly", "view_devices", "view_health"},
+		"Zone Staff":   {"view_elderly", "view_health", "view_devices"},
+	}
+
 	if err := c.BodyParser(user); err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
 
+	if perms, ok := rolePermissions[user.Role]; ok {
+		user.Permissions = perms
+	} else {
+		user.Permissions = []string{}
+	}
 	users = append(users, *user)
 	return c.JSON(user)
 }
@@ -588,3 +599,15 @@ func deleteDevice(c *fiber.Ctx) error {
 	}
 	return c.SendStatus(fiber.StatusNotFound)
 }
+
+// func getZoneStaff(c *fiber.Ctx) error {
+// 	zoneID, err := strconv.Atoi(c.Params("id"))
+// 	if err != nil {
+// 		c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid Zone ID"})
+// 	}
+// 	for _, z := range zones {
+// 		if zoneID == z.ZoneID {
+
+// 		}
+// 	}
+// }

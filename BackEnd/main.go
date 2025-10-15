@@ -50,6 +50,7 @@ func main() {
 	app.Put("/devices/:id", updateDevice)
 	app.Delete("/devices/:id", deleteDevice)
 
+	// app.Get("/zones/:id/staff", getZoneStaff)
 	app.Get("/dashboard/usage-trend", getUserTrend)
 	app.Get("/dashboard/summary", getDashSum)
 	app.Get("/dashboard/top-zones", getTopZones)
