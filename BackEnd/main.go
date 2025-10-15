@@ -24,18 +24,25 @@ func main() {
 	}))
 
 	app.Use(checkMiddleWare)
+	//system admin
 	app.Get("/users", getAllUser)
 	app.Get("/users/:id", getUserByID)
 	app.Post("/users", createUser)
 	app.Put("/users/:id", updateUser)
 	app.Delete("/users/:id", deleteUser)
 	app.Post("/users/:id/reset-password", resetPassword)
-	//zone admin
+
 	app.Get("/zones", getAllZone)
+
+	app.Get("/system/health/servers", getHealthservers)
+	app.Get("/system/alerts", getAlert)
+
 	app.Get("/zones/my-zones", getMyZone)
 	app.Post("/zones", createZone)
 	app.Put("/zones/:id", updateZone)
 	app.Delete("/zones/:id", deleteZone)
+	//zone admin
+
 	app.Get("/zones/:id/dashboard", getZoneDashboard)
 	app.Post("zones/elderlyRegister", addEldertoZone)
 
@@ -50,9 +57,6 @@ func main() {
 	//zone staff
 	app.Get("/zones/:id/elders", getElderinZone)
 	app.Get("/zones/:id/elders/alertandstatus", getElderAlertandstatus)
-
-	app.Get("/system/health/servers", getHealthservers)
-	app.Get("/system/alerts", getAlert)
 
 	app.Get("/devices", getAllDevice)
 	app.Post("/devices", createDevice)
