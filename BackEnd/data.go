@@ -1,18 +1,34 @@
 package main
 
 type User struct {
-	UserID      int      `json:"userId"`
-	Name        string   `json:"name"`
+	UserID      int          `json:"userId"`
+	Name        string       `json:"name"`
+	Email       string       `json:"email"`
+	Phone       string       `json:"phone"`
+	Username    string       `json:"username,omitempty"`
+	Password    string       `json:"password,omitempty"`
+	Role        string       `json:"role"`
+	ZoneIDs     []int        `json:"zoneids"`
+	Status      string       `json:"status"`
+	LastLogin   string       `json:"lastLogin"`
+	CreatedAt   string       `json:"createdAt"`
+	Permissions []string     `json:"permission"`
+	StaffInfo   *StaffDetail `json:"staff_info,omitempty"`
+}
+type CreateZoneStaffRequest struct {
+	FirstName   string   `json:"firstname"`
+	Lastname    string   `json:"lastname"`
 	Email       string   `json:"email"`
 	Phone       string   `json:"phone"`
-	Role        string   `json:"role"`
-	ZoneIDs     []int    `json:"zoneids"`
-	Status      string   `json:"status"`
-	LastLogin   string   `json:"lastLogin"`
-	CreatedAt   string   `json:"createdAt"`
-	Username    string   `json:"username,omitempty"`
-	Password    string   `json:"password,omitempty"`
-	Permissions []string `json:"permission"`
+	Username    string   `json:"username"`
+	Password    string   `json:"password"`
+	Permissions []string `json:"permissions"`
+	Description string   `json:"description"`
+	Position    string   `json:"position"`
+}
+type StaffDetail struct {
+	Position    string `json:"position"`
+	Description string `json:"description"`
 }
 
 type Zone struct {
@@ -111,6 +127,7 @@ var users = []User{
 		Email:       "66015172@kmitl.ac.th",
 		ZoneIDs:     []int{1, 2, 3, 4, 5, 6, 7},
 		Permissions: []string{"manage_zones", "manage_users", "view_all"},
+		Status:      "Online",
 	},
 	{
 		UserID:      2,
@@ -122,6 +139,7 @@ var users = []User{
 		Email:       "66015134@kmitl.ac.th",
 		ZoneIDs:     []int{1, 3, 4},
 		Permissions: []string{"manage_elderly", "view_devices", "view_health"},
+		Status:      "Online",
 	},
 	{
 		UserID:      3,
@@ -131,8 +149,29 @@ var users = []User{
 		Phone:       "0987654321",
 		Role:        "Zone Staff",
 		Email:       "66015072@kmitl.ac.th",
-		ZoneIDs:     []int{2, 5},
+		ZoneIDs:     []int{2},
 		Permissions: []string{"manage_elderly", "view_devices", "view_health"},
+		StaffInfo: &StaffDetail{
+			Position:    "เจ้าหน้าที่ IT",
+			Description: "เจ้าหน้าที่ IT รับผิดชอบระบบและอุปกรณ์",
+		},
+		Status: "Online",
+	},
+	{
+		UserID:      4,
+		Username:    "book",
+		Password:    "9999",
+		Name:        "Aphiwit Somphet",
+		Phone:       "0987443121",
+		Role:        "Zone Staff",
+		Email:       "66015221@kmitl.ac.th",
+		ZoneIDs:     []int{2},
+		Permissions: []string{"manage_elderly", "view_devices", "view_health"},
+		StaffInfo: &StaffDetail{
+			Position:    "นักสังคมสงเคราะห์",
+			Description: "เชี่ยวชาญด้านดูแลผู้สูงอายุ",
+		},
+		Status: "offline",
 	},
 }
 
