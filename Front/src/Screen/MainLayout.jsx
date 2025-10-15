@@ -12,6 +12,7 @@ import ZoneStaffManagement from './ZoneAdminMenu/ZoneStaffManagement';
 import NotFoundPage from './NotFound';
 import LoginPage from './Login';
 import DeviceDetail from './DeviceDetail';
+import ElderlyMonitoring from './ZoneStaffMenu/ElderlyMonitoring';
 
 function MainLayout() {
   return (
@@ -27,7 +28,7 @@ function MainLayout() {
           <Route path="/zone-management" element={<ZoneManagement/>} />
           <Route path="/user-management" element={<UserManagement/>} />
 
-          {/*Zone Staff Menu*/}
+          {/*Zone Admin Menu*/}
           <Route path="/zone-dashboard" element={<ZoneDashboard/>}/>
           <Route path="/zone-details/:zoneid" element={<ZoneDashboardDetail/>}/>
           <Route path="/device-management" element={<DeviceManagement/>}/>
@@ -35,6 +36,9 @@ function MainLayout() {
           
           <Route path='/deivce-details/:device_id' element={<DeviceDetail/>}/>
           {/* ... ส่วนที่เหลือ ... */}
+
+          {/* Zone Staff Menu */}
+          <Route path="/eldery-monitoring" element={<ElderlyMonitoring/>}/>
 
           <Route path="/health-monitoring" element={<HealthMonitoring/>} />
           <Route path="*" element={<NotFoundPage />} />

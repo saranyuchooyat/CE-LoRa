@@ -4,7 +4,8 @@ import ZoneAdminTable from "./Table/ZoneAdminTable";
 import UserTable from "./Table/UserTable";
 
 function CardFull({ data }){
-    // console.log("data",data)
+
+    console.log("data",data)
 
     let displayContent = null
     let displayHeader = null
@@ -13,6 +14,7 @@ function CardFull({ data }){
         if (!Array.isArray(arr) || arr.length === 0) {
             return false;
         }
+        console.log("arr1",'id' in arr[0] && 'title' in arr[0])
         return 'id' in arr[0] && 'title' in arr[0];
     };
 
@@ -20,6 +22,7 @@ function CardFull({ data }){
         if (!Array.isArray(arr) || arr.length === 0) {
             return false;
         }
+        console.log("arr2",'zoneid' in arr[0] && 'zonename' in arr[0])
         return 'zoneid' in arr[0] && 'zonename' in arr[0];
     };
 
@@ -27,7 +30,16 @@ function CardFull({ data }){
         if (!Array.isArray(arr) || arr.length === 0) {
             return false;
         }
+        console.log("arr3",'userId' in arr[0] && 'name' in arr[0])
         return 'userId' in arr[0] && 'name' in arr[0];
+    }
+
+    const isZoneStaffData = (arr) => {
+        if (!Array.isArray(arr) || arr.length === 0) {
+            return false;
+        }
+        console.log("arr4",'name' in arr[0] && 'position' in arr[0])
+        return 'name' in arr[0] && 'position' in arr[0];
     }
 
     if(isNotiData(data)){
@@ -42,6 +54,10 @@ function CardFull({ data }){
     else if(isStaffData(data)){
         console.log("StaffPass")
         displayContent = <UserTable data={data}/>;
+    }
+    else if(isZoneStaffData(data)){
+        console.log("ZoneStaffPass")
+        displayContent = <ZoneAdminTable data={data}/>;
     }
 
 

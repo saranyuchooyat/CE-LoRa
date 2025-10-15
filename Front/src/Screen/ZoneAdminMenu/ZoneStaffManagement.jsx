@@ -6,6 +6,7 @@ import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
 import CardFilter from "../../components/CardFilter";
 import Cardno2 from "../../components/Cardno2";
 import Cardno5 from "../../components/Cardno5";
+import CardLayouts from "../../components/CardLayouts";
 import Modal from "../../components/ModalForm/Modal";
 import AddUserForm from "../../components/ModalForm/AddUserForm";
 
@@ -18,15 +19,15 @@ const initialFilters = {
 function UserManagement(){
     
     const location = useLocation();
-    const [filters, setFilters] = useState(initialFilters);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const handleOpenModal = () => setIsModalOpen(true);
-    const handleCloseModal = () => setIsModalOpen(false);
+    // const [filters, setFilters] = useState(initialFilters);
+    // const [isModalOpen, setIsModalOpen] = useState(false);
+    // const handleOpenModal = () => setIsModalOpen(true);
+    // const handleCloseModal = () => setIsModalOpen(false);
 
     //ดึงข้อมูลหลังบ้าน
     const userQueries = useQueries({
         queries: [
-        { queryKey: ['users'], queryFn: () => api.get('/users').then(res => res.data) },
+        { queryKey: ['zoneStaff'], queryFn: () => api.get(`/zones/${2}/staff`).then(res => res.data) }
         ],
     });
 
@@ -42,74 +43,53 @@ function UserManagement(){
         }
     }, [location.state]);
 
-    const userQueryResult = userQueries[0];
+    const zoneStaffData = userQueries[0].data || [];
     //ดึงข้อมูลหลังบ้าน
 
 
     // ระบบ filter
-    const handleFilterChange = (key, value) => {
-        setFilters(prev => ({
-            ...prev,
-            [key]: value
-        }));
-    };
+    // const handleFilterChange = (key, value) => {
+    //     setFilters(prev => ({
+    //         ...prev,
+    //         [key]: value
+    //     }));
+    // };
 
-    const handleClearFilters = () => {
-        setFilters(initialFilters);
-    };
+    // const handleClearFilters = () => {
+    //     setFilters(initialFilters);
+    // };
 
-    const filteredUsers = useMemo(() => {
-        const { search, role, status } = filters;
-        let data = userQueryResult.data || []; 
+    // const filteredUsers = useMemo(() => {
+    //     const { search, role, status } = filters;
+    //     let data = userQueryResult.data || []; 
 
-        // กรองตามช่องค้นหา (Search)
-        if (search) {
-            const lowerSearch = search.toLowerCase();
-            data = data.filter(user => (
-            //ตรวจสอบ user.username
-            (user.name && user.name.toLowerCase().includes(lowerSearch)) ||
-            //ตรวจสอบ email
-            (user.email && user.email.toLowerCase().includes(lowerSearch)) ||
-            //ตรวจสอบ phone
-            (user.phone && String(user.phone).includes(lowerSearch))));
-        }
+    //     // กรองตามช่องค้นหา (Search)
+    //     if (search) {
+    //         const lowerSearch = search.toLowerCase();
+    //         data = data.filter(user => (
+    //         //ตรวจสอบ user.username
+    //         (user.name && user.name.toLowerCase().includes(lowerSearch)) ||
+    //         //ตรวจสอบ email
+    //         (user.email && user.email.toLowerCase().includes(lowerSearch)) ||
+    //         //ตรวจสอบ phone
+    //         (user.phone && String(user.phone).includes(lowerSearch))));
+    //     }
 
-        // กรองตามบทบาท (Role)
-        if (role && role !== 'ทั้งหมด') {
-            data = data.filter(user => user.role === role);
-        }
+    //     // กรองตามบทบาท (Role)
+    //     if (role && role !== 'ทั้งหมด') {
+    //         data = data.filter(user => user.role === role);
+    //     }
 
-        // กรองตามสถานะ (Status) - *ต้องเพิ่ม Key 'status' ในข้อมูล user*
-        // สมมติว่า user มี Key 'status' (Active/Inactive)
-        if (status && status !== 'ทั้งหมด') {
-            data = data.filter(user => user.status === status);
-        }
-        return data;
-    }, [userQueryResult.data, filters]);
+    //     // กรองตามสถานะ (Status) - *ต้องเพิ่ม Key 'status' ในข้อมูล user*
+    //     // สมมติว่า user มี Key 'status' (Active/Inactive)
+    //     if (status && status !== 'ทั้งหมด') {
+    //         data = data.filter(user => user.status === status);
+    //     }
+    //     return data;
+    // }, [userQueryResult.data, filters]);
     // ระบบ filter
 
-    // ระบบกรองจำวน Role
-        const roleCountsObject = (userQueryResult.data || []).reduce((acc, user) => {
-        const role = user.role;
-        acc[role] = (acc[role] || 0) + 1;
-        return acc;
-    }, {});
 
-    const staffDataList = Object.entries(roleCountsObject).map(([roleName, count]) => {
-        return {
-            name: roleName,
-            value: count
-        };
-    })
-
-    const totalStaffObjects= {name:"จำนวนทั้งหมด", value:userQueries.length}
-
-    const staffData=[
-        totalStaffObjects,
-        ...staffDataList
-    ]
-    // ระบบกรองจำวน Role
-    
     if (isSystemLoading) {
         return <div className="mx-5 mt-10 text-center text-xl">Loading Dashboard...</div>;
     }
@@ -118,33 +98,37 @@ function UserManagement(){
         return <div className="mx-5 mt-10 text-center text-xl text-red-600">Error fetching data!</div>;
     }
 
+    console.log("zoneStaff",zoneStaffData)
+
     return(
         <>
             <div className="mx-5">
                 <MenuNameCard
-                title="จัดการผู้ใช้งาน"
-                description="ระบบจัดการบัญชีผู้ใช้และสิทธิ์การเข้าถึง"
-                onButtonClick={handleOpenModal} // ต้องเพิ่ม Prop นี้ใน MenuNameCard
+                title="จัดการ Zone Staff Smart Healthcare"
+                description=""
+                onButtonClick="{handleOpenModal}" // ต้องเพิ่ม Prop นี้ใน MenuNameCard
                 detail={false}
-                buttonText="เพิ่มผู้ใช้งานใหม่"/>
+                buttonText="เพิ่ม Zone Staff ใหม่"/>
 
-                <Cardno2 data={staffData}/>
+                {/* <Cardno2 data=""/> */}
 
-                <CardFilter
+                {/* <CardFilter
                     name="ผู้ใช้งาน"
                     placeholderName=" ชื่อ, อีเมล, หรือเบอร์โทรศัพท์"
                     option1Name="สถานะ"
                     option2Name="บทบาท"
                     // ส่งค่าปัจจุบันและฟังก์ชันควบคุม
-                    filters={filters}
-                    onFilterChange={handleFilterChange}
-                    onClear={handleClearFilters}
+                    // filters={filters}
+                    onFilterChange="{handleFilterChange}"
+                    onClear="{handleClearFilters}"
                     option2Key="role"
-                />
-                <Cardno5 data={filteredUsers}/> 
+                /> */}
+                <CardLayouts
+                name= "staff" 
+                data={zoneStaffData}/> 
             </div>
 
-            <Modal 
+            {/* <Modal 
                 title="เพิ่มผู้ใช้งานใหม่" 
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}>
@@ -152,7 +136,7 @@ function UserManagement(){
                 <AddUserForm 
                 onClose={handleCloseModal} 
                 onSaveSuccess={userQueryResult}/>
-            </Modal>
+            </Modal> */}
 
 
         </>

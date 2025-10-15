@@ -19,7 +19,7 @@ function CardLayouts({ name, data }) {
             return <DeviceCard data={data}/>
         }
         else if(name == 'staff'){
-            return <ZoneStaffCard/>
+            return <ZoneStaffCard data={data}/>
         }
 
     };
