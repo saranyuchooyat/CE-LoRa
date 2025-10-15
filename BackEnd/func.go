@@ -30,10 +30,21 @@ func getAllUser(c *fiber.Ctx) error {
 func createUser(c *fiber.Ctx) error {
 	user := new(User)
 
+	var rolePermissions = map[string][]string{
+		"System Admin": {"manage_zones", "manage_users", "view_all"},
+		"Zone Admin":   {"manage_elderly", "view_devices", "view_health"},
+		"Zone Staff":   {"view_elderly", "view_health", "view_devices"},
+	}
+
 	if err := c.BodyParser(user); err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
 
+	if perms, ok := rolePermissions[user.Role]; ok {
+		user.Permissions = perms
+	} else {
+		user.Permissions = []string{}
+	}
 	users = append(users, *user)
 	return c.JSON(user)
 }
@@ -516,4 +527,287 @@ func getElderinZone(c *fiber.Ctx) error {
 		}
 	}
 	return c.JSON(elderlyinZone)
+}
+
+func createDevice(c *fiber.Ctx) error {
+	device := new(Device)
+
+	if err := c.BodyParser(device); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	device.AssignedTo = ""
+	device.ZoneID = 0
+	devices = append(devices, *device)
+	return c.JSON(device)
+}
+
+func updateDevice(c *fiber.Ctx) error {
+	deviceID := c.Params("id")
+
+	updatedDevice := new(Device)
+	if err := c.BodyParser(updatedDevice); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	for i, d := range devices {
+		if d.DeviceID == deviceID {
+
+			if updatedDevice.SerialNumber != "" {
+				devices[i].SerialNumber = updatedDevice.SerialNumber
+			}
+			if updatedDevice.Type != "" {
+				devices[i].Type = updatedDevice.Type
+			}
+			if updatedDevice.Model != "" {
+				devices[i].Model = updatedDevice.Model
+			}
+			if updatedDevice.Status != "" {
+				devices[i].Status = updatedDevice.Status
+			}
+			if updatedDevice.AssignedTo != "" {
+				devices[i].AssignedTo = updatedDevice.AssignedTo
+			}
+			if updatedDevice.ZoneID != 0 {
+				devices[i].ZoneID = updatedDevice.ZoneID
+			}
+			if updatedDevice.Battery != 0 {
+				devices[i].Battery = updatedDevice.Battery
+			}
+			if len(updatedDevice.Features) > 0 {
+				devices[i].Features = updatedDevice.Features
+			}
+			if updatedDevice.LastUpdate != "" {
+				devices[i].LastUpdate = updatedDevice.LastUpdate
+			}
+
+			return c.JSON(devices[i])
+		}
+	}
+	return c.SendStatus(fiber.StatusNotFound)
+}
+
+func deleteDevice(c *fiber.Ctx) error {
+	deviceID := c.Params("id")
+
+	for i, d := range devices {
+		if d.DeviceID == deviceID {
+			fmt.Println(d.DeviceID)
+			devices = append(devices[:i], devices[i+1:]...)
+			return c.SendStatus(fiber.StatusNoContent)
+		}
+	}
+	return c.SendStatus(fiber.StatusNotFound)
+}
+
+func getZoneStaff(c *fiber.Ctx) error {
+	zoneID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid Zone ID"})
+	}
+	found := false
+	for _, z := range zones {
+		if zoneID == z.ZoneID {
+			found = true
+			break
+		}
+	}
+	if !found {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Zone not found",
+		})
+	}
+	var staffList []fiber.Map
+	for _, u := range users {
+		if len(u.ZoneIDs) == 1 && u.ZoneIDs[0] == zoneID {
+			staffList = append(staffList, fiber.Map{
+				"id":          fmt.Sprintf("staff-%03d", u.UserID),
+				"name":        u.Name,
+				"position":    u.StaffInfo.Position,
+				"Description": u.StaffInfo.Description,
+				"phone":       u.Phone,
+				"email":       u.Email,
+				"join_date":   u.CreatedAt,
+				"last_login":  u.LastLogin,
+				"status":      u.Status,
+				"permissions": u.Permissions,
+			})
+		}
+	}
+	return c.JSON(staffList)
+}
+
+func createZoneStaff(c *fiber.Ctx) error {
+	zoneID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid Zone ID"})
+	}
+	var req CreateZoneStaffRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	validPermissions := map[string]bool{
+		"view_elderly":   true,
+		"view_devices":   true,
+		"view_health":    true,
+		"manage_elderly": true,
+	}
+	var finalPerms []string
+	for _, p := range req.Permissions {
+		if validPermissions[p] {
+			finalPerms = append(finalPerms, p)
+		}
+	}
+	newUser := User{
+		UserID:      len(users) + 1,
+		Name:        req.FirstName + " " + req.Lastname,
+		Email:       req.Email,
+		Phone:       req.Phone,
+		Username:    req.Username,
+		Password:    req.Password,
+		Role:        "Zone Staff",
+		ZoneIDs:     []int{zoneID},
+		Status:      "active",
+		CreatedAt:   time.Now().Format("2006-01-02 15:04:05"),
+		Permissions: finalPerms,
+		StaffInfo: &StaffDetail{
+			Description: req.Description,
+			Position:    req.Position,
+		},
+	}
+
+	users = append(users, newUser)
+
+	return c.Status(fiber.StatusCreated).JSON(newUser)
+}
+
+func updateZoneStaff(c *fiber.Ctx) error {
+	zoneID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid Zone ID"})
+	}
+	userID, err := strconv.Atoi(c.Params("staffid"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid User ID"})
+	}
+
+	var userToUpdate *User
+	for i := range users {
+		if users[i].UserID == userID {
+			userToUpdate = &users[i]
+			break
+		}
+	}
+
+	if userToUpdate == nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User not found"})
+	}
+
+	var req CreateZoneStaffRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+	if req.FirstName != "" || req.Lastname != "" {
+		userToUpdate.Name = req.FirstName + " " + req.Lastname
+	}
+
+	if req.Email != "" {
+		userToUpdate.Email = req.Email
+	}
+
+	if req.Phone != "" {
+		userToUpdate.Phone = req.Phone
+	}
+
+	if req.Username != "" {
+		userToUpdate.Username = req.Username
+	}
+
+	if req.Password != "" {
+		userToUpdate.Password = req.Password
+	}
+
+	if len(req.Permissions) > 0 {
+		var finalPerms []string
+		validPermissions := map[string]bool{
+			"view_elderly":   true,
+			"view_devices":   true,
+			"view_health":    true,
+			"manage_elderly": true,
+		}
+		for _, p := range req.Permissions {
+			if validPermissions[p] {
+				finalPerms = append(finalPerms, p)
+			}
+		}
+		userToUpdate.Permissions = finalPerms
+	}
+
+	if req.Description != "" {
+		userToUpdate.StaffInfo.Description = req.Description
+	}
+
+	if req.Position != "" {
+		userToUpdate.StaffInfo.Position = req.Position
+	}
+	if zoneID != 0 {
+		userToUpdate.ZoneIDs = []int{zoneID}
+	}
+
+	return c.Status(fiber.StatusOK).JSON(userToUpdate)
+}
+
+func deleteZoneStaff(c *fiber.Ctx) error {
+	userID, err := strconv.Atoi(c.Params("staffid"))
+
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	for i, u := range users {
+		if u.UserID == userID {
+			users = append(users[:i], users[i+1:]...)
+			return c.SendStatus(fiber.StatusNoContent)
+		}
+	}
+	return c.SendStatus(fiber.StatusNotFound)
+}
+func getZoneStaffSummary(c *fiber.Ctx) error {
+	zoneID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid zone ID"})
+	}
+
+	countElderly := 0
+	for _, e := range elderlys {
+		if e.ZoneID == zoneID {
+			countElderly++
+		}
+	}
+
+	countDevices := 0
+	for _, d := range devices {
+		if d.ZoneID == zoneID {
+			countDevices++
+		}
+	}
+
+	countCaregivers := 0
+	for _, u := range users {
+		if u.Role == "Zone Staff" || u.Role == "Zone Admin" {
+			for _, z := range u.ZoneIDs {
+				if z == zoneID {
+					countCaregivers++
+				}
+			}
+		}
+	}
+
+	return c.JSON(fiber.Map{
+		"ZoneID":       zoneID,
+		"elderlyCount": countElderly,
+		"devicesCount": countDevices,
+		"caregivers":   countCaregivers,
+	})
 }
