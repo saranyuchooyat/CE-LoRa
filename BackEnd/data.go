@@ -209,6 +209,16 @@ var elderlys = []Elderly{
 	{
 		ID: "E005", Name: "นายมานพ อดทน", Age: 80, Gender: "ชาย", Status: "critical", CitizenID: "1309903050904",
 		Vitals:   Vitals{HeartRate: 130, BloodPressure: "170/100", SpO2: 88, Temperature: 39.2},
+		DeviceID: "SW-2024-005", Battery: 12, LastUpdated: "2025-08-20T14:45:00Z", ZoneID: 2,
+	},
+	{
+		ID: "E006", Name: "นายรัสวิ อิอิ", Age: 80, Gender: "ชาย", Status: "stable", CitizenID: "1309903050904",
+		Vitals:   Vitals{HeartRate: 130, BloodPressure: "170/100", SpO2: 88, Temperature: 39.2},
+		DeviceID: "SW-2024-005", Battery: 19, LastUpdated: "2025-08-20T14:45:00Z", ZoneID: 2,
+	},
+	{
+		ID: "E007", Name: "นายมานพ อดทน", Age: 80, Gender: "ชาย", Status: "critical", CitizenID: "1309903050904",
+		Vitals:   Vitals{HeartRate: 130, BloodPressure: "170/100", SpO2: 88, Temperature: 39.2},
 		DeviceID: "SW-2024-005", Battery: 12, LastUpdated: "2025-08-20T14:45:00Z", ZoneID: 3,
 	},
 }

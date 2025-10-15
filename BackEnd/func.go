@@ -529,6 +529,84 @@ func getElderinZone(c *fiber.Ctx) error {
 	return c.JSON(elderlyinZone)
 }
 
+func getElderAlertandstatus(c *fiber.Ctx) error {
+	zoneID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid Zone ID"})
+	}
+
+	type AlertInfo struct {
+		ID      string `json:"id"`
+		Name    string `json:"name"`
+		Message string `json:"message"`
+		Status  string `json:"status"`
+		Battery int    `json:"battery"`
+	}
+
+	var alerts []AlertInfo
+	onlineCount := 0
+	offlineCount := 0
+
+	for _, d := range devices {
+		if d.ZoneID == zoneID {
+			if d.Status == "online" {
+				onlineCount++
+			} else {
+				offlineCount++
+			}
+		}
+	}
+
+	for _, e := range elderlys {
+		if e.ZoneID != zoneID {
+			continue
+		}
+
+		var alertMsg string
+
+		if e.Battery < 20 {
+			alertMsg = fmt.Sprintf("Battery low: %d%%", e.Battery)
+		}
+
+		if e.Status == "critical" {
+			if alertMsg != "" {
+				alertMsg += " | "
+			}
+			alertMsg += fmt.Sprintf("Critical condition: BloodPressure = %s, HeartRate = %d bpm", e.Vitals.BloodPressure, e.Vitals.HeartRate)
+		} else if e.Status == "warning" {
+			if alertMsg != "" {
+				alertMsg += " | "
+			}
+			alertMsg += fmt.Sprintf("Warning condition: HeartRate = %d bpm", e.Vitals.HeartRate)
+		}
+
+		if alertMsg != "" {
+			alerts = append(alerts, AlertInfo{
+				ID:      e.ID,
+				Name:    e.Name,
+				Message: alertMsg,
+				Status:  e.Status,
+				Battery: e.Battery,
+			})
+		}
+	}
+
+	total := onlineCount + offlineCount
+	onlineRate := 0
+	if total > 0 {
+		onlineRate = int(float64(onlineCount) / float64(total) * 100)
+	}
+
+	return c.JSON(fiber.Map{
+		"zoneID":       zoneID,
+		"onlineCount":  onlineCount,
+		"offlineCount": offlineCount,
+		"onlineRate":   onlineRate,
+		"alertCount":   len(alerts),
+		"alerts":       alerts,
+	})
+}
+
 func createDevice(c *fiber.Ctx) error {
 	device := new(Device)
 

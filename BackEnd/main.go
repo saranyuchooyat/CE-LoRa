@@ -30,7 +30,7 @@ func main() {
 	app.Put("/users/:id", updateUser)
 	app.Delete("/users/:id", deleteUser)
 	app.Post("/users/:id/reset-password", resetPassword)
-
+	//zone admin
 	app.Get("/zones", getAllZone)
 	app.Get("/zones/my-zones", getMyZone)
 	app.Post("/zones", createZone)
@@ -38,9 +38,18 @@ func main() {
 	app.Delete("/zones/:id", deleteZone)
 	app.Get("/zones/:id/dashboard", getZoneDashboard)
 	app.Post("zones/elderlyRegister", addEldertoZone)
-	app.Get("/zones/:id/elder", getElderinZone)
+
+	app.Get("/zones/:id/staff", getZoneStaff)
+	app.Post("/zones/:id/staff", createZoneStaff)
+	app.Put("/zones/:id/staff/:staffid", updateZoneStaff)
+	app.Delete("/zones/:id/staff/:staffid", deleteZoneStaff)
+	app.Get("/zones/:id/summary", getZoneStaffSummary)
 
 	app.Get("/elders", getAllElderly)
+
+	//zone staff
+	app.Get("/zones/:id/elders", getElderinZone)
+	app.Get("/zones/:id/elders/alertandstatus", getElderAlertandstatus)
 
 	app.Get("/system/health/servers", getHealthservers)
 	app.Get("/system/alerts", getAlert)
@@ -49,12 +58,6 @@ func main() {
 	app.Post("/devices", createDevice)
 	app.Put("/devices/:id", updateDevice)
 	app.Delete("/devices/:id", deleteDevice)
-
-	app.Get("/zones/:id/staff", getZoneStaff)
-	app.Post("/zones/:id/staff", createZoneStaff)
-	app.Put("/zones/:id/staff/:staffid", updateZoneStaff)
-	app.Delete("/zones/:id/staff/:staffid", deleteZoneStaff)
-	app.Get("/zones/:id/summary", getZoneStaffSummary)
 
 	app.Get("/dashboard/usage-trend", getUserTrend)
 	app.Get("/dashboard/summary", getDashSum)
