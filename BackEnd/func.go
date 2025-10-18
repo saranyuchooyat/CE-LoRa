@@ -23,12 +23,38 @@ func checkMiddleWare(c *fiber.Ctx) error {
 	return fiber.ErrUnauthorized
 
 }
+
+// getAllUser godoc
+// @Summary Get all users
+// @Description ดึงข้อมูลผู้ใช้งานทั้งหมด
+// @Tags User
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {array} User
+// @Failure 401 {object} ErrorResponse
+// @Router /users [get]
 func getAllUser(c *fiber.Ctx) error {
 	return c.JSON(users)
 }
 
+// createUser godoc
+// @Summary Create a new user
+// @Description สร้างผู้ใช้งานใหม่ในระบบ (UserID และสถานะจะถูกสร้างอัตโนมัติ)
+// @Tags User
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body UserCreationRequest true "User details (UserID, Status, Permissions ถูกสร้างอัตโนมัติ)"
+// @Success 201 {object} User
+// @Failure 400 {object} ErrorResponse
+// @Router /users [post]
 func createUser(c *fiber.Ctx) error {
-	user := new(User)
+	req := new(UserCreationRequest)
+
+	if err := c.BodyParser(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
 
 	var rolePermissions = map[string][]string{
 		"System Admin": {"manage_zones", "manage_users", "view_all"},
@@ -36,17 +62,33 @@ func createUser(c *fiber.Ctx) error {
 		"Zone Staff":   {"view_elderly", "view_health", "view_devices"},
 	}
 
-	if err := c.BodyParser(user); err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	newUser := User{
+		UserID:   len(users) + 1,
+		Name:     req.Name,
+		Email:    req.Email,
+		Phone:    req.Phone,
+		Username: req.Username,
+		Password: req.Password,
+		Role:     req.Role,
+		ZoneIDs:  req.ZoneIDs,
+
+		Status:    "active",
+		CreatedAt: time.Now().Format("2006-01-02 15:04:05"),
+
+		StaffInfo: &StaffDetail{
+			Description: req.Description,
+			Position:    req.Position,
+		},
 	}
 
-	if perms, ok := rolePermissions[user.Role]; ok {
-		user.Permissions = perms
+	if perms, ok := rolePermissions[newUser.Role]; ok {
+		newUser.Permissions = perms
 	} else {
-		user.Permissions = []string{}
+		newUser.Permissions = []string{}
 	}
-	users = append(users, *user)
-	return c.JSON(user)
+
+	users = append(users, newUser)
+	return c.Status(fiber.StatusCreated).JSON(newUser)
 }
 
 func updateUser(c *fiber.Ctx) error {
@@ -415,6 +457,16 @@ func sendEmail(to, subject, body string) error {
 	return nil
 }
 
+// Login godoc
+// @Summary Login
+// @Description เข้าสู่ระบบเพื่อรับ JWT Token
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body LoginRequest true "Login credentials"
+// @Success 200 {object} LoginResponse
+// @Failure 400 {object} ErrorResponse
+// @Router /auth/login [post]
 func login(c *fiber.Ctx) error {
 	type LoginRequest struct {
 		Username string `json:"username"`

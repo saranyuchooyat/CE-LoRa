@@ -6,11 +6,26 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/gofiber/fiber/v2/middleware/cors"
+
 	jwtware "github.com/gofiber/jwt/v2"
+	fiberSwagger "github.com/swaggo/fiber-swagger"
+
+	_ "github.com/saranyuchooyat/CE-LoRa/docs"
 )
+
+// @title Elder Care API
+// @version 1.0
+// @description ระบบจัดการผู้สูงอายุ
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description พิมพ์ "Bearer " แล้วตามด้วย token เช่น "Bearer eyJhbGciOiJIUzI1NiIsInR5..."
 
 func main() {
 	app := fiber.New()
+
+	app.Get("/swagger/*", fiberSwagger.WrapHandler)
+
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
 		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
@@ -44,9 +59,10 @@ func main() {
 	//zone admin
 
 	app.Get("/zones/:id/dashboard", getZoneDashboard)
-	app.Post("zones/elderlyRegister", addEldertoZone)
+	app.Post("/zones/elderlyRegister", addEldertoZone)
 
 	app.Get("/zones/:id/staff", getZoneStaff)
+
 	app.Post("/zones/:id/staff", createZoneStaff)
 	app.Put("/zones/:id/staff/:staffid", updateZoneStaff)
 	app.Delete("/zones/:id/staff/:staffid", deleteZoneStaff)

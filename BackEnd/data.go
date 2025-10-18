@@ -15,6 +15,18 @@ type User struct {
 	Permissions []string     `json:"permission"`
 	StaffInfo   *StaffDetail `json:"staff_info,omitempty"`
 }
+type UserCreationRequest struct {
+	Name     string `json:"name" example:"John Doe"`
+	Email    string `json:"email example:"john.d@example.com""`
+	Phone    string `json:"phone" example:"0812345678"`
+	Username string `json:"username" example:"johndoe"`
+	Password string `json:"password" example:"P@ssword123"`
+	Role     string `json:"role" example:"Zone Staff"`
+	ZoneIDs  []int  `json:"zoneids"`
+
+	Description string `json:"description" example:"Staff at main building"`
+	Position    string `json:"position" example:"Nurse"`
+}
 type CreateZoneStaffRequest struct {
 	FirstName   string   `json:"firstname"`
 	Lastname    string   `json:"lastname"`
@@ -112,6 +124,18 @@ type Alert struct {
 type UsageTrend struct {
 	Date        string `json:"date"`
 	ActiveUsers int    `json:"activeUsers"`
+}
+
+type LoginRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type LoginResponse struct {
+	Token string `json:"token"`
+}
+type ErrorResponse struct {
+	Error string `json:"error"`
 }
 
 // ---------------- Mock Data ----------------
