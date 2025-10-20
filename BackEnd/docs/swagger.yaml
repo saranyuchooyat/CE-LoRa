@@ -17,6 +17,21 @@ definitions:
         example: critical
         type: string
     type: object
+  main.AlertSummaryResponse:
+    properties:
+      critical:
+        example: 3
+        type: integer
+      high_priority:
+        example: 7
+        type: integer
+      medium_priority:
+        example: 12
+        type: integer
+      total_alerts:
+        example: 45
+        type: integer
+    type: object
   main.AlertZoneInfo:
     properties:
       battery:
@@ -294,7 +309,6 @@ definitions:
         example: "2025-08-19T13:50:00Z"
         type: string
       lastUpdate:
-        description: Used by lorawan-status
         example: "2025-08-19T14:20:00Z"
         type: string
       latencyMs:
@@ -404,6 +418,18 @@ definitions:
         type: string
       timestamp:
         example: "2025-08-17T14:35:25Z"
+        type: string
+    type: object
+  main.TeamStatusEntry:
+    properties:
+      is_ready:
+        example: false
+        type: boolean
+      status:
+        example: กำลังเดินทาง - ETA 5 นาที
+        type: string
+      team_name:
+        example: ทีม Alpha-1
         type: string
     type: object
   main.TopZonesResponse:
@@ -916,6 +942,38 @@ paths:
       summary: Get elderly patient details
       tags:
       - Elderly
+  /emergencys/alert/summary:
+    get:
+      description: ดึงจำนวนรวมของ Alert ที่กำลังดำเนินอยู่แบ่งตามระดับความสำคัญ
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.AlertSummaryResponse'
+      security:
+      - BearerAuth: []
+      summary: Get emergency alert summary counts
+      tags:
+      - Emergency
+  /emergencys/team/status:
+    get:
+      description: ดึงสถานะของทีมตอบสนองฉุกเฉินทั้งหมด
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.TeamStatusEntry'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Get emergency response team statuses
+      tags:
+      - Emergency
   /system/alerts:
     get:
       description: ดึงรายการการแจ้งเตือนทั้งหมดในระบบ

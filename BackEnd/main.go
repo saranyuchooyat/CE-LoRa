@@ -85,5 +85,9 @@ func main() {
 	app.Get("/dashboard/usage-trend", getUserTrend)
 	app.Get("/dashboard/summary", getDashSum)
 	app.Get("/dashboard/top-zones", getTopZones)
+
+	//emergency
+	app.Get("/emergencys/alert/summary", getEmergencySum)
+	app.Get("/emergencys/team/status", getTeamsStatus)
 	app.Listen(":8080")
 }

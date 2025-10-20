@@ -1368,3 +1368,27 @@ func getSystemNetworks(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(response)
 }
+
+// getemergencySum godoc
+// @Summary Get emergency alert summary counts
+// @Description ดึงจำนวนรวมของ Alert ที่กำลังดำเนินอยู่แบ่งตามระดับความสำคัญ
+// @Tags Emergency
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} AlertSummaryResponse
+// @Router /emergencys/alert/summary [get]
+func getEmergencySum(c *fiber.Ctx) error {
+	return c.JSON(summary)
+}
+
+// getTeamsStatus godoc
+// @Summary Get emergency response team statuses
+// @Description ดึงสถานะของทีมตอบสนองฉุกเฉินทั้งหมด
+// @Tags Emergency
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {array} TeamStatusEntry
+// @Router /emergencys/team/status [get]
+func getTeamsStatus(c *fiber.Ctx) error {
+	return c.JSON(teams)
+}
