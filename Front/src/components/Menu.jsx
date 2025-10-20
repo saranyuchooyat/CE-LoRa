@@ -65,12 +65,17 @@ function Menu() {
             const currentPath = location.pathname;
             const buttons = roleRoutes[currentRole];
             
+            console.log("path",currentPath)
             // วนลูปในเมนูสำหรับ Role ปัจจุบัน
             for (const buttonTitle in buttons) {
                 // ถ้า Path ของปุ่มตรงกับ Path ปัจจุบัน
                 if (buttons[buttonTitle] === currentPath) {
                     setActiveButton(buttonTitle);
                     return; // พบแล้ว ออกจากฟังก์ชัน
+                }
+                else if(currentPath.startsWith("/zone-details/")){
+                    setActiveButton(buttonTitle);
+                    return console.log(true)
                 }
             }
             

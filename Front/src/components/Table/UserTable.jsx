@@ -45,11 +45,16 @@ function UserTable({ data }){
         return "N/A";
     };
 
-    const getStatus = (status) => {
-        if (!status) {
-            return "N/A"; 
-        }
-        return status; 
+    const statusCheck = (status) => {
+        console.log("user",status)
+        switch (status) {
+            case 'Online':
+                return 'text-main-blue bg-complete-bg';
+            case 'offline':
+                return 'text-gray-800 bg-gray-300';
+            default:
+                return 'text-gray-700 bg-gray-200';
+        } 
     };
 
     if (!Array.isArray(data) || data.length === 0) {
@@ -86,7 +91,8 @@ function UserTable({ data }){
                     <tbody className="divide-y divide-gray-100"> 
                         {data.map((card, index) => {
                             const isOddRow = (index % 2 === 0);
-                            const rowBgClass = isOddRow ? 'bg-gray-100' : 'bg-gray-200';                             
+                            const rowBgClass = isOddRow ? 'bg-gray-100' : 'bg-gray-200';
+                            const statusClass = statusCheck(card.status);                             
                             return(
                                 <tr key={index} className={rowBgClass}>
                                     <td className="table-data whitespace-nowrap">{card.name}</td>
@@ -94,7 +100,9 @@ function UserTable({ data }){
                                     {/* **สำคัญ:** ใช้ card.ZoneName หรือ card.Zone ถ้ามี Key นี้ในข้อมูล */}
                                     <td className="table-data whitespace-wrap w-[200px]">{getZoneName(card.zoneids,zoneData)}</td>
                                     <td className="table-data whitespace-nowrap">{card.phone}</td>
-                                    <td className="table-data whitespace-nowrap">{getStatus(card.status)}</td>
+                                    <td className="table-data whitespace-nowrap">
+                                        <span className={`table-status ${statusClass}`}>{card.status}</span>
+                                    </td>
                                     
                                     {/* Un-commented และแก้ไขส่วนของปุ่ม Menu */}
                                     <td className="p-3 text-sm text-left whitespace-nowrap w-fit">
