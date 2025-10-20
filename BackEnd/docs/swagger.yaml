@@ -1,14 +1,259 @@
 definitions:
+  main.Alert:
+    properties:
+      createdAt:
+        example: "2025-10-18T10:00:00Z"
+        type: string
+      description:
+        example: HeartRate 120 bpm, BP 160/100
+        type: string
+      id:
+        example: 1
+        type: integer
+      title:
+        example: Elder Bua has critical condition
+        type: string
+      type:
+        example: critical
+        type: string
+    type: object
+  main.AlertZoneInfo:
+    properties:
+      battery:
+        type: integer
+      id:
+        type: string
+      message:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+    type: object
+  main.CreateZoneStaffRequest:
+    properties:
+      description:
+        example: Day shift nurse
+        type: string
+      email:
+        example: sombat.j@zone.com
+        type: string
+      firstName:
+        example: Sombat
+        type: string
+      lastName:
+        example: Jitdee
+        type: string
+      password:
+        example: securepass123
+        type: string
+      permissions:
+        example:
+        - view_elderly
+        - view_health
+        items:
+          type: string
+        type: array
+      phone:
+        example: "0912340000"
+        type: string
+      position:
+        example: Nurse
+        type: string
+      username:
+        example: sombat.j
+        type: string
+    type: object
+  main.DashboardSummary:
+    properties:
+      devicesCount:
+        example: 30
+        type: integer
+      elderlyCount:
+        example: 35
+        type: integer
+      usersCount:
+        example: 12
+        type: integer
+      zonesCount:
+        example: 4
+        type: integer
+    type: object
+  main.Device:
+    properties:
+      assigned_to:
+        type: string
+      battery:
+        type: integer
+      device_id:
+        type: string
+      features:
+        items:
+          type: string
+        type: array
+      last_update:
+        type: string
+      model:
+        type: string
+      serial_number:
+        type: string
+      status:
+        type: string
+      type:
+        type: string
+      zone_id:
+        type: integer
+    type: object
+  main.DeviceCreationRequest:
+    properties:
+      battery:
+        example: 100
+        type: integer
+      deviceId:
+        example: D-WATCH-007
+        type: string
+      features:
+        example:
+        - heart_rate
+        - ' spo2'
+        items:
+          type: string
+        type: array
+      lastUpdate:
+        example: "2025-10-19 10:00:00"
+        type: string
+      model:
+        example: WatchX
+        type: string
+      serialNumber:
+        example: SN12345678
+        type: string
+      status:
+        example: unassigned
+        type: string
+      type:
+        example: Wearable
+        type: string
+    required:
+    - deviceId
+    - serialNumber
+    type: object
+  main.DeviceSummary:
+    properties:
+      offline:
+        example: 2
+        type: integer
+      online:
+        example: 28
+        type: integer
+      total:
+        example: 30
+        type: integer
+    type: object
+  main.DeviceUpdateRequest:
+    properties:
+      assigned_to:
+        example: Elder Bua
+        type: string
+      battery:
+        example: 85
+        type: integer
+      features:
+        example:
+        - heart_rate
+        - ' spo2'
+        - ' gps'
+        items:
+          type: string
+        type: array
+      lastUpdate:
+        example: "2025-10-20 15:00:00"
+        type: string
+      model:
+        example: WatchX Pro
+        type: string
+      serialNumber:
+        example: SN98765432
+        type: string
+      status:
+        example: online
+        type: string
+      type:
+        example: Watch
+        type: string
+      zoneId:
+        example: 1
+        type: integer
+    type: object
+  main.Elderly:
+    properties:
+      address:
+        type: string
+      age:
+        type: integer
+      battery:
+        type: integer
+      birthDate:
+        type: string
+      citizenId:
+        type: string
+      device_id:
+        type: string
+      email:
+        type: string
+      gender:
+        type: string
+      id:
+        type: string
+      last_updated:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      status:
+        type: string
+      vitals:
+        $ref: '#/definitions/main.Vitals'
+      zone_id:
+        type: integer
+    type: object
+  main.ElderlyRegistrationResponse:
+    properties:
+      message:
+        example: Elderly registered successfully
+        type: string
+    type: object
   main.ErrorResponse:
     properties:
       error:
         type: string
     type: object
+  main.HealthSummaryResponse:
+    properties:
+      onlineServers:
+        example: 4
+        type: integer
+      storageUsed:
+        example: 3.2TB
+        type: string
+      systemLoad:
+        example: 66.1
+        type: number
+      totalServers:
+        example: 4
+        type: integer
+      uptimePercentage:
+        example: 99.7
+        type: number
+    type: object
   main.LoginRequest:
     properties:
       password:
+        example: "5678"
         type: string
       username:
+        example: ink
         type: string
     type: object
   main.LoginResponse:
@@ -16,11 +261,163 @@ definitions:
       token:
         type: string
     type: object
+  main.NetworkStatusEntry:
+    properties:
+      blockedIPs:
+        example: 5
+        type: integer
+      devicesOffline:
+        example: 126
+        type: integer
+      devicesOnline:
+        example: 2721
+        type: integer
+      downSpeedMbps:
+        example: 156
+        type: integer
+      firewallStatus:
+        description: Security Status Fields
+        example: active
+        type: string
+      gatewaysActive:
+        description: LoRaWAN Status Fields
+        example: 24
+        type: integer
+      idsStatus:
+        example: active
+        type: string
+      isp:
+        description: Internet Status Fields
+        example: AIS Fiber
+        type: string
+      lastScan:
+        example: "2025-08-19T13:50:00Z"
+        type: string
+      lastUpdate:
+        description: Used by lorawan-status
+        example: "2025-08-19T14:20:00Z"
+        type: string
+      latencyMs:
+        example: 12
+        type: integer
+      name:
+        example: internet-status
+        type: string
+      securityThreats:
+        example: 0
+        type: integer
+      status:
+        description: Common Fields
+        example: online
+        type: string
+      upSpeedMbps:
+        example: 45
+        type: integer
+    type: object
+  main.NetworkSummaryResponse:
+    properties:
+      networks:
+        items:
+          $ref: '#/definitions/main.NetworkStatusEntry'
+        type: array
+    type: object
+  main.PasswordResetResponse:
+    properties:
+      email:
+        example: testuser@example.com
+        type: string
+      message:
+        example: รหัสผ่านได้ถูกรีเซ็ทและส่งไปทางเมลแล้ว
+        type: string
+      userId:
+        example: 5
+        type: integer
+    type: object
+  main.RegisterElderlyRequest:
+    properties:
+      address:
+        example: 123 Elder Home
+        type: string
+      birthDate:
+        example: "1945-05-15"
+        format: YYYY-MM-DD
+        type: string
+      citizenId:
+        example: "1101100011000"
+        type: string
+      device:
+        properties:
+          deviceId:
+            example: SW-2024-006
+            type: string
+        type: object
+      email:
+        example: boonmee@contact.com
+        type: string
+      fname:
+        example: Boonmee
+        type: string
+      gender:
+        example: Female
+        type: string
+      lname:
+        example: Saetang
+        type: string
+      phone:
+        example: "0881234567"
+        type: string
+      zoneId:
+        example: 1
+        type: integer
+    type: object
+  main.Server:
+    properties:
+      cpuUsage:
+        type: integer
+      diskTotal:
+        type: string
+      diskUsed:
+        type: string
+      memoryTotal:
+        type: string
+      memoryUsed:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+    type: object
   main.StaffDetail:
     properties:
       description:
         type: string
       position:
+        type: string
+    type: object
+  main.SystemLogEntry:
+    properties:
+      level:
+        example: INFO
+        type: string
+      message:
+        example: New health data batch processed successfully (156 records)
+        type: string
+      timestamp:
+        example: "2025-08-17T14:35:25Z"
+        type: string
+    type: object
+  main.TopZonesResponse:
+    properties:
+      topzones:
+        items:
+          $ref: '#/definitions/main.Zone'
+        type: array
+    type: object
+  main.UsageTrend:
+    properties:
+      activeUsers:
+        type: integer
+      date:
         type: string
     type: object
   main.User:
@@ -61,7 +458,8 @@ definitions:
       description:
         example: Staff at main building
         type: string
-      'email example:':
+      email:
+        example: john.d@example.com
         type: string
       name:
         example: John Doe
@@ -86,10 +484,208 @@ definitions:
           type: integer
         type: array
     type: object
+  main.UserTrendResponse:
+    properties:
+      trend:
+        items:
+          $ref: '#/definitions/main.UsageTrend'
+        type: array
+    type: object
+  main.UserUpdateRequest:
+    properties:
+      description:
+        example: Staff at main building
+        type: string
+      email:
+        example: john.d@example.com
+        type: string
+      name:
+        example: John Doe
+        type: string
+      password:
+        example: P@ssword123
+        type: string
+      phone:
+        example: "0812345678"
+        type: string
+      position:
+        example: Nurse
+        type: string
+      role:
+        example: Zone Staff
+        type: string
+      username:
+        example: johndoe
+        type: string
+      zoneids:
+        items:
+          type: integer
+        type: array
+    type: object
+  main.Vitals:
+    properties:
+      blood_pressure:
+        type: string
+      heart_rate:
+        type: integer
+      spo2:
+        type: integer
+      temperature:
+        type: number
+    type: object
+  main.Zone:
+    properties:
+      activeuser:
+        type: integer
+      address:
+        type: string
+      description:
+        type: string
+      status:
+        type: string
+      zoneid:
+        type: integer
+      zonename:
+        type: string
+    type: object
+  main.ZoneAlertStatusResponse:
+    properties:
+      alertCount:
+        example: 3
+        type: integer
+      alerts:
+        items:
+          $ref: '#/definitions/main.AlertZoneInfo'
+        type: array
+      offlineCount:
+        example: 2
+        type: integer
+      onlineCount:
+        example: 10
+        type: integer
+      onlineRate:
+        example: 83
+        type: integer
+      zoneID:
+        example: 1
+        type: integer
+    type: object
+  main.ZoneCreationRequest:
+    properties:
+      address:
+        example: 123 Main St Soi Lardkrabang
+        type: string
+      description:
+        example: ศูนย์กลางติดสถานีรถไฟลาดกระบัง
+        type: string
+      zoneName:
+        example: Lardkrabang-A
+        type: string
+    type: object
+  main.ZoneDashboardInfo:
+    properties:
+      activeUsers:
+        example: 15
+        type: integer
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Zone A - Main Building
+        type: string
+      status:
+        example: operational
+        type: string
+    type: object
+  main.ZoneDashboardResponse:
+    properties:
+      alerts:
+        items:
+          $ref: '#/definitions/main.Alert'
+        type: array
+      deviceStatus:
+        $ref: '#/definitions/main.DeviceSummary'
+      elderlyCount:
+        example: 35
+        type: integer
+      elders:
+        items:
+          $ref: '#/definitions/main.Elderly'
+        type: array
+      zone:
+        $ref: '#/definitions/main.ZoneDashboardInfo'
+    type: object
+  main.ZoneStaffResponse:
+    properties:
+      Description:
+        example: Specialized in elderly care
+        type: string
+      email:
+        example: sompong@zone.com
+        type: string
+      id:
+        example: staff-005
+        type: string
+      join_date:
+        example: "2024-03-10 09:00:00"
+        type: string
+      last_login:
+        example: "2025-10-18 15:00:00"
+        type: string
+      name:
+        example: Sompong Jaidee
+        type: string
+      permissions:
+        example:
+        - '[view_elderly'
+        - ' view_health]'
+        items:
+          type: string
+        type: array
+      phone:
+        example: "0812345678"
+        type: string
+      position:
+        example: Nurse
+        type: string
+      status:
+        example: active
+        type: string
+    type: object
+  main.ZoneSummaryResponse:
+    properties:
+      ZoneID:
+        example: 1
+        type: integer
+      caregivers:
+        example: 5
+        type: integer
+      devicesCount:
+        example: 20
+        type: integer
+      elderlyCount:
+        example: 25
+        type: integer
+    type: object
+  main.ZoneUpdateRequest:
+    properties:
+      address:
+        example: 53/2 Prayathai
+        type: string
+      description:
+        example: โซนติด 4 แยก BTS ถึงปลายสถานี
+        type: string
+      status:
+        example: maintenance
+        type: string
+      zoneName:
+        example: Prayathai-A
+        type: string
+    type: object
 info:
   contact: {}
-  description: ระบบจัดการผู้สูงอายุ
-  title: Elder Care API
+  description: ระบบจัดการช่วยเหลือผู้สูงอายุผ่าน LoraWan
+  title: LoraWan Service API
   version: "1.0"
 paths:
   /auth/login:
@@ -118,6 +714,290 @@ paths:
       summary: Login
       tags:
       - Auth
+  /dashboard/summary:
+    get:
+      description: ดึงจำนวนรวมของ โซน, ผู้ใช้งาน, ผู้สูงอายุ และอุปกรณ์ทั้งหมด
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.DashboardSummary'
+      security:
+      - BearerAuth: []
+      summary: Get dashboard summary counts
+      tags:
+      - Dashboard
+  /dashboard/top-zones:
+    get:
+      description: ดึงข้อมูลโซนที่มีผู้ใช้งาน Active มากที่สุด (เรียงตาม ActiveUser)
+      parameters:
+      - description: 'จำนวนโซนสูงสุดที่ต้องการแสดง (ค่าเริ่มต้น: 5)'
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.TopZonesResponse'
+      security:
+      - BearerAuth: []
+      summary: Get top zones by active users
+      tags:
+      - Dashboard
+  /dashboard/usage-trend:
+    get:
+      description: ดึงข้อมูลแนวโน้มการใช้งานของผู้ใช้ในช่วงเวลาที่กำหนด
+      parameters:
+      - description: 'จำนวนวันย้อนหลังที่ต้องการดูข้อมูล (ค่าเริ่มต้น: 30)'
+        in: query
+        name: days
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.UserTrendResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user activity trend
+      tags:
+      - Dashboard
+  /devices:
+    get:
+      description: ดึงข้อมูลอุปกรณ์ติดตามสุขภาพทั้งหมดในระบบ
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.Device'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Get all devices
+      tags:
+      - Device
+    post:
+      consumes:
+      - application/json
+      description: ลงทะเบียนอุปกรณ์ติดตามสุขภาพใหม่
+      parameters:
+      - description: Device registration details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.DeviceCreationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.Device'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Register a new device
+      tags:
+      - Device
+  /devices/{id}:
+    delete:
+      description: ลบอุปกรณ์ติดตามสุขภาพออกจากระบบด้วย Device ID
+      parameters:
+      - description: Device ID ที่ต้องการลบ
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content (ลบสำเร็จ)
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a device
+      tags:
+      - Device
+    put:
+      consumes:
+      - application/json
+      description: อัปเดตข้อมูลอุปกรณ์ติดตามสุขภาพด้วย Device ID
+      parameters:
+      - description: Device ID ที่ต้องการอัปเดต
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update (ใช้เฉพาะฟิลด์ที่ต้องการเปลี่ยน)
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.DeviceUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.Device'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update device details
+      tags:
+      - Device
+  /elders:
+    get:
+      description: ดึงข้อมูลผู้สูงอายุทั้งหมดในระบบ
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.Elderly'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Get all elderly records
+      tags:
+      - Elderly
+  /elders/{id}:
+    get:
+      description: ดึงข้อมูลรายละเอียดผู้สูงอายุและ Vital Signs ตาม ID
+      parameters:
+      - description: Elder ID (เช่น E001)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.Elderly'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get elderly patient details
+      tags:
+      - Elderly
+  /system/alerts:
+    get:
+      description: ดึงรายการการแจ้งเตือนทั้งหมดในระบบ
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.Alert'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Get all system alerts
+      tags:
+      - System
+  /system/health/servers:
+    get:
+      description: ดึงสถานะของเซิร์ฟเวอร์ที่เกี่ยวข้องกับระบบสุขภาพ
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.Server'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Get health server status
+      tags:
+      - System
+  /system/logs:
+    get:
+      description: ดึงรายการ Log ล่าสุดของระบบ
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.SystemLogEntry'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Get system logs
+      tags:
+      - System
+  /system/networks:
+    get:
+      description: ดึงข้อมูลสถานะเครือข่ายต่างๆ ของระบบ (อินเทอร์เน็ต, LoRaWAN, ความปลอดภัย)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.NetworkSummaryResponse'
+      security:
+      - BearerAuth: []
+      summary: Get system network status
+      tags:
+      - Health
+  /system/summarys:
+    get:
+      description: ดึงข้อมูลสรุปสถานะสุขภาพโดยรวมของระบบ (จำนวนเซิร์ฟเวอร์, uptime,
+        load, storage)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.HealthSummaryResponse'
+      security:
+      - BearerAuth: []
+      summary: Get system summary
+      tags:
+      - System
   /users:
     get:
       consumes:
@@ -168,9 +1048,532 @@ paths:
       summary: Create a new user
       tags:
       - User
+  /users/{id}:
+    delete:
+      description: ลบผู้ใช้งานออกจากระบบด้วย ID
+      parameters:
+      - description: User ID ที่ต้องการลบ
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content (ลบสำเร็จ)
+        "400":
+          description: ID ไม่ถูกต้อง
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: ไม่พบผู้ใช้งาน
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a user
+      tags:
+      - User
+    get:
+      description: ดึงข้อมูลผู้ใช้งานตาม ID
+      parameters:
+      - description: User ID ที่ต้องการดูข้อมูล
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user by ID
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      description: อัปเดตข้อมูลผู้ใช้งานด้วย ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Fields to update (ใช้เฉพาะฟิลด์ที่ต้องการเปลี่ยน)
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.UserUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update user
+      tags:
+      - User
+  /users/{id}/reset-password:
+    post:
+      description: รีเซ็ตรหัสผ่านของผู้ใช้งานตาม ID และส่งรหัสผ่านใหม่ทางอีเมล
+      parameters:
+      - description: User ID ที่ต้องการรีเซ็ตรหัสผ่าน
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.PasswordResetResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Reset user password
+      tags:
+      - User
+  /zones:
+    get:
+      description: ดึงข้อมูลโซนดูแลผู้สูงอายุทั้งหมด
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.Zone'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Get all zones
+      tags:
+      - Zone
+    post:
+      consumes:
+      - application/json
+      description: สร้างโซนดูแลผู้สูงอายุใหม่
+      parameters:
+      - description: Zone details (ZoneID และ Status จะถูกสร้างอัตโนมัติ)
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.ZoneCreationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.Zone'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new zone
+      tags:
+      - Zone
+  /zones/{id}:
+    delete:
+      description: ลบโซนดูแลผู้สูงอายุออกจากระบบ
+      parameters:
+      - description: Zone ID ที่ต้องการลบ
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content (ลบสำเร็จ)
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a zone
+      tags:
+      - Zone
+    put:
+      consumes:
+      - application/json
+      description: อัปเดตข้อมูลโซนด้วย ID (เช่น ชื่อ, ที่อยู่, สถานะ)
+      parameters:
+      - description: Zone ID ที่ต้องการอัปเดต
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Fields to update
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.ZoneUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.Zone'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update zone details
+      tags:
+      - Zone
+  /zones/{id}/dashboard:
+    get:
+      description: ดึงข้อมูลสรุปสำหรับ Dashboard ของแต่ละโซน (ผู้สูงอายุ, สถานะอุปกรณ์,
+        Alert)
+      parameters:
+      - description: Zone ID สำหรับ Dashboard
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.ZoneDashboardResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get dashboard data for a specific zone
+      tags:
+      - Zone
+  /zones/{id}/elders:
+    get:
+      description: ดึงรายการผู้สูงอายุทั้งหมดที่อยู่ในโซนที่กำหนด
+      parameters:
+      - description: Zone ID ที่ต้องการดึงข้อมูลผู้สูงอายุ
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.Elderly'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get elderly patients in a specific zone
+      tags:
+      - Zone
+  /zones/{id}/elders/alertandstatus:
+    get:
+      description: ดึงข้อมูลสรุปสถานะอุปกรณ์และรายการแจ้งเตือนของผู้สูงอายุในโซน
+      parameters:
+      - description: Zone ID สำหรับดึงข้อมูล
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.ZoneAlertStatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get elderly status and device alert summary
+      tags:
+      - Elderly
+  /zones/{id}/staff:
+    get:
+      description: ดึงรายการบุคลากรทั้งหมดที่ถูกกำหนดให้กับโซนตาม ID
+      parameters:
+      - description: Zone ID สำหรับดึงข้อมูลบุคลากร
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.ZoneStaffResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all staff members in a zone
+      tags:
+      - Zone
+    post:
+      consumes:
+      - application/json
+      description: สร้างผู้ใช้งานใหม่ในฐานะ Zone Staff และกำหนดให้รับผิดชอบ ZoneID
+        ที่ระบุ
+      parameters:
+      - description: Zone ID ที่ต้องการเพิ่มบุคลากร
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Staff details and permissions
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.CreateZoneStaffRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Add a new staff member to a zone
+      tags:
+      - Zone
+  /zones/{id}/staff/{userid}:
+    delete:
+      description: ลบผู้ใช้งานที่เป็นบุคลากรโซนออกจากระบบด้วย User ID
+      parameters:
+      - description: Zone ID ที่บุคลากรคนนี้สังกัด (ใช้ในการตรวจสอบสิทธิ์)
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: User ID ของบุคลากรที่ต้องการลบ
+        in: path
+        name: userid
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content (ลบสำเร็จ)
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "403":
+          description: Staff member is not assigned to this zone
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a staff member
+      tags:
+      - Zone
+    put:
+      consumes:
+      - application/json
+      description: อัปเดตข้อมูลบุคลากรในโซนที่กำหนด
+      parameters:
+      - description: Zone ID ที่บุคลากรคนนี้สังกัด
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: User ID ของบุคลากรที่ต้องการอัปเดต
+        in: path
+        name: userid
+        required: true
+        type: integer
+      - description: Fields to update (ใช้เฉพาะฟิลด์ที่ต้องการเปลี่ยน)
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.CreateZoneStaffRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a staff member's details
+      tags:
+      - Zone
+  /zones/{id}/summary:
+    get:
+      description: ดึงข้อมูลสรุปจำนวนผู้สูงอายุ, อุปกรณ์ และบุคลากรในโซน
+      parameters:
+      - description: Zone ID สำหรับดึงข้อมูลสรุป
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.ZoneSummaryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get summary counts for a zone
+      tags:
+      - Zone
+  /zones/elderlyRegister:
+    post:
+      consumes:
+      - application/json
+      description: ลงทะเบียนผู้สูงอายุใหม่ คำนวณอายุ และผูกกับอุปกรณ์ในโซน
+      parameters:
+      - description: Elderly registration details and initial device assignment
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.RegisterElderlyRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.ElderlyRegistrationResponse'
+        "400":
+          description: Invalid request, device not found, device not available, or
+            invalid date format
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Register elderly and assign device
+      tags:
+      - Zone
+  /zones/my-zones:
+    get:
+      description: ดึงรายการโซนที่ผูกกับผู้ใช้งานที่กำลัง Login อยู่ (อิงจาก JWT Token)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.Zone'
+            type: array
+        "401":
+          description: Unauthorized (Token ไม่ถูกต้อง)
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: User not found (ไม่พบผู้ใช้งานในระบบ)
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get zones assigned to the current user
+      tags:
+      - Zone
 securityDefinitions:
   BearerAuth:
-    description: พิมพ์ "Bearer " แล้วตามด้วย token เช่น "Bearer eyJhbGciOiJIUzI1NiIsInR5..."
+    description: พิมพ์ Bearer  แล้วตามด้วย token เช่น Bearer eyJhbGciOiJIUzI1NiIsInR5...
     in: header
     name: Authorization
     type: apiKey

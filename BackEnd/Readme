@@ -1,4 +1,11 @@
-ติดตั้ง go บนเว็บ
+setup
+1.ติดตั้ง go บนเว็บ
 เสร็จ
-go version ถ้ามีแล้ว
-go run .
+2.go version ถ้ามีแล้ว
+3.go run .
+
+
+เข้า swagger
+1.พิม swagger init
+2.go run .
+3.http://localhost:8080/swagger/index.html เข้าเว็บ

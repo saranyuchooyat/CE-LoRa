@@ -91,36 +91,85 @@ func createUser(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(newUser)
 }
 
+// updateUser godoc
+// @Summary Update user
+// @Description อัปเดตข้อมูลผู้ใช้งานด้วย ID
+// @Tags User
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "User ID"
+// @Param request body UserUpdateRequest true "Fields to update (ใช้เฉพาะฟิลด์ที่ต้องการเปลี่ยน)"
+// @Success 200 {object} User
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Router /users/{id} [put]
 func updateUser(c *fiber.Ctx) error {
 	userID, err := strconv.Atoi(c.Params("id"))
 
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid User ID format"})
 	}
 
-	userUpdate := new(User)
-	if err := c.BodyParser(userUpdate); err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	requestBody := new(UserUpdateRequest)
+	if err := c.BodyParser(requestBody); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	for i, u := range users {
-		if u.UserID == userID {
-			if userUpdate.Username != "" {
-				users[i].Username = userUpdate.Username
+	for i := range users {
+		if users[i].UserID == userID {
+
+			if requestBody.Username != "" {
+				users[i].Username = requestBody.Username
 			}
-			if userUpdate.Password != "" {
-				users[i].Password = userUpdate.Password
+			if requestBody.Name != "" {
+				users[i].Name = requestBody.Name
 			}
-			if userUpdate.Role != "" {
-				users[i].Role = userUpdate.Role
+			if requestBody.Password != "" {
+
+				users[i].Password = requestBody.Password
 			}
-			return c.JSON(users[i])
+			if requestBody.Role != "" {
+				users[i].Role = requestBody.Role
+
+			}
+			if requestBody.Email != "" {
+				users[i].Email = requestBody.Email
+			}
+			if requestBody.Phone != "" {
+				users[i].Phone = requestBody.Phone
+			}
+			if len(requestBody.ZoneIDs) > 0 {
+				users[i].ZoneIDs = requestBody.ZoneIDs
+			}
+
+			if users[i].StaffInfo == nil {
+				users[i].StaffInfo = &StaffDetail{}
+			}
+			if requestBody.Position != "" {
+				users[i].StaffInfo.Position = requestBody.Position
+			}
+			if requestBody.Description != "" {
+				users[i].StaffInfo.Description = requestBody.Description
+			}
+
+			return c.Status(fiber.StatusOK).JSON(users[i])
 		}
 	}
 
-	return c.SendStatus(fiber.StatusNotFound)
+	return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User not found"})
 }
 
+// deleteUser godoc
+// @Summary Delete a user
+// @Description ลบผู้ใช้งานออกจากระบบด้วย ID
+// @Tags User
+// @Security BearerAuth
+// @Param id path int true "User ID ที่ต้องการลบ"
+// @Success 204 "No Content (ลบสำเร็จ)"
+// @Failure 400 {object} ErrorResponse "ID ไม่ถูกต้อง"
+// @Failure 404 {object} ErrorResponse "ไม่พบผู้ใช้งาน"
+// @Router /users/{id} [delete]
 func deleteUser(c *fiber.Ctx) error {
 	userID, err := strconv.Atoi(c.Params("id"))
 
@@ -137,6 +186,17 @@ func deleteUser(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNotFound)
 }
 
+// getUserByID godoc
+// @Summary Get user by ID
+// @Description ดึงข้อมูลผู้ใช้งานตาม ID
+// @Tags User
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "User ID ที่ต้องการดูข้อมูล"
+// @Success 200 {object} User
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Router /users/{id} [get]
 func getUserByID(c *fiber.Ctx) error {
 	userID, err := strconv.Atoi(c.Params("id"))
 
@@ -148,40 +208,92 @@ func getUserByID(c *fiber.Ctx) error {
 			return c.JSON(u)
 		}
 	}
-	return c.JSON(users)
+	return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User not found"})
 }
+
+// getAllElderly godoc
+// @Summary Get all elderly records
+// @Description ดึงข้อมูลผู้สูงอายุทั้งหมดในระบบ
+// @Tags Elderly
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {array} Elderly
+// @Router /elders [get]
 func getAllElderly(c *fiber.Ctx) error {
 	return c.JSON(elderlys)
 }
 
+// getAllZone godoc
+// @Summary Get all zones
+// @Description ดึงข้อมูลโซนดูแลผู้สูงอายุทั้งหมด
+// @Tags Zone
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {array} Zone
+// @Router /zones [get]
 func getAllZone(c *fiber.Ctx) error {
 	return c.JSON(zones)
 }
 
+// createZone godoc
+// @Summary Create a new zone
+// @Description สร้างโซนดูแลผู้สูงอายุใหม่
+// @Tags Zone
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body ZoneCreationRequest true "Zone details (ZoneID และ Status จะถูกสร้างอัตโนมัติ)"
+// @Success 201 {object} Zone
+// @Failure 400 {object} ErrorResponse
+// @Router /zones [post]
 func createZone(c *fiber.Ctx) error {
-	zone := new(Zone)
-	if err := c.BodyParser(zone); err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	req := new(ZoneCreationRequest)
+	if err := c.BodyParser(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	zones = append(zones, *zone)
-	return c.JSON(zone)
+	newZone := Zone{
+		ZoneID:      len(zones) + 1,
+		ZoneName:    req.ZoneName,
+		Address:     req.Address,
+		Description: req.Description,
+
+		Status:     "Active",
+		ActiveUser: 0,
+	}
+
+	zones = append(zones, newZone)
+	return c.Status(fiber.StatusCreated).JSON(newZone)
 }
 
+// updateZone godoc
+// @Summary Update zone details
+// @Description อัปเดตข้อมูลโซนด้วย ID (เช่น ชื่อ, ที่อยู่, สถานะ)
+// @Tags Zone
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Zone ID ที่ต้องการอัปเดต"
+// @Param request body ZoneUpdateRequest true "Fields to update"
+// @Success 200 {object} Zone
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Router /zones/{id} [put]
 func updateZone(c *fiber.Ctx) error {
 	zoneID, err := strconv.Atoi(c.Params("id"))
 
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid Zone ID format"})
 	}
 
-	zoneUpdate := new(Zone)
+	zoneUpdate := new(ZoneUpdateRequest)
 	if err := c.BodyParser(zoneUpdate); err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	for i, z := range zones {
-		if z.ZoneID == zoneID {
+	for i := range zones {
+		if zones[i].ZoneID == zoneID {
+
 			if zoneUpdate.ZoneName != "" {
 				zones[i].ZoneName = zoneUpdate.ZoneName
 			}
@@ -195,13 +307,22 @@ func updateZone(c *fiber.Ctx) error {
 				zones[i].Status = zoneUpdate.Status
 			}
 
-			return c.JSON(zones[i])
+			return c.Status(fiber.StatusOK).JSON(zones[i])
 		}
 	}
-
-	return c.SendStatus(fiber.StatusNotFound)
+	return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Zone not found"})
 }
 
+// deleteZone godoc
+// @Summary Delete a zone
+// @Description ลบโซนดูแลผู้สูงอายุออกจากระบบ
+// @Tags Zone
+// @Security BearerAuth
+// @Param id path int true "Zone ID ที่ต้องการลบ"
+// @Success 204 "No Content (ลบสำเร็จ)"
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Router /zones/{id} [delete]
 func deleteZone(c *fiber.Ctx) error {
 	zoneID, err := strconv.Atoi(c.Params("id"))
 
@@ -218,6 +339,15 @@ func deleteZone(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNotFound)
 }
 
+// getTopZones godoc
+// @Summary Get top zones by active users
+// @Description ดึงข้อมูลโซนที่มีผู้ใช้งาน Active มากที่สุด (เรียงตาม ActiveUser)
+// @Tags Dashboard
+// @Produce json
+// @Security BearerAuth
+// @Param limit query int false "จำนวนโซนสูงสุดที่ต้องการแสดง (ค่าเริ่มต้น: 5)"
+// @Success 200 {object} TopZonesResponse
+// @Router /dashboard/top-zones [get]
 func getTopZones(c *fiber.Ctx) error {
 	limit := c.QueryInt("limit", 5)
 
@@ -237,6 +367,16 @@ func getTopZones(c *fiber.Ctx) error {
 
 }
 
+// getMyZone godoc
+// @Summary Get zones assigned to the current user
+// @Description ดึงรายการโซนที่ผูกกับผู้ใช้งานที่กำลัง Login อยู่ (อิงจาก JWT Token)
+// @Tags Zone
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {array} Zone
+// @Failure 401 {object} ErrorResponse "Unauthorized (Token ไม่ถูกต้อง)"
+// @Failure 404 {object} ErrorResponse "User not found (ไม่พบผู้ใช้งานในระบบ)"
+// @Router /zones/my-zones [get]
 func getMyZone(c *fiber.Ctx) error {
 	token := c.Locals("user").(*jwt.Token)
 	claims := token.Claims.(jwt.MapClaims)
@@ -268,6 +408,17 @@ func getMyZone(c *fiber.Ctx) error {
 	return c.JSON(myzone)
 }
 
+// getZoneDashboard godoc
+// @Summary Get dashboard data for a specific zone
+// @Description ดึงข้อมูลสรุปสำหรับ Dashboard ของแต่ละโซน (ผู้สูงอายุ, สถานะอุปกรณ์, Alert)
+// @Tags Zone
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Zone ID สำหรับ Dashboard"
+// @Success 200 {object} ZoneDashboardResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Router /zones/{id}/dashboard [get]
 func getZoneDashboard(c *fiber.Ctx) error {
 	zoneID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
@@ -350,10 +501,26 @@ func getZoneDashboard(c *fiber.Ctx) error {
 
 }
 
+// getAllDevice godoc
+// @Summary Get all devices
+// @Description ดึงข้อมูลอุปกรณ์ติดตามสุขภาพทั้งหมดในระบบ
+// @Tags Device
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {array} Device
+// @Router /devices [get]
 func getAllDevice(c *fiber.Ctx) error {
 	return c.JSON(devices)
 }
 
+// getDashSum godoc
+// @Summary Get dashboard summary counts
+// @Description ดึงจำนวนรวมของ โซน, ผู้ใช้งาน, ผู้สูงอายุ และอุปกรณ์ทั้งหมด
+// @Tags Dashboard
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} DashboardSummary
+// @Router /dashboard/summary [get]
 func getDashSum(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"zonesCount":   len(zones),
@@ -363,14 +530,39 @@ func getDashSum(c *fiber.Ctx) error {
 	})
 }
 
+// getHealthservers godoc
+// @Summary Get health server status
+// @Description ดึงสถานะของเซิร์ฟเวอร์ที่เกี่ยวข้องกับระบบสุขภาพ
+// @Tags System
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {array} Server
+// @Router /system/health/servers [get]
 func getHealthservers(c *fiber.Ctx) error {
 	return c.JSON(servers)
 }
 
+// getAlert godoc
+// @Summary Get all system alerts
+// @Description ดึงรายการการแจ้งเตือนทั้งหมดในระบบ
+// @Tags System
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {array} Alert
+// @Router /system/alerts [get]
 func getAlert(c *fiber.Ctx) error {
 	return c.JSON(alerts)
 }
 
+// getUserTrend godoc
+// @Summary Get user activity trend
+// @Description ดึงข้อมูลแนวโน้มการใช้งานของผู้ใช้ในช่วงเวลาที่กำหนด
+// @Tags Dashboard
+// @Produce json
+// @Security BearerAuth
+// @Param days query int false "จำนวนวันย้อนหลังที่ต้องการดูข้อมูล (ค่าเริ่มต้น: 30)"
+// @Success 200 {object} UserTrendResponse
+// @Router /dashboard/usage-trend [get]
 func getUserTrend(c *fiber.Ctx) error {
 	days := c.QueryInt("days", 30)
 
@@ -384,10 +576,21 @@ func getUserTrend(c *fiber.Ctx) error {
 	})
 }
 
+// resetPassword godoc
+// @Summary Reset user password
+// @Description รีเซ็ตรหัสผ่านของผู้ใช้งานตาม ID และส่งรหัสผ่านใหม่ทางอีเมล
+// @Tags User
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "User ID ที่ต้องการรีเซ็ตรหัสผ่าน"
+// @Success 200 {object} PasswordResetResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Router /users/{id}/reset-password [post]
 func resetPassword(c *fiber.Ctx) error {
 	userId, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid User ID format"})
 	}
 	var Resetuser *User
 
@@ -419,7 +622,7 @@ func resetPassword(c *fiber.Ctx) error {
 
 	fmt.Printf("ส่งรหัสใหม่ไปที่ %s: %s\n", Resetuser.Email, newPass)
 
-	return c.JSON(fiber.Map{
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "รหัสผ่านได้ถูกรีเซ็ทและส่งไปทางเมลแล้ว",
 		"userId":  Resetuser.UserID,
 		"email":   Resetuser.Email,
@@ -521,6 +724,18 @@ func findDeviceByID(id string) *Device {
 	}
 	return nil
 }
+
+// addEldertoZone godoc
+// @Summary Register elderly and assign device
+// @Description ลงทะเบียนผู้สูงอายุใหม่ คำนวณอายุ และผูกกับอุปกรณ์ในโซน
+// @Tags Zone
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body RegisterElderlyRequest true "Elderly registration details and initial device assignment"
+// @Success 201 {object} ElderlyRegistrationResponse
+// @Failure 400 {object} ErrorResponse "Invalid request, device not found, device not available, or invalid date format"
+// @Router /zones/elderlyRegister [post]
 func addEldertoZone(c *fiber.Ctx) error {
 	var req RegisterElderlyRequest
 	fmt.Println(req)
@@ -567,6 +782,16 @@ func addEldertoZone(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "Elderly registered successfully"})
 }
 
+// getElderinZone godoc
+// @Summary Get elderly patients in a specific zone
+// @Description ดึงรายการผู้สูงอายุทั้งหมดที่อยู่ในโซนที่กำหนด
+// @Tags Zone
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Zone ID ที่ต้องการดึงข้อมูลผู้สูงอายุ"
+// @Success 200 {array} Elderly
+// @Failure 400 {object} ErrorResponse
+// @Router /zones/{id}/elders [get]
 func getElderinZone(c *fiber.Ctx) error {
 	zoneID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
@@ -581,21 +806,23 @@ func getElderinZone(c *fiber.Ctx) error {
 	return c.JSON(elderlyinZone)
 }
 
+// getElderAlertandstatus godoc
+// @Summary Get elderly status and device alert summary
+// @Description ดึงข้อมูลสรุปสถานะอุปกรณ์และรายการแจ้งเตือนของผู้สูงอายุในโซน
+// @Tags Elderly
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Zone ID สำหรับดึงข้อมูล"
+// @Success 200 {object} ZoneAlertStatusResponse
+// @Failure 400 {object} ErrorResponse
+// @Router /zones/{id}/elders/alertandstatus [get]
 func getElderAlertandstatus(c *fiber.Ctx) error {
 	zoneID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid Zone ID"})
 	}
 
-	type AlertInfo struct {
-		ID      string `json:"id"`
-		Name    string `json:"name"`
-		Message string `json:"message"`
-		Status  string `json:"status"`
-		Battery int    `json:"battery"`
-	}
-
-	var alerts []AlertInfo
+	var alerts []AlertZoneInfo
 	onlineCount := 0
 	offlineCount := 0
 
@@ -633,7 +860,7 @@ func getElderAlertandstatus(c *fiber.Ctx) error {
 		}
 
 		if alertMsg != "" {
-			alerts = append(alerts, AlertInfo{
+			alerts = append(alerts, AlertZoneInfo{
 				ID:      e.ID,
 				Name:    e.Name,
 				Message: alertMsg,
@@ -659,25 +886,61 @@ func getElderAlertandstatus(c *fiber.Ctx) error {
 	})
 }
 
+// createDevice godoc
+// @Summary Register a new device
+// @Description ลงทะเบียนอุปกรณ์ติดตามสุขภาพใหม่
+// @Tags Device
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body DeviceCreationRequest true "Device registration details"
+// @Success 201 {object} Device
+// @Failure 400 {object} ErrorResponse
+// @Router /devices [post]
 func createDevice(c *fiber.Ctx) error {
-	device := new(Device)
 
-	if err := c.BodyParser(device); err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	req := new(DeviceCreationRequest)
+	if err := c.BodyParser(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	device.AssignedTo = ""
-	device.ZoneID = 0
-	devices = append(devices, *device)
-	return c.JSON(device)
+	newDevice := Device{
+		DeviceID:     req.DeviceID,
+		SerialNumber: req.SerialNumber,
+		Type:         req.Type,
+		Model:        req.Model,
+		Battery:      req.Battery,
+		Features:     req.Features,
+		LastUpdate:   req.LastUpdate,
+		Status:       req.Status,
+
+		AssignedTo: "",
+		ZoneID:     0,
+	}
+
+	devices = append(devices, newDevice)
+	return c.Status(fiber.StatusCreated).JSON(newDevice)
 }
 
+// updateDevice godoc
+// @Summary Update device details
+// @Description อัปเดตข้อมูลอุปกรณ์ติดตามสุขภาพด้วย Device ID
+// @Tags Device
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Device ID ที่ต้องการอัปเดต"
+// @Param request body DeviceUpdateRequest true "Fields to update (ใช้เฉพาะฟิลด์ที่ต้องการเปลี่ยน)"
+// @Success 200 {object} Device
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Router /devices/{id} [put]
 func updateDevice(c *fiber.Ctx) error {
 	deviceID := c.Params("id")
 
 	updatedDevice := new(Device)
 	if err := c.BodyParser(updatedDevice); err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	for i, d := range devices {
@@ -711,12 +974,21 @@ func updateDevice(c *fiber.Ctx) error {
 				devices[i].LastUpdate = updatedDevice.LastUpdate
 			}
 
-			return c.JSON(devices[i])
+			return c.Status(fiber.StatusOK).JSON(devices[i])
 		}
 	}
-	return c.SendStatus(fiber.StatusNotFound)
+	return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Device not found"}) // เปลี่ยนเป็น JSON
 }
 
+// deleteDevice godoc
+// @Summary Delete a device
+// @Description ลบอุปกรณ์ติดตามสุขภาพออกจากระบบด้วย Device ID
+// @Tags Device
+// @Security BearerAuth
+// @Param id path string true "Device ID ที่ต้องการลบ"
+// @Success 204 "No Content (ลบสำเร็จ)"
+// @Failure 404 {object} ErrorResponse
+// @Router /devices/{id} [delete]
 func deleteDevice(c *fiber.Ctx) error {
 	deviceID := c.Params("id")
 
@@ -727,9 +999,20 @@ func deleteDevice(c *fiber.Ctx) error {
 			return c.SendStatus(fiber.StatusNoContent)
 		}
 	}
-	return c.SendStatus(fiber.StatusNotFound)
+	return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Device not found"})
 }
 
+// getZoneStaff godoc
+// @Summary Get all staff members in a zone
+// @Description ดึงรายการบุคลากรทั้งหมดที่ถูกกำหนดให้กับโซนตาม ID
+// @Tags Zone
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Zone ID สำหรับดึงข้อมูลบุคลากร"
+// @Success 200 {array} ZoneStaffResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Router /zones/{id}/staff [get]
 func getZoneStaff(c *fiber.Ctx) error {
 	zoneID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
@@ -751,7 +1034,7 @@ func getZoneStaff(c *fiber.Ctx) error {
 	for _, u := range users {
 		if len(u.ZoneIDs) == 1 && u.ZoneIDs[0] == zoneID {
 			staffList = append(staffList, fiber.Map{
-				"id":          fmt.Sprintf("staff-%03d", u.UserID),
+				"id":          u.UserID,
 				"name":        u.Name,
 				"position":    u.StaffInfo.Position,
 				"Description": u.StaffInfo.Description,
@@ -767,6 +1050,18 @@ func getZoneStaff(c *fiber.Ctx) error {
 	return c.JSON(staffList)
 }
 
+// createZoneStaff godoc
+// @Summary Add a new staff member to a zone
+// @Description สร้างผู้ใช้งานใหม่ในฐานะ Zone Staff และกำหนดให้รับผิดชอบ ZoneID ที่ระบุ
+// @Tags Zone
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Zone ID ที่ต้องการเพิ่มบุคลากร"
+// @Param request body CreateZoneStaffRequest true "Staff details and permissions"
+// @Success 201 {object} User
+// @Failure 400 {object} ErrorResponse
+// @Router /zones/{id}/staff [post]
 func createZoneStaff(c *fiber.Ctx) error {
 	zoneID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
@@ -812,12 +1107,26 @@ func createZoneStaff(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(newUser)
 }
 
+// updateZoneStaff godoc
+// @Summary Update a staff member's details
+// @Description อัปเดตข้อมูลบุคลากรในโซนที่กำหนด
+// @Tags Zone
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Zone ID ที่บุคลากรคนนี้สังกัด"
+// @Param userid path int true "User ID ของบุคลากรที่ต้องการอัปเดต"
+// @Param request body CreateZoneStaffRequest true "Fields to update (ใช้เฉพาะฟิลด์ที่ต้องการเปลี่ยน)"
+// @Success 200 {object} User
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Router /zones/{id}/staff/{userid} [put]
 func updateZoneStaff(c *fiber.Ctx) error {
 	zoneID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
-		c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid Zone ID"})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid Zone ID format"})
 	}
-	userID, err := strconv.Atoi(c.Params("staffid"))
+	userID, err := strconv.Atoi(c.Params("userid"))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid User ID"})
 	}
@@ -888,21 +1197,61 @@ func updateZoneStaff(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(userToUpdate)
 }
 
+// deleteZoneStaff godoc
+// @Summary Delete a staff member
+// @Description ลบผู้ใช้งานที่เป็นบุคลากรโซนออกจากระบบด้วย User ID
+// @Tags Zone
+// @Security BearerAuth
+// @Param id path int true "Zone ID ที่บุคลากรคนนี้สังกัด (ใช้ในการตรวจสอบสิทธิ์)"
+// @Param userid path int true "User ID ของบุคลากรที่ต้องการลบ"
+// @Success 204 "No Content (ลบสำเร็จ)"
+// @Failure 400 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse "Staff member is not assigned to this zone"
+// @Failure 404 {object} ErrorResponse
+// @Router /zones/{id}/staff/{userid} [delete]
 func deleteZoneStaff(c *fiber.Ctx) error {
-	userID, err := strconv.Atoi(c.Params("staffid"))
-
+	zoneID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid Zone ID format"})
+	}
+
+	userID, err := strconv.Atoi(c.Params("userid"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid User ID format"})
 	}
 
 	for i, u := range users {
 		if u.UserID == userID {
+
+			isStaffInZone := false
+			for _, zid := range u.ZoneIDs {
+				if zid == zoneID {
+					isStaffInZone = true
+					break
+				}
+			}
+
+			if !isStaffInZone {
+				return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "Staff member is not assigned to this zone"})
+			}
+
 			users = append(users[:i], users[i+1:]...)
 			return c.SendStatus(fiber.StatusNoContent)
 		}
 	}
-	return c.SendStatus(fiber.StatusNotFound)
+	return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User not found"})
 }
+
+// getZoneStaffSummary godoc
+// @Summary Get summary counts for a zone
+// @Description ดึงข้อมูลสรุปจำนวนผู้สูงอายุ, อุปกรณ์ และบุคลากรในโซน
+// @Tags Zone
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Zone ID สำหรับดึงข้อมูลสรุป"
+// @Success 200 {object} ZoneSummaryResponse
+// @Failure 400 {object} ErrorResponse
+// @Router /zones/{id}/summary [get]
 func getZoneStaffSummary(c *fiber.Ctx) error {
 	zoneID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
@@ -940,4 +1289,82 @@ func getZoneStaffSummary(c *fiber.Ctx) error {
 		"devicesCount": countDevices,
 		"caregivers":   countCaregivers,
 	})
+}
+
+// getElderDetail godoc
+// @Summary Get elderly patient details
+// @Description ดึงข้อมูลรายละเอียดผู้สูงอายุและ Vital Signs ตาม ID
+// @Tags Elderly
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Elder ID (เช่น E001)"
+// @Success 200 {object} Elderly
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Router /elders/{id} [get]
+func getElderDetail(c *fiber.Ctx) error {
+	elderID := c.Params("id")
+
+	for _, e := range elderlys {
+		if e.ID == elderID {
+			return c.JSON(e)
+		}
+	}
+
+	return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User not found"})
+}
+
+// getSystemSummary godoc
+// @Summary Get system summary
+// @Description ดึงข้อมูลสรุปสถานะสุขภาพโดยรวมของระบบ (จำนวนเซิร์ฟเวอร์, uptime, load, storage)
+// @Tags System
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} HealthSummaryResponse
+// @Router /system/summarys [get]
+func getSystemSum(c *fiber.Ctx) error {
+	var countOnline int
+	for _, s := range servers {
+		if s.Status == "online" {
+			countOnline++
+		}
+	}
+	response := HealthSummaryResponse{
+		TotalServers:     len(servers),
+		OnlineServers:    countOnline,
+		UptimePercentage: 99.7,
+		SystemLoad:       66.1,
+		StorageUsed:      "3.2TB",
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response)
+}
+
+// getSystemLogs godoc
+// @Summary Get system logs
+// @Description ดึงรายการ Log ล่าสุดของระบบ
+// @Tags System
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {array} SystemLogEntry
+// @Router /system/logs [get]
+func getSystemLogs(c *fiber.Ctx) error {
+	return c.Status(fiber.StatusOK).JSON(logs)
+}
+
+// getSystemNetworks godoc
+// @Summary Get system network status
+// @Description ดึงข้อมูลสถานะเครือข่ายต่างๆ ของระบบ (อินเทอร์เน็ต, LoRaWAN, ความปลอดภัย)
+// @Tags Health
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} NetworkSummaryResponse
+// @Router /system/networks [get]
+func getSystemNetworks(c *fiber.Ctx) error {
+
+	response := NetworkSummaryResponse{
+		Networks: networks,
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response)
 }

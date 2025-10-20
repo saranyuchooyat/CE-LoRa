@@ -55,6 +55,466 @@ const docTemplate = `{
                 }
             }
         },
+        "/dashboard/summary": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงจำนวนรวมของ โซน, ผู้ใช้งาน, ผู้สูงอายุ และอุปกรณ์ทั้งหมด",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get dashboard summary counts",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.DashboardSummary"
+                        }
+                    }
+                }
+            }
+        },
+        "/dashboard/top-zones": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงข้อมูลโซนที่มีผู้ใช้งาน Active มากที่สุด (เรียงตาม ActiveUser)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get top zones by active users",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "จำนวนโซนสูงสุดที่ต้องการแสดง (ค่าเริ่มต้น: 5)",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.TopZonesResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/dashboard/usage-trend": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงข้อมูลแนวโน้มการใช้งานของผู้ใช้ในช่วงเวลาที่กำหนด",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get user activity trend",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "จำนวนวันย้อนหลังที่ต้องการดูข้อมูล (ค่าเริ่มต้น: 30)",
+                        "name": "days",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.UserTrendResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/devices": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงข้อมูลอุปกรณ์ติดตามสุขภาพทั้งหมดในระบบ",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Device"
+                ],
+                "summary": "Get all devices",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.Device"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ลงทะเบียนอุปกรณ์ติดตามสุขภาพใหม่",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Device"
+                ],
+                "summary": "Register a new device",
+                "parameters": [
+                    {
+                        "description": "Device registration details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.DeviceCreationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/main.Device"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/devices/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "อัปเดตข้อมูลอุปกรณ์ติดตามสุขภาพด้วย Device ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Device"
+                ],
+                "summary": "Update device details",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Device ID ที่ต้องการอัปเดต",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Fields to update (ใช้เฉพาะฟิลด์ที่ต้องการเปลี่ยน)",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.DeviceUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.Device"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ลบอุปกรณ์ติดตามสุขภาพออกจากระบบด้วย Device ID",
+                "tags": [
+                    "Device"
+                ],
+                "summary": "Delete a device",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Device ID ที่ต้องการลบ",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content (ลบสำเร็จ)"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/elders": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงข้อมูลผู้สูงอายุทั้งหมดในระบบ",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Elderly"
+                ],
+                "summary": "Get all elderly records",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.Elderly"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/elders/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงข้อมูลรายละเอียดผู้สูงอายุและ Vital Signs ตาม ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Elderly"
+                ],
+                "summary": "Get elderly patient details",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Elder ID (เช่น E001)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.Elderly"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/system/alerts": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงรายการการแจ้งเตือนทั้งหมดในระบบ",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System"
+                ],
+                "summary": "Get all system alerts",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.Alert"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/system/health/servers": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงสถานะของเซิร์ฟเวอร์ที่เกี่ยวข้องกับระบบสุขภาพ",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System"
+                ],
+                "summary": "Get health server status",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.Server"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/system/logs": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงรายการ Log ล่าสุดของระบบ",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System"
+                ],
+                "summary": "Get system logs",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.SystemLogEntry"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/system/networks": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงข้อมูลสถานะเครือข่ายต่างๆ ของระบบ (อินเทอร์เน็ต, LoRaWAN, ความปลอดภัย)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Get system network status",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.NetworkSummaryResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/system/summarys": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงข้อมูลสรุปสถานะสุขภาพโดยรวมของระบบ (จำนวนเซิร์ฟเวอร์, uptime, load, storage)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System"
+                ],
+                "summary": "Get system summary",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.HealthSummaryResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "security": [
@@ -134,9 +594,1153 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/users/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงข้อมูลผู้ใช้งานตาม ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get user by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID ที่ต้องการดูข้อมูล",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "อัปเดตข้อมูลผู้ใช้งานด้วย ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Fields to update (ใช้เฉพาะฟิลด์ที่ต้องการเปลี่ยน)",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.UserUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ลบผู้ใช้งานออกจากระบบด้วย ID",
+                "tags": [
+                    "User"
+                ],
+                "summary": "Delete a user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID ที่ต้องการลบ",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content (ลบสำเร็จ)"
+                    },
+                    "400": {
+                        "description": "ID ไม่ถูกต้อง",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "ไม่พบผู้ใช้งาน",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}/reset-password": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "รีเซ็ตรหัสผ่านของผู้ใช้งานตาม ID และส่งรหัสผ่านใหม่ทางอีเมล",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Reset user password",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID ที่ต้องการรีเซ็ตรหัสผ่าน",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.PasswordResetResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/zones": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงข้อมูลโซนดูแลผู้สูงอายุทั้งหมด",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Zone"
+                ],
+                "summary": "Get all zones",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.Zone"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "สร้างโซนดูแลผู้สูงอายุใหม่",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Zone"
+                ],
+                "summary": "Create a new zone",
+                "parameters": [
+                    {
+                        "description": "Zone details (ZoneID และ Status จะถูกสร้างอัตโนมัติ)",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.ZoneCreationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/main.Zone"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/zones/elderlyRegister": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ลงทะเบียนผู้สูงอายุใหม่ คำนวณอายุ และผูกกับอุปกรณ์ในโซน",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Zone"
+                ],
+                "summary": "Register elderly and assign device",
+                "parameters": [
+                    {
+                        "description": "Elderly registration details and initial device assignment",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.RegisterElderlyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/main.ElderlyRegistrationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request, device not found, device not available, or invalid date format",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/zones/my-zones": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงรายการโซนที่ผูกกับผู้ใช้งานที่กำลัง Login อยู่ (อิงจาก JWT Token)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Zone"
+                ],
+                "summary": "Get zones assigned to the current user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.Zone"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized (Token ไม่ถูกต้อง)",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found (ไม่พบผู้ใช้งานในระบบ)",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/zones/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "อัปเดตข้อมูลโซนด้วย ID (เช่น ชื่อ, ที่อยู่, สถานะ)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Zone"
+                ],
+                "summary": "Update zone details",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Zone ID ที่ต้องการอัปเดต",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Fields to update",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.ZoneUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.Zone"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ลบโซนดูแลผู้สูงอายุออกจากระบบ",
+                "tags": [
+                    "Zone"
+                ],
+                "summary": "Delete a zone",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Zone ID ที่ต้องการลบ",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content (ลบสำเร็จ)"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/zones/{id}/dashboard": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงข้อมูลสรุปสำหรับ Dashboard ของแต่ละโซน (ผู้สูงอายุ, สถานะอุปกรณ์, Alert)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Zone"
+                ],
+                "summary": "Get dashboard data for a specific zone",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Zone ID สำหรับ Dashboard",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.ZoneDashboardResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/zones/{id}/elders": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงรายการผู้สูงอายุทั้งหมดที่อยู่ในโซนที่กำหนด",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Zone"
+                ],
+                "summary": "Get elderly patients in a specific zone",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Zone ID ที่ต้องการดึงข้อมูลผู้สูงอายุ",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.Elderly"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/zones/{id}/elders/alertandstatus": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงข้อมูลสรุปสถานะอุปกรณ์และรายการแจ้งเตือนของผู้สูงอายุในโซน",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Elderly"
+                ],
+                "summary": "Get elderly status and device alert summary",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Zone ID สำหรับดึงข้อมูล",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.ZoneAlertStatusResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/zones/{id}/staff": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงรายการบุคลากรทั้งหมดที่ถูกกำหนดให้กับโซนตาม ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Zone"
+                ],
+                "summary": "Get all staff members in a zone",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Zone ID สำหรับดึงข้อมูลบุคลากร",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.ZoneStaffResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "สร้างผู้ใช้งานใหม่ในฐานะ Zone Staff และกำหนดให้รับผิดชอบ ZoneID ที่ระบุ",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Zone"
+                ],
+                "summary": "Add a new staff member to a zone",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Zone ID ที่ต้องการเพิ่มบุคลากร",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Staff details and permissions",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.CreateZoneStaffRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/main.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/zones/{id}/staff/{userid}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "อัปเดตข้อมูลบุคลากรในโซนที่กำหนด",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Zone"
+                ],
+                "summary": "Update a staff member's details",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Zone ID ที่บุคลากรคนนี้สังกัด",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "User ID ของบุคลากรที่ต้องการอัปเดต",
+                        "name": "userid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Fields to update (ใช้เฉพาะฟิลด์ที่ต้องการเปลี่ยน)",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.CreateZoneStaffRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ลบผู้ใช้งานที่เป็นบุคลากรโซนออกจากระบบด้วย User ID",
+                "tags": [
+                    "Zone"
+                ],
+                "summary": "Delete a staff member",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Zone ID ที่บุคลากรคนนี้สังกัด (ใช้ในการตรวจสอบสิทธิ์)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "User ID ของบุคลากรที่ต้องการลบ",
+                        "name": "userid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content (ลบสำเร็จ)"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Staff member is not assigned to this zone",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/zones/{id}/summary": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงข้อมูลสรุปจำนวนผู้สูงอายุ, อุปกรณ์ และบุคลากรในโซน",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Zone"
+                ],
+                "summary": "Get summary counts for a zone",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Zone ID สำหรับดึงข้อมูลสรุป",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.ZoneSummaryResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "main.Alert": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string",
+                    "example": "2025-10-18T10:00:00Z"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "HeartRate 120 bpm, BP 160/100"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Elder Bua has critical condition"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "critical"
+                }
+            }
+        },
+        "main.AlertZoneInfo": {
+            "type": "object",
+            "properties": {
+                "battery": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.CreateZoneStaffRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Day shift nurse"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "sombat.j@zone.com"
+                },
+                "firstName": {
+                    "type": "string",
+                    "example": "Sombat"
+                },
+                "lastName": {
+                    "type": "string",
+                    "example": "Jitdee"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "securepass123"
+                },
+                "permissions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "view_elderly",
+                        "view_health"
+                    ]
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "0912340000"
+                },
+                "position": {
+                    "type": "string",
+                    "example": "Nurse"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "sombat.j"
+                }
+            }
+        },
+        "main.DashboardSummary": {
+            "type": "object",
+            "properties": {
+                "devicesCount": {
+                    "type": "integer",
+                    "example": 30
+                },
+                "elderlyCount": {
+                    "type": "integer",
+                    "example": 35
+                },
+                "usersCount": {
+                    "type": "integer",
+                    "example": 12
+                },
+                "zonesCount": {
+                    "type": "integer",
+                    "example": 4
+                }
+            }
+        },
+        "main.Device": {
+            "type": "object",
+            "properties": {
+                "assigned_to": {
+                    "type": "string"
+                },
+                "battery": {
+                    "type": "integer"
+                },
+                "device_id": {
+                    "type": "string"
+                },
+                "features": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "last_update": {
+                    "type": "string"
+                },
+                "model": {
+                    "type": "string"
+                },
+                "serial_number": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "zone_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "main.DeviceCreationRequest": {
+            "type": "object",
+            "required": [
+                "deviceId",
+                "serialNumber"
+            ],
+            "properties": {
+                "battery": {
+                    "type": "integer",
+                    "example": 100
+                },
+                "deviceId": {
+                    "type": "string",
+                    "example": "D-WATCH-007"
+                },
+                "features": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "heart_rate",
+                        " spo2"
+                    ]
+                },
+                "lastUpdate": {
+                    "type": "string",
+                    "example": "2025-10-19 10:00:00"
+                },
+                "model": {
+                    "type": "string",
+                    "example": "WatchX"
+                },
+                "serialNumber": {
+                    "type": "string",
+                    "example": "SN12345678"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "unassigned"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "Wearable"
+                }
+            }
+        },
+        "main.DeviceSummary": {
+            "type": "object",
+            "properties": {
+                "offline": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "online": {
+                    "type": "integer",
+                    "example": 28
+                },
+                "total": {
+                    "type": "integer",
+                    "example": 30
+                }
+            }
+        },
+        "main.DeviceUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "assigned_to": {
+                    "type": "string",
+                    "example": "Elder Bua"
+                },
+                "battery": {
+                    "type": "integer",
+                    "example": 85
+                },
+                "features": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "heart_rate",
+                        " spo2",
+                        " gps"
+                    ]
+                },
+                "lastUpdate": {
+                    "type": "string",
+                    "example": "2025-10-20 15:00:00"
+                },
+                "model": {
+                    "type": "string",
+                    "example": "WatchX Pro"
+                },
+                "serialNumber": {
+                    "type": "string",
+                    "example": "SN98765432"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "online"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "Watch"
+                },
+                "zoneId": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "main.Elderly": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "age": {
+                    "type": "integer"
+                },
+                "battery": {
+                    "type": "integer"
+                },
+                "birthDate": {
+                    "type": "string"
+                },
+                "citizenId": {
+                    "type": "string"
+                },
+                "device_id": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "last_updated": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "vitals": {
+                    "$ref": "#/definitions/main.Vitals"
+                },
+                "zone_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "main.ElderlyRegistrationResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Elderly registered successfully"
+                }
+            }
+        },
         "main.ErrorResponse": {
             "type": "object",
             "properties": {
@@ -145,14 +1749,41 @@ const docTemplate = `{
                 }
             }
         },
+        "main.HealthSummaryResponse": {
+            "type": "object",
+            "properties": {
+                "onlineServers": {
+                    "type": "integer",
+                    "example": 4
+                },
+                "storageUsed": {
+                    "type": "string",
+                    "example": "3.2TB"
+                },
+                "systemLoad": {
+                    "type": "number",
+                    "example": 66.1
+                },
+                "totalServers": {
+                    "type": "integer",
+                    "example": 4
+                },
+                "uptimePercentage": {
+                    "type": "number",
+                    "example": 99.7
+                }
+            }
+        },
         "main.LoginRequest": {
             "type": "object",
             "properties": {
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "5678"
                 },
                 "username": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "ink"
                 }
             }
         },
@@ -164,6 +1795,181 @@ const docTemplate = `{
                 }
             }
         },
+        "main.NetworkStatusEntry": {
+            "type": "object",
+            "properties": {
+                "blockedIPs": {
+                    "type": "integer",
+                    "example": 5
+                },
+                "devicesOffline": {
+                    "type": "integer",
+                    "example": 126
+                },
+                "devicesOnline": {
+                    "type": "integer",
+                    "example": 2721
+                },
+                "downSpeedMbps": {
+                    "type": "integer",
+                    "example": 156
+                },
+                "firewallStatus": {
+                    "description": "Security Status Fields",
+                    "type": "string",
+                    "example": "active"
+                },
+                "gatewaysActive": {
+                    "description": "LoRaWAN Status Fields",
+                    "type": "integer",
+                    "example": 24
+                },
+                "idsStatus": {
+                    "type": "string",
+                    "example": "active"
+                },
+                "isp": {
+                    "description": "Internet Status Fields",
+                    "type": "string",
+                    "example": "AIS Fiber"
+                },
+                "lastScan": {
+                    "type": "string",
+                    "example": "2025-08-19T13:50:00Z"
+                },
+                "lastUpdate": {
+                    "description": "Used by lorawan-status",
+                    "type": "string",
+                    "example": "2025-08-19T14:20:00Z"
+                },
+                "latencyMs": {
+                    "type": "integer",
+                    "example": 12
+                },
+                "name": {
+                    "type": "string",
+                    "example": "internet-status"
+                },
+                "securityThreats": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "status": {
+                    "description": "Common Fields",
+                    "type": "string",
+                    "example": "online"
+                },
+                "upSpeedMbps": {
+                    "type": "integer",
+                    "example": 45
+                }
+            }
+        },
+        "main.NetworkSummaryResponse": {
+            "type": "object",
+            "properties": {
+                "networks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/main.NetworkStatusEntry"
+                    }
+                }
+            }
+        },
+        "main.PasswordResetResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "testuser@example.com"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "รหัสผ่านได้ถูกรีเซ็ทและส่งไปทางเมลแล้ว"
+                },
+                "userId": {
+                    "type": "integer",
+                    "example": 5
+                }
+            }
+        },
+        "main.RegisterElderlyRequest": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "123 Elder Home"
+                },
+                "birthDate": {
+                    "type": "string",
+                    "format": "YYYY-MM-DD",
+                    "example": "1945-05-15"
+                },
+                "citizenId": {
+                    "type": "string",
+                    "example": "1101100011000"
+                },
+                "device": {
+                    "type": "object",
+                    "properties": {
+                        "deviceId": {
+                            "type": "string",
+                            "example": "SW-2024-006"
+                        }
+                    }
+                },
+                "email": {
+                    "type": "string",
+                    "example": "boonmee@contact.com"
+                },
+                "fname": {
+                    "type": "string",
+                    "example": "Boonmee"
+                },
+                "gender": {
+                    "type": "string",
+                    "example": "Female"
+                },
+                "lname": {
+                    "type": "string",
+                    "example": "Saetang"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "0881234567"
+                },
+                "zoneId": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "main.Server": {
+            "type": "object",
+            "properties": {
+                "cpuUsage": {
+                    "type": "integer"
+                },
+                "diskTotal": {
+                    "type": "string"
+                },
+                "diskUsed": {
+                    "type": "string"
+                },
+                "memoryTotal": {
+                    "type": "string"
+                },
+                "memoryUsed": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "main.StaffDetail": {
             "type": "object",
             "properties": {
@@ -171,6 +1977,45 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "position": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.SystemLogEntry": {
+            "type": "object",
+            "properties": {
+                "level": {
+                    "type": "string",
+                    "example": "INFO"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "New health data batch processed successfully (156 records)"
+                },
+                "timestamp": {
+                    "type": "string",
+                    "example": "2025-08-17T14:35:25Z"
+                }
+            }
+        },
+        "main.TopZonesResponse": {
+            "type": "object",
+            "properties": {
+                "topzones": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/main.Zone"
+                    }
+                }
+            }
+        },
+        "main.UsageTrend": {
+            "type": "object",
+            "properties": {
+                "activeUsers": {
+                    "type": "integer"
+                },
+                "date": {
                     "type": "string"
                 }
             }
@@ -232,8 +2077,9 @@ const docTemplate = `{
                     "type": "string",
                     "example": "Staff at main building"
                 },
-                "email example:": {
-                    "type": "string"
+                "email": {
+                    "type": "string",
+                    "example": "john.d@example.com"
                 },
                 "name": {
                     "type": "string",
@@ -266,11 +2112,294 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "main.UserTrendResponse": {
+            "type": "object",
+            "properties": {
+                "trend": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/main.UsageTrend"
+                    }
+                }
+            }
+        },
+        "main.UserUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Staff at main building"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "john.d@example.com"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "P@ssword123"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "0812345678"
+                },
+                "position": {
+                    "type": "string",
+                    "example": "Nurse"
+                },
+                "role": {
+                    "type": "string",
+                    "example": "Zone Staff"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "johndoe"
+                },
+                "zoneids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "main.Vitals": {
+            "type": "object",
+            "properties": {
+                "blood_pressure": {
+                    "type": "string"
+                },
+                "heart_rate": {
+                    "type": "integer"
+                },
+                "spo2": {
+                    "type": "integer"
+                },
+                "temperature": {
+                    "type": "number"
+                }
+            }
+        },
+        "main.Zone": {
+            "type": "object",
+            "properties": {
+                "activeuser": {
+                    "type": "integer"
+                },
+                "address": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "zoneid": {
+                    "type": "integer"
+                },
+                "zonename": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.ZoneAlertStatusResponse": {
+            "type": "object",
+            "properties": {
+                "alertCount": {
+                    "type": "integer",
+                    "example": 3
+                },
+                "alerts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/main.AlertZoneInfo"
+                    }
+                },
+                "offlineCount": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "onlineCount": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "onlineRate": {
+                    "type": "integer",
+                    "example": 83
+                },
+                "zoneID": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "main.ZoneCreationRequest": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "123 Main St Soi Lardkrabang"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "ศูนย์กลางติดสถานีรถไฟลาดกระบัง"
+                },
+                "zoneName": {
+                    "type": "string",
+                    "example": "Lardkrabang-A"
+                }
+            }
+        },
+        "main.ZoneDashboardInfo": {
+            "type": "object",
+            "properties": {
+                "activeUsers": {
+                    "type": "integer",
+                    "example": 15
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Zone A - Main Building"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "operational"
+                }
+            }
+        },
+        "main.ZoneDashboardResponse": {
+            "type": "object",
+            "properties": {
+                "alerts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/main.Alert"
+                    }
+                },
+                "deviceStatus": {
+                    "$ref": "#/definitions/main.DeviceSummary"
+                },
+                "elderlyCount": {
+                    "type": "integer",
+                    "example": 35
+                },
+                "elders": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/main.Elderly"
+                    }
+                },
+                "zone": {
+                    "$ref": "#/definitions/main.ZoneDashboardInfo"
+                }
+            }
+        },
+        "main.ZoneStaffResponse": {
+            "type": "object",
+            "properties": {
+                "Description": {
+                    "type": "string",
+                    "example": "Specialized in elderly care"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "sompong@zone.com"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "staff-005"
+                },
+                "join_date": {
+                    "type": "string",
+                    "example": "2024-03-10 09:00:00"
+                },
+                "last_login": {
+                    "type": "string",
+                    "example": "2025-10-18 15:00:00"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Sompong Jaidee"
+                },
+                "permissions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "[view_elderly",
+                        " view_health]"
+                    ]
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "0812345678"
+                },
+                "position": {
+                    "type": "string",
+                    "example": "Nurse"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "active"
+                }
+            }
+        },
+        "main.ZoneSummaryResponse": {
+            "type": "object",
+            "properties": {
+                "ZoneID": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "caregivers": {
+                    "type": "integer",
+                    "example": 5
+                },
+                "devicesCount": {
+                    "type": "integer",
+                    "example": 20
+                },
+                "elderlyCount": {
+                    "type": "integer",
+                    "example": 25
+                }
+            }
+        },
+        "main.ZoneUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "53/2 Prayathai"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "โซนติด 4 แยก BTS ถึงปลายสถานี"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "maintenance"
+                },
+                "zoneName": {
+                    "type": "string",
+                    "example": "Prayathai-A"
+                }
+            }
         }
     },
     "securityDefinitions": {
         "BearerAuth": {
-            "description": "พิมพ์ \"Bearer \" แล้วตามด้วย token เช่น \"Bearer eyJhbGciOiJIUzI1NiIsInR5...\"",
+            "description": "พิมพ์ Bearer  แล้วตามด้วย token เช่น Bearer eyJhbGciOiJIUzI1NiIsInR5...",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"
@@ -284,8 +2413,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "Elder Care API",
-	Description:      "ระบบจัดการผู้สูงอายุ",
+	Title:            "LoraWan Service API",
+	Description:      "ระบบจัดการช่วยเหลือผู้สูงอายุผ่าน LoraWan",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
