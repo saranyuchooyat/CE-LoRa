@@ -335,6 +335,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/elders/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงข้อมูลรายละเอียดผู้สูงอายุและ Vital Signs ตาม ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Elderly"
+                ],
+                "summary": "Get elderly patient details",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Elder ID (เช่น E001)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.Elderly"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/system/alerts": {
             "get": {
                 "security": [
@@ -386,6 +432,84 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/main.Server"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/system/logs": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงรายการ Log ล่าสุดของระบบ",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System"
+                ],
+                "summary": "Get system logs",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.SystemLogEntry"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/system/networks": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงข้อมูลสถานะเครือข่ายต่างๆ ของระบบ (อินเทอร์เน็ต, LoRaWAN, ความปลอดภัย)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Get system network status",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.NetworkSummaryResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/system/summarys": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงข้อมูลสรุปสถานะสุขภาพโดยรวมของระบบ (จำนวนเซิร์ฟเวอร์, uptime, load, storage)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System"
+                ],
+                "summary": "Get system summary",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.HealthSummaryResponse"
                         }
                     }
                 }
@@ -1625,6 +1749,31 @@ const docTemplate = `{
                 }
             }
         },
+        "main.HealthSummaryResponse": {
+            "type": "object",
+            "properties": {
+                "onlineServers": {
+                    "type": "integer",
+                    "example": 4
+                },
+                "storageUsed": {
+                    "type": "string",
+                    "example": "3.2TB"
+                },
+                "systemLoad": {
+                    "type": "number",
+                    "example": 66.1
+                },
+                "totalServers": {
+                    "type": "integer",
+                    "example": 4
+                },
+                "uptimePercentage": {
+                    "type": "number",
+                    "example": 99.7
+                }
+            }
+        },
         "main.LoginRequest": {
             "type": "object",
             "properties": {
@@ -1643,6 +1792,87 @@ const docTemplate = `{
             "properties": {
                 "token": {
                     "type": "string"
+                }
+            }
+        },
+        "main.NetworkStatusEntry": {
+            "type": "object",
+            "properties": {
+                "blockedIPs": {
+                    "type": "integer",
+                    "example": 5
+                },
+                "devicesOffline": {
+                    "type": "integer",
+                    "example": 126
+                },
+                "devicesOnline": {
+                    "type": "integer",
+                    "example": 2721
+                },
+                "downSpeedMbps": {
+                    "type": "integer",
+                    "example": 156
+                },
+                "firewallStatus": {
+                    "description": "Security Status Fields",
+                    "type": "string",
+                    "example": "active"
+                },
+                "gatewaysActive": {
+                    "description": "LoRaWAN Status Fields",
+                    "type": "integer",
+                    "example": 24
+                },
+                "idsStatus": {
+                    "type": "string",
+                    "example": "active"
+                },
+                "isp": {
+                    "description": "Internet Status Fields",
+                    "type": "string",
+                    "example": "AIS Fiber"
+                },
+                "lastScan": {
+                    "type": "string",
+                    "example": "2025-08-19T13:50:00Z"
+                },
+                "lastUpdate": {
+                    "description": "Used by lorawan-status",
+                    "type": "string",
+                    "example": "2025-08-19T14:20:00Z"
+                },
+                "latencyMs": {
+                    "type": "integer",
+                    "example": 12
+                },
+                "name": {
+                    "type": "string",
+                    "example": "internet-status"
+                },
+                "securityThreats": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "status": {
+                    "description": "Common Fields",
+                    "type": "string",
+                    "example": "online"
+                },
+                "upSpeedMbps": {
+                    "type": "integer",
+                    "example": 45
+                }
+            }
+        },
+        "main.NetworkSummaryResponse": {
+            "type": "object",
+            "properties": {
+                "networks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/main.NetworkStatusEntry"
+                    }
                 }
             }
         },
@@ -1734,6 +1964,9 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },
@@ -1745,6 +1978,23 @@ const docTemplate = `{
                 },
                 "position": {
                     "type": "string"
+                }
+            }
+        },
+        "main.SystemLogEntry": {
+            "type": "object",
+            "properties": {
+                "level": {
+                    "type": "string",
+                    "example": "INFO"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "New health data batch processed successfully (156 records)"
+                },
+                "timestamp": {
+                    "type": "string",
+                    "example": "2025-08-17T14:35:25Z"
                 }
             }
         },

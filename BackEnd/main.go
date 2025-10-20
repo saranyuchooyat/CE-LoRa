@@ -51,6 +51,9 @@ func main() {
 
 	app.Get("/system/health/servers", getHealthservers)
 	app.Get("/system/alerts", getAlert)
+	app.Get("/system/summarys", getSystemSum)
+	app.Get("/system/logs", getSystemLogs)
+	app.Get("/system/networks", getSystemNetworks)
 
 	app.Get("/zones/my-zones", getMyZone)
 	app.Post("/zones", createZone)
@@ -68,6 +71,7 @@ func main() {
 	app.Get("/zones/:id/summary", getZoneStaffSummary)
 
 	app.Get("/elders", getAllElderly)
+	app.Get("/elders/:id", getElderDetail)
 
 	//zone staff
 	app.Get("/zones/:id/elders", getElderinZone)

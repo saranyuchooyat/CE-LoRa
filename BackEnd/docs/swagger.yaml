@@ -229,6 +229,24 @@ definitions:
       error:
         type: string
     type: object
+  main.HealthSummaryResponse:
+    properties:
+      onlineServers:
+        example: 4
+        type: integer
+      storageUsed:
+        example: 3.2TB
+        type: string
+      systemLoad:
+        example: 66.1
+        type: number
+      totalServers:
+        example: 4
+        type: integer
+      uptimePercentage:
+        example: 99.7
+        type: number
+    type: object
   main.LoginRequest:
     properties:
       password:
@@ -242,6 +260,66 @@ definitions:
     properties:
       token:
         type: string
+    type: object
+  main.NetworkStatusEntry:
+    properties:
+      blockedIPs:
+        example: 5
+        type: integer
+      devicesOffline:
+        example: 126
+        type: integer
+      devicesOnline:
+        example: 2721
+        type: integer
+      downSpeedMbps:
+        example: 156
+        type: integer
+      firewallStatus:
+        description: Security Status Fields
+        example: active
+        type: string
+      gatewaysActive:
+        description: LoRaWAN Status Fields
+        example: 24
+        type: integer
+      idsStatus:
+        example: active
+        type: string
+      isp:
+        description: Internet Status Fields
+        example: AIS Fiber
+        type: string
+      lastScan:
+        example: "2025-08-19T13:50:00Z"
+        type: string
+      lastUpdate:
+        description: Used by lorawan-status
+        example: "2025-08-19T14:20:00Z"
+        type: string
+      latencyMs:
+        example: 12
+        type: integer
+      name:
+        example: internet-status
+        type: string
+      securityThreats:
+        example: 0
+        type: integer
+      status:
+        description: Common Fields
+        example: online
+        type: string
+      upSpeedMbps:
+        example: 45
+        type: integer
+    type: object
+  main.NetworkSummaryResponse:
+    properties:
+      networks:
+        items:
+          $ref: '#/definitions/main.NetworkStatusEntry'
+        type: array
     type: object
   main.PasswordResetResponse:
     properties:
@@ -306,12 +384,26 @@ definitions:
         type: string
       name:
         type: string
+      status:
+        type: string
     type: object
   main.StaffDetail:
     properties:
       description:
         type: string
       position:
+        type: string
+    type: object
+  main.SystemLogEntry:
+    properties:
+      level:
+        example: INFO
+        type: string
+      message:
+        example: New health data batch processed successfully (156 records)
+        type: string
+      timestamp:
+        example: "2025-08-17T14:35:25Z"
         type: string
     type: object
   main.TopZonesResponse:
@@ -795,6 +887,35 @@ paths:
       summary: Get all elderly records
       tags:
       - Elderly
+  /elders/{id}:
+    get:
+      description: ดึงข้อมูลรายละเอียดผู้สูงอายุและ Vital Signs ตาม ID
+      parameters:
+      - description: Elder ID (เช่น E001)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.Elderly'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get elderly patient details
+      tags:
+      - Elderly
   /system/alerts:
     get:
       description: ดึงรายการการแจ้งเตือนทั้งหมดในระบบ
@@ -827,6 +948,54 @@ paths:
       security:
       - BearerAuth: []
       summary: Get health server status
+      tags:
+      - System
+  /system/logs:
+    get:
+      description: ดึงรายการ Log ล่าสุดของระบบ
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.SystemLogEntry'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Get system logs
+      tags:
+      - System
+  /system/networks:
+    get:
+      description: ดึงข้อมูลสถานะเครือข่ายต่างๆ ของระบบ (อินเทอร์เน็ต, LoRaWAN, ความปลอดภัย)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.NetworkSummaryResponse'
+      security:
+      - BearerAuth: []
+      summary: Get system network status
+      tags:
+      - Health
+  /system/summarys:
+    get:
+      description: ดึงข้อมูลสรุปสถานะสุขภาพโดยรวมของระบบ (จำนวนเซิร์ฟเวอร์, uptime,
+        load, storage)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.HealthSummaryResponse'
+      security:
+      - BearerAuth: []
+      summary: Get system summary
       tags:
       - System
   /users:

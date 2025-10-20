@@ -1290,3 +1290,81 @@ func getZoneStaffSummary(c *fiber.Ctx) error {
 		"caregivers":   countCaregivers,
 	})
 }
+
+// getElderDetail godoc
+// @Summary Get elderly patient details
+// @Description ดึงข้อมูลรายละเอียดผู้สูงอายุและ Vital Signs ตาม ID
+// @Tags Elderly
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Elder ID (เช่น E001)"
+// @Success 200 {object} Elderly
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Router /elders/{id} [get]
+func getElderDetail(c *fiber.Ctx) error {
+	elderID := c.Params("id")
+
+	for _, e := range elderlys {
+		if e.ID == elderID {
+			return c.JSON(e)
+		}
+	}
+
+	return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User not found"})
+}
+
+// getSystemSummary godoc
+// @Summary Get system summary
+// @Description ดึงข้อมูลสรุปสถานะสุขภาพโดยรวมของระบบ (จำนวนเซิร์ฟเวอร์, uptime, load, storage)
+// @Tags System
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} HealthSummaryResponse
+// @Router /system/summarys [get]
+func getSystemSum(c *fiber.Ctx) error {
+	var countOnline int
+	for _, s := range servers {
+		if s.Status == "online" {
+			countOnline++
+		}
+	}
+	response := HealthSummaryResponse{
+		TotalServers:     len(servers),
+		OnlineServers:    countOnline,
+		UptimePercentage: 99.7,
+		SystemLoad:       66.1,
+		StorageUsed:      "3.2TB",
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response)
+}
+
+// getSystemLogs godoc
+// @Summary Get system logs
+// @Description ดึงรายการ Log ล่าสุดของระบบ
+// @Tags System
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {array} SystemLogEntry
+// @Router /system/logs [get]
+func getSystemLogs(c *fiber.Ctx) error {
+	return c.Status(fiber.StatusOK).JSON(logs)
+}
+
+// getSystemNetworks godoc
+// @Summary Get system network status
+// @Description ดึงข้อมูลสถานะเครือข่ายต่างๆ ของระบบ (อินเทอร์เน็ต, LoRaWAN, ความปลอดภัย)
+// @Tags Health
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} NetworkSummaryResponse
+// @Router /system/networks [get]
+func getSystemNetworks(c *fiber.Ctx) error {
+
+	response := NetworkSummaryResponse{
+		Networks: networks,
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response)
+}

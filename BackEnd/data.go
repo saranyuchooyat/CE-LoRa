@@ -142,6 +142,17 @@ type Elderly struct {
 	LastUpdated string `json:"last_updated"`
 	ZoneID      int    `json:"zone_id"`
 }
+type ElderDetailResponse struct {
+	ID          string `json:"id" example:"E001"`
+	Name        string `json:"name" example:"นายสมชาย มั่นคง"`
+	Age         int    `json:"age" example:"72"`
+	Gender      string `json:"gender" example:"ชาย"`
+	Status      string `json:"status" example:"critical"`
+	Vitals      Vitals `json:"vitals"`
+	DeviceID    string `json:"device_id" example:"SW-2024-001"`
+	Battery     int    `json:"battery" example:"78"`
+	LastUpdated string `json:"last_updated" example:"2025-08-20T14:30:00Z"`
+}
 type RegisterElderlyRequest struct {
 	Fname     string `json:"fname" example:"Boonmee"`
 	Lname     string `json:"lname" example:"Saetang"`
@@ -238,6 +249,14 @@ type ZoneSummaryResponse struct {
 	DevicesCount int `json:"devicesCount" example:"20"`
 	Caregivers   int `json:"caregivers" example:"5"`
 }
+
+type HealthSummaryResponse struct {
+	TotalServers     int     `json:"totalServers" example:"4"`
+	OnlineServers    int     `json:"onlineServers" example:"4"`
+	UptimePercentage float64 `json:"uptimePercentage" example:"99.7"`
+	SystemLoad       float64 `json:"systemLoad" example:"66.1"`
+	StorageUsed      string  `json:"storageUsed" example:"3.2TB"`
+}
 type Server struct {
 	Name        string `json:"name"`
 	CPUUsage    int    `json:"cpuUsage"`
@@ -245,6 +264,7 @@ type Server struct {
 	MemoryTotal string `json:"memoryTotal"`
 	DiskUsed    string `json:"diskUsed"`
 	DiskTotal   string `json:"diskTotal"`
+	Status      string `json:"status"`
 }
 
 type UsageTrend struct {
@@ -257,6 +277,42 @@ type LoginResponse struct {
 }
 type ErrorResponse struct {
 	Error string `json:"error"`
+}
+
+type SystemLogEntry struct {
+	Timestamp string `json:"timestamp" example:"2025-08-17T14:35:25Z"`
+	Level     string `json:"level" example:"INFO"`
+	Message   string `json:"message" example:"New health data batch processed successfully (156 records)"`
+}
+
+type NetworkStatusEntry struct {
+	Name string `json:"name" example:"internet-status"`
+
+	// Internet Status Fields
+	ISP           string `json:"isp,omitempty" example:"AIS Fiber"`
+	DownSpeedMbps int    `json:"downSpeedMbps,omitempty" example:"156"`
+	UpSpeedMbps   int    `json:"upSpeedMbps,omitempty" example:"45"`
+	LatencyMs     int    `json:"latencyMs,omitempty" example:"12"`
+
+	// LoRaWAN Status Fields
+	GatewaysActive int `json:"gatewaysActive,omitempty" example:"24"`
+	DevicesOnline  int `json:"devicesOnline,omitempty" example:"2721"`
+	DevicesOffline int `json:"devicesOffline,omitempty" example:"126"`
+
+	// Security Status Fields
+	FirewallStatus  string `json:"firewallStatus,omitempty" example:"active"`
+	IdsStatus       string `json:"idsStatus,omitempty" example:"active"`
+	SecurityThreats int    `json:"securityThreats,omitempty" example:"0"`
+	BlockedIPs      int    `json:"blockedIPs,omitempty" example:"5"`
+	LastScan        string `json:"lastScan,omitempty" example:"2025-08-19T13:50:00Z"`
+
+	// Common Fields
+	Status     string `json:"status,omitempty" example:"online"`                   // Used by internet-status
+	LastUpdate string `json:"lastUpdate,omitempty" example:"2025-08-19T14:20:00Z"` // Used by lorawan-status
+}
+
+type NetworkSummaryResponse struct {
+	Networks []NetworkStatusEntry `json:"networks"`
 }
 
 // ---------------- Mock Data ----------------
@@ -463,6 +519,7 @@ var servers = []Server{
 		MemoryTotal: "16GB",
 		DiskUsed:    "456GB",
 		DiskTotal:   "1TB",
+		Status:      "online",
 	},
 	{
 		Name:        "Database Server",
@@ -471,6 +528,7 @@ var servers = []Server{
 		MemoryTotal: "32GB",
 		DiskUsed:    "1.2TB",
 		DiskTotal:   "2TB",
+		Status:      "online",
 	},
 	{
 		Name:        "Analytics Server",
@@ -479,6 +537,7 @@ var servers = []Server{
 		MemoryTotal: "32GB",
 		DiskUsed:    "1.8TB",
 		DiskTotal:   "2TB",
+		Status:      "online",
 	},
 	{
 		Name:        "Web Application Server",
@@ -487,6 +546,7 @@ var servers = []Server{
 		MemoryTotal: "16GB",
 		DiskUsed:    "234GB",
 		DiskTotal:   "1TB",
+		Status:      "offline",
 	},
 }
 
@@ -520,4 +580,41 @@ var usageTrends = []UsageTrend{ //mock up ไปก่อน จริงๆ ต
 	{Date: "2025-07-22", ActiveUsers: 140},
 	{Date: "2025-07-23", ActiveUsers: 110},
 	{Date: "2025-07-24", ActiveUsers: 150},
+}
+var logs = []SystemLogEntry{
+	{
+		Timestamp: "2025-08-17T14:35:25Z",
+		Level:     "INFO",
+		Message:   "New health data batch processed successfully (156 records)",
+	},
+	{
+		Timestamp: "2025-08-17T14:30:03Z",
+		Level:     "WARN",
+		Message:   "Gateway ZN005: Signal strength below optimal threshold",
+	},
+}
+var networks = []NetworkStatusEntry{
+	{
+		Name:          "internet-status",
+		ISP:           "AIS Fiber",
+		DownSpeedMbps: 156,
+		UpSpeedMbps:   45,
+		LatencyMs:     12,
+		Status:        "online",
+	},
+	{
+		Name:           "lorawan-status",
+		GatewaysActive: 24,
+		DevicesOnline:  2721,
+		DevicesOffline: 126,
+		LastUpdate:     "2025-08-19T14:20:00Z",
+	},
+	{
+		Name:            "security-status",
+		FirewallStatus:  "active",
+		IdsStatus:       "active",
+		SecurityThreats: 0,
+		BlockedIPs:      5,
+		LastScan:        "2025-08-19T13:50:00Z",
+	},
 }
