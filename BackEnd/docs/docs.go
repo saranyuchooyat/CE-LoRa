@@ -381,6 +381,59 @@ const docTemplate = `{
                 }
             }
         },
+        "/emergencys/alert/summary": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงจำนวนรวมของ Alert ที่กำลังดำเนินอยู่แบ่งตามระดับความสำคัญ",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Emergency"
+                ],
+                "summary": "Get emergency alert summary counts",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.AlertSummaryResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/emergencys/team/status": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ดึงสถานะของทีมตอบสนองฉุกเฉินทั้งหมด",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Emergency"
+                ],
+                "summary": "Get emergency response team statuses",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.TeamStatusEntry"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/system/alerts": {
             "get": {
                 "security": [
@@ -1444,6 +1497,27 @@ const docTemplate = `{
                 }
             }
         },
+        "main.AlertSummaryResponse": {
+            "type": "object",
+            "properties": {
+                "critical": {
+                    "type": "integer",
+                    "example": 3
+                },
+                "high_priority": {
+                    "type": "integer",
+                    "example": 7
+                },
+                "medium_priority": {
+                    "type": "integer",
+                    "example": 12
+                },
+                "total_alerts": {
+                    "type": "integer",
+                    "example": 45
+                }
+            }
+        },
         "main.AlertZoneInfo": {
             "type": "object",
             "properties": {
@@ -1838,7 +1912,6 @@ const docTemplate = `{
                     "example": "2025-08-19T13:50:00Z"
                 },
                 "lastUpdate": {
-                    "description": "Used by lorawan-status",
                     "type": "string",
                     "example": "2025-08-19T14:20:00Z"
                 },
@@ -1995,6 +2068,23 @@ const docTemplate = `{
                 "timestamp": {
                     "type": "string",
                     "example": "2025-08-17T14:35:25Z"
+                }
+            }
+        },
+        "main.TeamStatusEntry": {
+            "type": "object",
+            "properties": {
+                "is_ready": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "status": {
+                    "type": "string",
+                    "example": "กำลังเดินทาง - ETA 5 นาที"
+                },
+                "team_name": {
+                    "type": "string",
+                    "example": "ทีม Alpha-1"
                 }
             }
         },

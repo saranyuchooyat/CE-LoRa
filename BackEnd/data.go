@@ -110,6 +110,7 @@ type Alert struct {
 	Description string `json:"description" example:"HeartRate 120 bpm, BP 160/100"`
 	Type        string `json:"type" example:"critical"`
 	CreatedAt   string `json:"createdAt" example:"2025-10-18T10:00:00Z"`
+	Status      string `json:"status" example:"pending"`
 }
 
 // struct ย่อย Zone dasboardResponse ----------
@@ -307,12 +308,31 @@ type NetworkStatusEntry struct {
 	LastScan        string `json:"lastScan,omitempty" example:"2025-08-19T13:50:00Z"`
 
 	// Common Fields
-	Status     string `json:"status,omitempty" example:"online"`                   // Used by internet-status
-	LastUpdate string `json:"lastUpdate,omitempty" example:"2025-08-19T14:20:00Z"` // Used by lorawan-status
+	Status     string `json:"status,omitempty" example:"online"`
+	LastUpdate string `json:"lastUpdate,omitempty" example:"2025-08-19T14:20:00Z"`
 }
 
 type NetworkSummaryResponse struct {
 	Networks []NetworkStatusEntry `json:"networks"`
+}
+type AlertSummaryResponse struct { //แนวคิดคือ ถ้า Alert ไหนแจ้งเตือน Cri hight Medium ให้มันบวก 1 ละเก็บไว้
+	Critical    int `json:"critical" example:"3"`
+	High        int `json:"high_priority" example:"7"`
+	Medium      int `json:"medium_priority" example:"12"`
+	TotalAlerts int `json:"total_alerts" example:"45"`
+}
+
+type TeamStatusEntry struct {
+	TeamName string `json:"team_name" example:"ทีม Alpha-1"`
+	Status   string `json:"status" example:"กำลังเดินทาง - ETA 5 นาที"`
+	IsReady  bool   `json:"is_ready" example:"false"`
+
+	VehicleLocation Location `json:"vehicle_location"`
+}
+
+type Location struct {
+	Latitude  float64 `json:"lat" example:"13.738012"`
+	Longitude float64 `json:"lon" example:"100.781605"`
 }
 
 // ---------------- Mock Data ----------------
@@ -557,6 +577,7 @@ var alerts = []Alert{
 		Description: "Memory usage reached 94% - immediate attention required",
 		CreatedAt:   "2025-08-19T10:25:00Z",
 		Type:        "critical",
+		Status:      "new",
 	},
 	{
 		ID:          2,
@@ -564,6 +585,7 @@ var alerts = []Alert{
 		Description: "Device offline เกิน 30 นาที - ตรวจสอบการเชื่อมต่อ",
 		CreatedAt:   "2025-08-19T10:10:00Z",
 		Type:        "warning",
+		Status:      "new",
 	},
 	{
 		ID:          3,
@@ -571,6 +593,7 @@ var alerts = []Alert{
 		Description: "Nightly backup finished successfully",
 		CreatedAt:   "2025-08-19T00:30:00Z",
 		Type:        "info",
+		Status:      "new",
 	},
 }
 
@@ -616,5 +639,32 @@ var networks = []NetworkStatusEntry{
 		SecurityThreats: 0,
 		BlockedIPs:      5,
 		LastScan:        "2025-08-19T13:50:00Z",
+	},
+}
+var summary = AlertSummaryResponse{
+	Critical:    3,
+	High:        7,
+	Medium:      12,
+	TotalAlerts: 45,
+}
+
+var teams = []TeamStatusEntry{
+	{
+		TeamName:        "ทีม Alpha-1",
+		Status:          "กำลังเดินทาง - ETA 5 นาที",
+		IsReady:         false,
+		VehicleLocation: Location{Latitude: 13.7563, Longitude: 100.5018},
+	},
+	{
+		TeamName:        "ทีม Beta-2",
+		Status:          "พร้อมตอบรับแล้ว",
+		IsReady:         true,
+		VehicleLocation: Location{Latitude: 13.6890, Longitude: 100.7510},
+	},
+	{
+		TeamName:        "ทีม Gamma-3",
+		Status:          "รอกู้คืนระบบ",
+		IsReady:         true,
+		VehicleLocation: Location{Latitude: 13.8000, Longitude: 100.4000},
 	},
 }
