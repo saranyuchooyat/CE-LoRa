@@ -1,0 +1,177 @@
+definitions:
+  main.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  main.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  main.LoginResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  main.StaffDetail:
+    properties:
+      description:
+        type: string
+      position:
+        type: string
+    type: object
+  main.User:
+    properties:
+      createdAt:
+        type: string
+      email:
+        type: string
+      lastLogin:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      permission:
+        items:
+          type: string
+        type: array
+      phone:
+        type: string
+      role:
+        type: string
+      staff_info:
+        $ref: '#/definitions/main.StaffDetail'
+      status:
+        type: string
+      userId:
+        type: integer
+      username:
+        type: string
+      zoneids:
+        items:
+          type: integer
+        type: array
+    type: object
+  main.UserCreationRequest:
+    properties:
+      description:
+        example: Staff at main building
+        type: string
+      'email example:':
+        type: string
+      name:
+        example: John Doe
+        type: string
+      password:
+        example: P@ssword123
+        type: string
+      phone:
+        example: "0812345678"
+        type: string
+      position:
+        example: Nurse
+        type: string
+      role:
+        example: Zone Staff
+        type: string
+      username:
+        example: johndoe
+        type: string
+      zoneids:
+        items:
+          type: integer
+        type: array
+    type: object
+info:
+  contact: {}
+  description: ระบบจัดการผู้สูงอายุ
+  title: Elder Care API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: เข้าสู่ระบบเพื่อรับ JWT Token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Login
+      tags:
+      - Auth
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: ดึงข้อมูลผู้ใช้งานทั้งหมด
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.User'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all users
+      tags:
+      - User
+    post:
+      consumes:
+      - application/json
+      description: สร้างผู้ใช้งานใหม่ในระบบ (UserID และสถานะจะถูกสร้างอัตโนมัติ)
+      parameters:
+      - description: User details (UserID, Status, Permissions ถูกสร้างอัตโนมัติ)
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.UserCreationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new user
+      tags:
+      - User
+securityDefinitions:
+  BearerAuth:
+    description: พิมพ์ "Bearer " แล้วตามด้วย token เช่น "Bearer eyJhbGciOiJIUzI1NiIsInR5..."
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
