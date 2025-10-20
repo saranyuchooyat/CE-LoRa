@@ -15,9 +15,13 @@ type User struct {
 	Permissions []string     `json:"permission"`
 	StaffInfo   *StaffDetail `json:"staff_info,omitempty"`
 }
+type LoginRequest struct {
+	Username string `json:"username" example:"ink"`
+	Password string `json:"password" example:"5678"`
+}
 type UserCreationRequest struct {
 	Name     string `json:"name" example:"John Doe"`
-	Email    string `json:"email example:"john.d@example.com""`
+	Email    string `json:"email" example:"john.d@example.com"`
 	Phone    string `json:"phone" example:"0812345678"`
 	Username string `json:"username" example:"johndoe"`
 	Password string `json:"password" example:"P@ssword123"`
@@ -27,20 +31,18 @@ type UserCreationRequest struct {
 	Description string `json:"description" example:"Staff at main building"`
 	Position    string `json:"position" example:"Nurse"`
 }
-type CreateZoneStaffRequest struct {
-	FirstName   string   `json:"firstname"`
-	Lastname    string   `json:"lastname"`
-	Email       string   `json:"email"`
-	Phone       string   `json:"phone"`
-	Username    string   `json:"username"`
-	Password    string   `json:"password"`
-	Permissions []string `json:"permissions"`
-	Description string   `json:"description"`
-	Position    string   `json:"position"`
-}
-type StaffDetail struct {
-	Position    string `json:"position"`
-	Description string `json:"description"`
+
+type UserUpdateRequest struct {
+	Name     string `json:"name" example:"John Doe"`
+	Email    string `json:"email" example:"john.d@example.com"`
+	Phone    string `json:"phone" example:"0812345678"`
+	Username string `json:"username" example:"johndoe"`
+	Password string `json:"password" example:"P@ssword123"`
+	Role     string `json:"role" example:"Zone Staff"`
+	ZoneIDs  []int  `json:"zoneids"`
+
+	Description string `json:"description" example:"Staff at main building"`
+	Position    string `json:"position" example:"Nurse"`
 }
 
 type Zone struct {
@@ -50,6 +52,70 @@ type Zone struct {
 	Description string `json:"description"`
 	Status      string `json:"status"`
 	ActiveUser  int    `json:"activeuser"`
+}
+type ZoneCreationRequest struct {
+	ZoneName    string `json:"zoneName" example:"Lardkrabang-A"`
+	Address     string `json:"address" example:"123 Main St Soi Lardkrabang"`
+	Description string `json:"description" example:"ศูนย์กลางติดสถานีรถไฟลาดกระบัง"`
+}
+type ZoneUpdateRequest struct {
+	ZoneName    string `json:"zoneName,omitempty" example:"Prayathai-A"`
+	Address     string `json:"address,omitempty" example:"53/2 Prayathai"`
+	Description string `json:"description,omitempty" example:"โซนติด 4 แยก BTS ถึงปลายสถานี"`
+	Status      string `json:"status,omitempty" example:"maintenance"`
+}
+type TopZonesResponse struct {
+	TopZones []Zone `json:"topzones"`
+}
+
+type ZoneDashboardResponse struct {
+	ZoneDashboardInfo `json:"zone"`
+	ElderlyCount      int           `json:"elderlyCount" example:"35"`
+	DeviceSummary     DeviceSummary `json:"deviceStatus"`
+	Alerts            []Alert       `json:"alerts"`
+	Elders            []Elderly     `json:"elders"`
+}
+
+// struct ย่อย Zone dasboardResponse-------
+
+type ZoneDashboardInfo struct {
+	ID          int    `json:"id" example:"1"`
+	Name        string `json:"name" example:"Zone A - Main Building"`
+	Status      string `json:"status" example:"operational"`
+	ActiveUsers int    `json:"activeUsers" example:"15"`
+}
+type UserTrendResponse struct {
+	Trend []UsageTrend `json:"trend"`
+}
+
+type PasswordResetResponse struct {
+	Message string `json:"message" example:"รหัสผ่านได้ถูกรีเซ็ทและส่งไปทางเมลแล้ว"`
+	UserID  int    `json:"userId" example:"5"`
+	Email   string `json:"email" example:"testuser@example.com"`
+}
+type DashboardSummary struct {
+	ZonesCount   int `json:"zonesCount" example:"4"`
+	UsersCount   int `json:"usersCount" example:"12"`
+	ElderlyCount int `json:"elderlyCount" example:"35"`
+	DevicesCount int `json:"devicesCount" example:"30"`
+}
+type DeviceSummary struct {
+	Online  int `json:"online" example:"28"`
+	Offline int `json:"offline" example:"2"`
+	Total   int `json:"total" example:"30"`
+}
+type Alert struct {
+	ID          int    `json:"id" example:"1"`
+	Title       string `json:"title" example:"Elder Bua has critical condition"`
+	Description string `json:"description" example:"HeartRate 120 bpm, BP 160/100"`
+	Type        string `json:"type" example:"critical"`
+	CreatedAt   string `json:"createdAt" example:"2025-10-18T10:00:00Z"`
+}
+
+// struct ย่อย Zone dasboardResponse ----------
+type StaffDetail struct {
+	Position    string `json:"position"`
+	Description string `json:"description"`
 }
 
 type Vitals struct {
@@ -77,20 +143,38 @@ type Elderly struct {
 	ZoneID      int    `json:"zone_id"`
 }
 type RegisterElderlyRequest struct {
-	Fname     string `json:"Fname"`
-	Lname     string `json:"Lname"`
-	CitizenID string `json:"citizenId"`
-	BirthDate string `json:"birthDate"`
-	Gender    string `json:"gender"`
-	Address   string `json:"address"`
-	Phone     string `json:"phone"`
-	Email     string `json:"email"`
-	ZoneID    int    `json:"zoneId"`
-	Device    struct {
-		DeviceID string `json:"deviceId"`
+	Fname     string `json:"fname" example:"Boonmee"`
+	Lname     string `json:"lname" example:"Saetang"`
+	CitizenID string `json:"citizenId" example:"1101100011000"`
+	BirthDate string `json:"birthDate" example:"1945-05-15" format:"YYYY-MM-DD"`
+	Gender    string `json:"gender" example:"Female"`
+	Address   string `json:"address" example:"123 Elder Home"`
+	Phone     string `json:"phone" example:"0881234567"`
+	Email     string `json:"email" example:"boonmee@contact.com"`
+	ZoneID    int    `json:"zoneId" example:"1"`
+
+	Device struct {
+		DeviceID string `json:"deviceId" example:"SW-2024-006"`
 	} `json:"device"`
 }
-
+type ElderlyRegistrationResponse struct {
+	Message string `json:"message" example:"Elderly registered successfully"`
+}
+type ZoneAlertStatusResponse struct {
+	ZoneID       int             `json:"zoneID" example:"1"`
+	OnlineCount  int             `json:"onlineCount" example:"10"`
+	OfflineCount int             `json:"offlineCount" example:"2"`
+	OnlineRate   int             `json:"onlineRate" example:"83"`
+	AlertCount   int             `json:"alertCount" example:"3"`
+	Alerts       []AlertZoneInfo `json:"alerts"`
+}
+type AlertZoneInfo struct {
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	Message string `json:"message"`
+	Status  string `json:"status"`
+	Battery int    `json:"battery"`
+}
 type Device struct {
 	DeviceID     string   `json:"device_id"`
 	SerialNumber string   `json:"serial_number"`
@@ -103,7 +187,57 @@ type Device struct {
 	Features     []string `json:"features"`
 	ZoneID       int      `json:"zone_id"`
 }
+type DeviceCreationRequest struct {
+	DeviceID     string   `json:"deviceId" example:"D-WATCH-007" binding:"required"`
+	SerialNumber string   `json:"serialNumber" example:"SN12345678" binding:"required"`
+	Type         string   `json:"type" example:"Wearable"`
+	Model        string   `json:"model" example:"WatchX"`
+	Battery      int      `json:"battery" example:"100"`
+	Features     []string `json:"features" example:"heart_rate, spo2"`
+	LastUpdate   string   `json:"lastUpdate" example:"2025-10-19 10:00:00"`
+	Status       string   `json:"status" example:"unassigned"`
+}
 
+type DeviceUpdateRequest struct {
+	SerialNumber string   `json:"serialNumber,omitempty" example:"SN98765432"`
+	Type         string   `json:"type,omitempty" example:"Watch"`
+	Model        string   `json:"model,omitempty" example:"WatchX Pro"`
+	Status       string   `json:"status,omitempty" example:"online"`
+	AssignedTo   string   `json:"assigned_to,omitempty" example:"Elder Bua"`
+	ZoneID       int      `json:"zoneId,omitempty" example:"1"`
+	Battery      int      `json:"battery,omitempty" example:"85"`
+	Features     []string `json:"features,omitempty" example:"heart_rate, spo2, gps"`
+	LastUpdate   string   `json:"lastUpdate,omitempty" example:"2025-10-20 15:00:00"`
+}
+type CreateZoneStaffRequest struct {
+	FirstName   string   `json:"firstName" example:"Sombat"`
+	Lastname    string   `json:"lastName" example:"Jitdee"`
+	Email       string   `json:"email" example:"sombat.j@zone.com"`
+	Phone       string   `json:"phone" example:"0912340000"`
+	Username    string   `json:"username" example:"sombat.j"`
+	Password    string   `json:"password" example:"securepass123"`
+	Description string   `json:"description" example:"Day shift nurse"`
+	Position    string   `json:"position" example:"Nurse"`
+	Permissions []string `json:"permissions" example:"view_elderly,view_health"`
+}
+type ZoneStaffResponse struct {
+	ID          string   `json:"id" example:"staff-005"`
+	Name        string   `json:"name" example:"Sompong Jaidee"`
+	Position    string   `json:"position" example:"Nurse"`
+	Description string   `json:"Description" example:"Specialized in elderly care"`
+	Phone       string   `json:"phone" example:"0812345678"`
+	Email       string   `json:"email" example:"sompong@zone.com"`
+	JoinDate    string   `json:"join_date" example:"2024-03-10 09:00:00"`
+	LastLogin   string   `json:"last_login" example:"2025-10-18 15:00:00"`
+	Status      string   `json:"status" example:"active"`
+	Permissions []string `json:"permissions" example:"[view_elderly, view_health]"`
+}
+type ZoneSummaryResponse struct {
+	ZoneID       int `json:"ZoneID" example:"1"`
+	ElderlyCount int `json:"elderlyCount" example:"25"`
+	DevicesCount int `json:"devicesCount" example:"20"`
+	Caregivers   int `json:"caregivers" example:"5"`
+}
 type Server struct {
 	Name        string `json:"name"`
 	CPUUsage    int    `json:"cpuUsage"`
@@ -113,22 +247,9 @@ type Server struct {
 	DiskTotal   string `json:"diskTotal"`
 }
 
-type Alert struct {
-	ID          int    `json:"id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	CreatedAt   string `json:"createdAt"`
-	Type        string `json:"type"`
-}
-
 type UsageTrend struct {
 	Date        string `json:"date"`
 	ActiveUsers int    `json:"activeUsers"`
-}
-
-type LoginRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
 }
 
 type LoginResponse struct {

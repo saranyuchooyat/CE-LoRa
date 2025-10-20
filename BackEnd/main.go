@@ -13,13 +13,13 @@ import (
 	_ "github.com/saranyuchooyat/CE-LoRa/docs"
 )
 
-// @title Elder Care API
+// @title LoraWan Service API
 // @version 1.0
-// @description ระบบจัดการผู้สูงอายุ
+// @description ระบบจัดการช่วยเหลือผู้สูงอายุผ่าน LoraWan
 // @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
-// @description พิมพ์ "Bearer " แล้วตามด้วย token เช่น "Bearer eyJhbGciOiJIUzI1NiIsInR5..."
+// @description พิมพ์ Bearer  แล้วตามด้วย token เช่น Bearer eyJhbGciOiJIUzI1NiIsInR5...
 
 func main() {
 	app := fiber.New()
@@ -62,10 +62,9 @@ func main() {
 	app.Post("/zones/elderlyRegister", addEldertoZone)
 
 	app.Get("/zones/:id/staff", getZoneStaff)
-
 	app.Post("/zones/:id/staff", createZoneStaff)
-	app.Put("/zones/:id/staff/:staffid", updateZoneStaff)
-	app.Delete("/zones/:id/staff/:staffid", deleteZoneStaff)
+	app.Put("/zones/:id/staff/:userid", updateZoneStaff)
+	app.Delete("/zones/:id/staff/:userid", deleteZoneStaff)
 	app.Get("/zones/:id/summary", getZoneStaffSummary)
 
 	app.Get("/elders", getAllElderly)
