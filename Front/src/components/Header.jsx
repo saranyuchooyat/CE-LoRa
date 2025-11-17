@@ -25,10 +25,12 @@ function Header(){
             <div className="flex items-center justify-between h-[64px] mt-3 mx-5flex items-center justify-between h-[64px] mt-3 mx-5">
                 <p className ="text-[24px] font-bold"> Smart Healthcare System</p>
 
-                <div className="flex items-center justify-around gap-2">
-                    <div className="w-12 h-12 bg-zinc-400 rounded-full"></div>
-                    <button className ="text-[18px] ml-[10px] text-zinc-400 hover:text-black cursor-pointer" onClick={() => handleRowClick()}>{currentUser}</button>
-                </div>
+                <button className ="text-[18px] ml-[10px] text-zinc-400 hover:text-black cursor-pointer" onClick={() => handleRowClick()}>
+                    <div className="flex items-center justify-around gap-2">
+                        <div className="w-12 h-12 bg-zinc-400 rounded-full"></div>
+                        {currentUser}
+                    </div>
+                </button>
                 
             </div>
         </>

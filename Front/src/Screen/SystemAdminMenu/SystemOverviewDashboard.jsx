@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import Cardno2 from "../../components/Cardno2";
-import Cardno3 from "../../components/Cardno3";
+import TwoGrpahCard from "../../components/CardTwoGraph";
 import CardFull from "../../components/Cardno5";
 import CardServerData from "../../components/CardServerData";
 
@@ -19,6 +19,7 @@ function SystemOverviewDashboard(){
             { queryKey: ['summaryInfo'], queryFn:() => api.get('dashboard/summary').then(res => res.data)},
             { queryKey: ['servers'], queryFn: () => api.get('/system/health/servers').then(res => res.data) },
             { queryKey: ['topZone'], queryFn:() => api.get('dashboard/top-zones').then(res => res.data)},
+            { queryKey: ['usageTrend'], queryFn:() => api.get('dashboard/usage-trend').then(res => res.data)},
             
         ],
     });
@@ -29,6 +30,7 @@ function SystemOverviewDashboard(){
     const summaryInfoData = systemQueries[0].data || [];
     const serverData = systemQueries[1].data || [];
     const topZoneData = systemQueries[2].data || [];
+    const UsageTrendData = systemQueries[3].data || [];
     
 
     useEffect(() => {
@@ -64,7 +66,7 @@ function SystemOverviewDashboard(){
         <>
             <div className="mx-5">
                 <Cardno2 data={systemData}/>
-                <Cardno3 data={topZoneData}/>
+                <TwoGrpahCard graphdata={UsageTrendData} piedata={topZoneData}/>
                 <CardServerData data={serverData}/>
             </div>
         </>
