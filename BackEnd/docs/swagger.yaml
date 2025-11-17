@@ -10,6 +10,9 @@ definitions:
       id:
         example: 1
         type: integer
+      status:
+        example: pending
+        type: string
       title:
         example: Elder Bua has critical condition
         type: string
@@ -262,6 +265,15 @@ definitions:
         example: 99.7
         type: number
     type: object
+  main.Location:
+    properties:
+      lat:
+        example: 13.738012
+        type: number
+      lon:
+        example: 100.781605
+        type: number
+    type: object
   main.LoginRequest:
     properties:
       password:
@@ -431,6 +443,8 @@ definitions:
       team_name:
         example: ทีม Alpha-1
         type: string
+      vehicle_location:
+        $ref: '#/definitions/main.Location'
     type: object
   main.TopZonesResponse:
     properties:

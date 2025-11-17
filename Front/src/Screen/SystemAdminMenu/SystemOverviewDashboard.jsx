@@ -16,24 +16,20 @@ function SystemOverviewDashboard(){
     //ดึงข้อมูลหลังบ้าน
     const systemQueries = useQueries({
         queries: [
-            { queryKey: ['users'], queryFn: () => api.get('/users').then(res => res.data) },
-            { queryKey: ['elders'], queryFn: () => api.get('/elders').then(res => res.data) },
-            { queryKey: ['devices'], queryFn: () => api.get('/devices').then(res => res.data) },
-            { queryKey: ['zones'], queryFn: () => api.get('/zones').then(res => res.data) },
+            { queryKey: ['summaryInfo'], queryFn:() => api.get('dashboard/summary').then(res => res.data)},
             { queryKey: ['servers'], queryFn: () => api.get('/system/health/servers').then(res => res.data) },
-            { queryKey: ['topZone'], queryFn:() => api.get('dashboard/top-zones').then(res => res.data)}
+            { queryKey: ['topZone'], queryFn:() => api.get('dashboard/top-zones').then(res => res.data)},
+            
         ],
     });
 
     const isSystemLoading = systemQueries.some(query => query.isLoading);
     const isSystemError = systemQueries.some(query => query.isError);
 
-    const userData = systemQueries[0].data || [];
-    const elderlyData = systemQueries[1].data || [];
-    const deviceData = systemQueries[2].data || [];
-    const zoneData = systemQueries[3].data || [];
-    const serverData = systemQueries[4].data || [];
-    const TopZoneData = systemQueries[5].data || [];
+    const summaryInfoData = systemQueries[0].data || [];
+    const serverData = systemQueries[1].data || [];
+    const topZoneData = systemQueries[2].data || [];
+    
 
     useEffect(() => {
         const tokenInStorage = localStorage.getItem('token');
@@ -45,12 +41,14 @@ function SystemOverviewDashboard(){
     }, [location.state]);
     //ดึงข้อมูลหลังบ้าน
 
-    const SystemData = 
+    console.log("summary",summaryInfoData)
+
+    const systemData = 
     [
-        {value: zoneData.length ,name:"จำนวน Zone ที่ใช้งาน"},
-        {value: (userData.length),name:"จำนวนผู้ใช้งานทั้งหมด"},
-        {value: elderlyData.length ,name:"จำนวนผู้สูงอายุที่ลงทะเบียน"},
-        {value: deviceData.length,name:"จำนวนอุปกรณ์ที่ลงทะเบียน"},
+        {value: summaryInfoData.zonesCount ,name:"จำนวน Zone ที่ใช้งาน"},
+        {value: summaryInfoData.usersCount ,name:"จำนวนผู้ใช้งานทั้งหมด"},
+        {value: summaryInfoData.elderlyCount ,name:"จำนวนผู้สูงอายุที่ลงทะเบียน"},
+        {value: summaryInfoData.devicesCount ,name:"จำนวนอุปกรณ์ที่ลงทะเบียน"},
     ]
 
     if (isSystemLoading) {
@@ -61,12 +59,12 @@ function SystemOverviewDashboard(){
         return <div className="mx-5 mt-10 text-center text-xl text-red-600">Error fetching data!</div>;
     }
 
-    console.log("topzone",TopZoneData)
+    // console.log("topzone",topZoneData)
     return(
         <>
             <div className="mx-5">
-                <Cardno2 data={SystemData}/>
-                <Cardno3/>
+                <Cardno2 data={systemData}/>
+                <Cardno3 data={topZoneData}/>
                 <CardServerData data={serverData}/>
             </div>
         </>
