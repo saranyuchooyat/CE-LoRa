@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
+import ApiDelete from '../API-Delete';
 
 function ZoneTable({ data }){
 
@@ -29,6 +30,18 @@ function ZoneTable({ data }){
                 return 'text-gray-700 bg-gray-200';
         }
     };
+
+
+    // Delete Button
+    const { mutate: deleteZone, isPending } = ApiDelete('zone'); 
+
+    const handleDeleteClick = (zoneId, event) => {
+        event.stopPropagation(); 
+        if (window.confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบ Zone ID: ${zoneId}?`)) {
+            deleteZone(zoneId); 
+        }
+    };
+    // Delete Button
 
     // ตรวจสอบว่า data เป็น Array และมีข้อมูลอยู่หรือไม่
     if (!Array.isArray(data) || data.length === 0) {
@@ -64,7 +77,6 @@ function ZoneTable({ data }){
                                 <tr 
                                     key={index} 
                                     className={`${rowBgClass} hover:bg-main-blue/10 cursor-pointer transition-colors duration-150`} 
-                                    // 💡 4. เพิ่ม onClick สำหรับแถว
                                     onClick={() => handleRowClick(card.zoneid)}
                                 >
                                     {console.log(card)}
@@ -75,12 +87,14 @@ function ZoneTable({ data }){
                                     <td className="table-data whitespace-nowrap">
                                         <span className={`table-status ${statusClass}`}>{card.status}</span>
                                     </td>
-                                    <td className="table-data whitespace-nowrap">{activeUserCheck(card.activeuser)}</td> 
+                                    <td className="table-data whitespace-nowrap">{activeUserCheck(card.activeuser)}</td>
                                     {/* ... Menu Buttons ... */}
                                     <td className="p-3 text-sm text-left hitespace-nowrap w-fit">
                                         <button className="table-btn hover:bg-main-yellow hover:text-white">Edit</button>
                                         <button className="table-btn hover:bg-green-500 hover:text-white">Setting</button>
-                                        <button className="table-btn hover:bg-main-red hover:text-white">Delete</button>
+                                        <button className="table-btn hover:bg-main-red hover:text-white"
+                                            onClick={(event) => handleDeleteClick(card.zoneid, event)}
+                                            disabled={isPending} >{isPending ? 'ลบ...' : 'Delete'}</button>
                                     </td>
                                 </tr>
                             );
