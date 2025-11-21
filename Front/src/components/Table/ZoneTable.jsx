@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { useLocation } from "react-router-dom";
 import ApiDelete from '../API-Delete';
 
 function ZoneTable({ data }){

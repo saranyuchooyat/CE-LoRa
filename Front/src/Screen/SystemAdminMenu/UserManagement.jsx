@@ -9,15 +9,18 @@ import Cardno5 from "../../components/Cardno5";
 import Modal from "../../components/ModalForm/Modal";
 import AddUserForm from "../../components/ModalForm/AddUserForm";
 
+//กำหนดตัวแปรแต่ละช่อง Filter
 const initialFilters = {
-    search: '', // สำหรับช่องค้นหา ชื่อ, อีเมล, เบอร์โทร
-    role: 'ทั้งหมด', // สำหรับ Role (option2Name)
-    status: 'ทั้งหมด' // สำหรับ Status (option1Name)
+  search: "", // สำหรับช่องค้นหา ชื่อ, อีเมล, เบอร์โทร
+  province: "ทั้งหมด", // สำหรับ Role (option2Name)
+  status: "ทั้งหมด", // สำหรับ Status (option1Name)
 };
+//กำหนดตัวแปรแต่ละช่อง Filter
 
 function UserManagement(){
     
     const location = useLocation();
+
     const [filters, setFilters] = useState(initialFilters);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const handleOpenModal = () => setIsModalOpen(true);
@@ -33,6 +36,8 @@ function UserManagement(){
     const isSystemLoading = userQueries.some(query => query.isLoading);
     const isSystemError = userQueries.some(query => query.isError);
 
+    const userData = userQueries[0].data || [];
+
     useEffect(() => {
         const tokenInStorage = localStorage.getItem('token');
         if (location.state?.token && location.state.token !== tokenInStorage) {
@@ -41,8 +46,6 @@ function UserManagement(){
             // เนื่องจากทุก Query จะถูก Trigger เมื่อ Token ถูกบันทึกและ Component Rerender
         }
     }, [location.state]);
-
-    const userData = userQueries[0];
     //ดึงข้อมูลหลังบ้าน
 
 
@@ -60,7 +63,7 @@ function UserManagement(){
 
     const filteredUsers = useMemo(() => {
         const { search, role, status } = filters;
-        let data = userData.data || []; 
+        let data = userData; 
 
         // กรองตามช่องค้นหา (Search)
         if (search) {
@@ -85,11 +88,11 @@ function UserManagement(){
             data = data.filter(user => user.status === status);
         }
         return data;
-    }, [userData.data, filters]);
+    }, [userData, filters]);
     // ระบบ filter
 
     // ระบบกรองจำวน Role
-        const roleCountsObject = (userData.data || []).reduce((acc, user) => {
+        const roleCountsObject = (userData).reduce((acc, user) => {
         const role = user.role;
         acc[role] = (acc[role] || 0) + 1;
         return acc;
@@ -117,8 +120,6 @@ function UserManagement(){
     if (isSystemError) {
         return <div className="mx-5 mt-10 text-center text-xl text-red-600">Error fetching data!</div>;
     }
-
-    // console.log("userData",userData.data)
 
     return(
         <>

@@ -4,10 +4,7 @@ import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import Cardno2 from "../../components/Cardno2";
 import TwoGrpahCard from "../../components/CardTwoGraph";
-import CardFull from "../../components/Cardno5";
 import CardServerData from "../../components/CardServerData";
-
-
 
 function SystemOverviewDashboard(){
 
@@ -37,13 +34,11 @@ function SystemOverviewDashboard(){
         const tokenInStorage = localStorage.getItem('token');
         if (location.state?.token && location.state.token !== tokenInStorage) {
              localStorage.setItem('token', location.state.token);
-             // 💡 เมื่อบันทึก Token ใหม่แล้ว React Query จะทำการ Refetch ให้อัตโนมัติ
+             // เมื่อบันทึก Token ใหม่แล้ว React Query จะทำการ Refetch ให้อัตโนมัติ
              // เนื่องจากทุก Query จะถูก Trigger เมื่อ Token ถูกบันทึกและ Component Rerender
         }
     }, [location.state]);
     //ดึงข้อมูลหลังบ้าน
-
-    console.log("summary",summaryInfoData)
 
     const systemData = 
     [
@@ -56,12 +51,11 @@ function SystemOverviewDashboard(){
     if (isSystemLoading) {
         return <div className="mx-5 mt-10 text-center text-xl">Loading Dashboard...</div>;
     }
-    
+
     if (isSystemError) {
         return <div className="mx-5 mt-10 text-center text-xl text-red-600">Error fetching data!</div>;
     }
 
-    // console.log("topzone",topZoneData)
     return(
         <>
             <div className="mx-5">

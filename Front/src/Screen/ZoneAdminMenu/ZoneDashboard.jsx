@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
@@ -7,40 +8,41 @@ import CardFilter from "../../components/CardFilter";
 import CardFull from "../../components/Cardno5";
 
 
+//กำหนดตัวแปรแต่ละช่อง Filter
 const initialFilters = {
-    search: '', // สำหรับช่องค้นหา ชื่อ, อีเมล, เบอร์โทร
-    province: 'ทั้งหมด', // สำหรับ Role (option2Name)
-    status: 'ทั้งหมด' // สำหรับ Status (option1Name)
+  search: "", // สำหรับช่องค้นหา ชื่อ, อีเมล, เบอร์โทร
+  province: "ทั้งหมด", // สำหรับ Role (option2Name)
+  status: "ทั้งหมด", // สำหรับ Status (option1Name)
 };
+//กำหนดตัวแปรแต่ละช่อง Filter
 
 function ZoneDashboard(){
 
     const location = useLocation();
+
     const [filters, setFilters] = useState(initialFilters);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const handleOpenModal = () => setIsModalOpen(true);
-    const handleCloseModal = () => setIsModalOpen(false);
+
 
     //ดึงข้อมูลหลังบ้าน
-    const ZoneQueries = useQueries({
+    const zoneQueries = useQueries({
         queries: [
         { queryKey: ['zones'], queryFn: () => api.get('/zones/my-zones').then(res => res.data) },
         ],
     });
 
-    const isSystemLoading = ZoneQueries.some(query => query.isLoading);
-    const isSystemError = ZoneQueries.some(query => query.isError);
+    const isSystemLoading = zoneQueries.some(query => query.isLoading);
+    const isSystemError = zoneQueries.some(query => query.isError);
+    
+    const zoneData = zoneQueries[0].data || [];
 
     useEffect(() => {
         const tokenInStorage = localStorage.getItem('token');
         if (location.state?.token && location.state.token !== tokenInStorage) {
             localStorage.setItem('token', location.state.token);
-            // 💡 เมื่อบันทึก Token ใหม่แล้ว React Query จะทำการ Refetch ให้อัตโนมัติ
-            // เนื่องจากทุก Query จะถูก Trigger เมื่อ Token ถูกบันทึกและ Component Rerender
         }
     }, [location.state]);
 
-    const zoneQueryResult = ZoneQueries[0];
+
     //ดึงข้อมูลหลังบ้าน
 
     //ระบบ filter
@@ -57,7 +59,7 @@ function ZoneDashboard(){
 
     const filteredZones = useMemo(() => {
         const { search, province, status } = filters;
-        let data = zoneQueryResult.data || []; 
+        let data = zoneData; 
 
         // กรองตามช่องค้นหา (Search)
         if (search) {
@@ -88,7 +90,7 @@ function ZoneDashboard(){
         }
 
         return data;
-    }, [zoneQueryResult.data, filters]);
+    }, [zoneData, filters]);
     //ระบบ filter
 
     if (isSystemLoading) {
@@ -106,7 +108,7 @@ function ZoneDashboard(){
                 title="ภาพรวม  Zone (พื้นที่)"
                 description="ระบบดูข้อมูลภาพรวมพื้นที่ใช้งาน Smart Healthcare System"
                 onButtonClick={false}
-                detail={ZoneQueries.length}
+                detail={zoneQueries.length}
                 buttonText="จำนวนพื้นที่ที่ผู้ใช้งานดูแล => "/>
 
                 <CardFilter

@@ -55,7 +55,7 @@ function ZoneDashboardDetail (){
 
 
     // 💡 สมมติ Key ที่จำเป็นสำหรับ MenuNameCard
-    const { alerts, deviceStatus, elderlyCount, elders, zone } = zoneDashboard;
+    const { alerts, deviceStatus, elders, zone } = zoneDashboard;
 
     const allAlertDetail = alerts;
     // console.log("alert",allAlertDetail)
@@ -65,6 +65,7 @@ function ZoneDashboardDetail (){
 
 
     const allEldery = elders
+    console.log("Elder",allEldery)
 
 
     const zoneDetail = zone;
@@ -82,7 +83,7 @@ function ZoneDashboardDetail (){
                 />
 
                 <MenuNameCard2
-                    title={zoneDetail?.activeUsers}
+                    title={allEldery.length}
                     description="จำนวนผู้สูงอายุทั้งหมด"
                 />
                 
