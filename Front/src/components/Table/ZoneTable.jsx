@@ -3,7 +3,7 @@ import ApiDelete from '../API-Delete';
 
 function ZoneTable({ data }){
 
-    console.log("table",data);
+    // console.log("table",data);
 
     const navigate = useNavigate();
 
@@ -93,8 +93,8 @@ function ZoneTable({ data }){
                                         <button className="table-btn hover:bg-main-yellow hover:text-white">Edit</button>
                                         <button className="table-btn hover:bg-green-500 hover:text-white">Setting</button>
                                         <button className="table-btn hover:bg-main-red hover:text-white"
-                                            onClick={(event) => handleDeleteClick(card.zoneid, event)}
-                                            disabled={isPending} >{isPending ? 'ลบ...' : 'Delete'}</button>
+                                                onClick={(event) => handleDeleteClick(card.zoneid, event)}
+                                                disabled={isPending} >{isPending ? 'ลบ...' : 'Delete'}</button>
                                     </td>
                                 </tr>
                             );

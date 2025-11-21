@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
+import ApiDelete from "../API-Delete";
 
 function UserTable({ data }){
 
@@ -57,6 +58,17 @@ function UserTable({ data }){
         } 
     };
 
+    // Delete Button
+    const { mutate: deleteZone, isPending } = ApiDelete('user'); 
+
+    const handleDeleteClick = (userId, event) => {
+        event.stopPropagation(); 
+        if (window.confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบ Zone ID: ${userId}?`)) {
+            deleteZone(userId); 
+        }
+    };
+    // Delete Button
+
     if (!Array.isArray(data) || data.length === 0) {
         return (
             <div className="p-4 text-center text-gray-500">
@@ -82,7 +94,7 @@ function UserTable({ data }){
                             {/* Thead ใช้ Role และ Zone เป็น Header */}
                             <th className="table-header">User Name</th>
                             <th className="table-header">Role</th>
-                            <th className="table-header">Zone ID</th>
+                            <th className="table-header">Zone</th>
                             <th className="table-header">Tel</th>
                             <th className="table-header">Status</th>
                             <th className="table-header">Menu</th>
@@ -108,7 +120,9 @@ function UserTable({ data }){
                                     <td className="p-3 text-sm text-left whitespace-nowrap w-fit">
                                         <button className="table-btn hover:bg-main-yellow hover:text-white">Edit</button>
                                         <button className="table-btn hover:bg-green-500 hover:text-white">Setting</button>
-                                        <button className="table-btn hover:bg-main-red hover:text-white">Delete</button>
+                                        <button className="table-btn hover:bg-main-red hover:text-white"
+                                                onClick={(event) => handleDeleteClick(card.userId, event)}
+                                                disabled={isPending} >{isPending ? 'ลบ...' : 'Delete'}</button>
                                     </td>
                                 </tr>
                             );

@@ -3,6 +3,7 @@ import ZoneTable from "./Table/ZoneTable";
 import ZoneAdminTable from "./Table/ZoneAdminTable";
 import UserTable from "./Table/UserTable";
 
+
 function CardFull({ data }){
 
     console.log("data",data)
