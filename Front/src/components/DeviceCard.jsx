@@ -1,14 +1,27 @@
 import J3 from '../assets/picture/J3-Smartwatch.png';
 import { Link, useNavigate } from 'react-router-dom';
+import ApiDelete from './API-Delete';
+
 
 function DeviceCard({data}) {
 
-    // console.log("device",data)
+    console.log("device",data)
     const navigate = useNavigate();
 
     const handleRowClick = (deviceId) => {
         navigate(`/deivce-details/${deviceId}`); 
     };
+
+    // Delete Button
+    const { mutate: deleteDevice, isPending } = ApiDelete('device'); 
+
+    const handleDeleteClick = (deviceId, event) => {
+        event.stopPropagation(); 
+        if (window.confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบ Device ID: ${deviceId}?`)) {
+            deleteDevice(deviceId); 
+        }
+    };
+    // Delete Button
 
     return(
         <>
@@ -78,7 +91,9 @@ function DeviceCard({data}) {
                         <div className='flex w-full gap-4'>
                             <button className="table-btn hover:bg-main-yellow hover:text-white">Edit</button>
                             <button className="table-btn hover:bg-green-500 hover:text-white">Setting</button>
-                            <button className="table-btn hover:bg-main-red hover:text-white">Delete</button>
+                            <button className="table-btn hover:bg-main-red hover:text-white"
+                                    onClick={(event) => handleDeleteClick(card.device_id, event)}
+                                    disabled={isPending} >{isPending ? 'ลบ...' : 'Delete'}</button>
                         </div>
 
                     </button>

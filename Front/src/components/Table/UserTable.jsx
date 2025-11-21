@@ -59,12 +59,12 @@ function UserTable({ data }){
     };
 
     // Delete Button
-    const { mutate: deleteZone, isPending } = ApiDelete('user'); 
+    const { mutate: deleteUser, isPending } = ApiDelete('user'); 
 
     const handleDeleteClick = (userId, event) => {
         event.stopPropagation(); 
-        if (window.confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบ Zone ID: ${userId}?`)) {
-            deleteZone(userId); 
+        if (window.confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบ User ID: ${userId}?`)) {
+            deleteUser(userId); 
         }
     };
     // Delete Button
