@@ -82,10 +82,8 @@ function UserManagement(){
             data = data.filter(user => user.role === role);
         }
 
-        // กรองตามสถานะ (Status) - *ต้องเพิ่ม Key 'status' ในข้อมูล user*
-        // สมมติว่า user มี Key 'status' (Active/Inactive)
         if (status && status !== 'ทั้งหมด') {
-            data = data.filter(user => user.status === status);
+            data = data.filter((zone) => zone.status === status);
         }
         return data;
     }, [userData, filters]);

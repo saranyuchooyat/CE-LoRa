@@ -39,6 +39,8 @@ function ZoneManagement() {
 
   const zoneData = zoneQueries[0].data || [];
 
+  console.log(zoneQueries.status)
+
   useEffect(() => {
     const tokenInStorage = localStorage.getItem('token');
     if (location.state?.token && location.state.token !== tokenInStorage) {
@@ -68,6 +70,7 @@ function ZoneManagement() {
     if (search) {
       const lowerSearch = search.toLowerCase();
       data = data.filter((zone) => {
+
         // 1. การค้นหาด้วย ID (ต้องแปลงเป็น String ก่อน)
         const zoneIdSearch = zone.zoneid
           ? String(zone.zoneid).includes(lowerSearch)
@@ -89,7 +92,7 @@ function ZoneManagement() {
     }
 
     if (status && status !== "ทั้งหมด") {
-      data = data.filter((zone) => zone.Status === status);
+      data = data.filter((zone) => zone.status === status);
     }
 
     return data;

@@ -1,4 +1,4 @@
-import J3 from '../assets/picture/J3-Smartwatch.png';
+
 
 function ZoneStaffCard({data}) {
 

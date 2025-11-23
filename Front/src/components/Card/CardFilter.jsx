@@ -5,8 +5,6 @@ import ProvinceDropdown from "../Dropdown/ProvinceDropdown";
 // รับ props เพิ่ม: filters, onFilterChange, onClear
 function CardFilter({name, placeholderName, option1Name, option2Name, filters, onFilterChange, onClear, option2Key}){
 
-    console.log("option2",option2Name)
-
     const [openStatus, setOpenStatus] = useState(false);
     const [openProvince, setOpenProvince] = useState(false);
 
@@ -16,15 +14,13 @@ function CardFilter({name, placeholderName, option1Name, option2Name, filters, o
     };
 
     // 2. สร้าง Handler สำหรับ Dropdown
-    // เนื่องจากเราไม่เห็นโค้ด StatusDropdown/ProvinceDropdown
-    // เราจะสร้างฟังก์ชันจำลองการเลือกและปิด Dropdown
     const handleOption2Select = (value) => {
         // 💡 ใช้ option2Key ที่ส่งมาจาก Component แม่
         onFilterChange(option2Key, value); 
         setOpenProvince(false);
     };
     
-    // Handler สำหรับ Dropdown ตัวที่ 1 (Status) 
+    // Handler สำหรับ Dropdown ตัวที่ 1 (Status)
     const handleStatusSelect = (value) => {
         onFilterChange('status', value);
         setOpenStatus(false);
@@ -42,23 +38,22 @@ function CardFilter({name, placeholderName, option1Name, option2Name, filters, o
                             className="w-[400px] bg-gray-200" 
                             type="search" 
                             placeholder={placeholderName}
-                            // 3. ผูกค่าและ Event เข้ากับ State
                             value={filters.search}
                             onChange={handleSearchChange}
                         />
                     </form>
                 </div>
 
+               {/* Dropdown 1: สถานะ */}
                 <div className="relative mr-3">
                     <p className="text-start">{option1Name}</p>
                     <button className="dropdown-btn" onClick={() => setOpenStatus((prev) => !prev)}>
-                        {/* แสดงสถานะปัจจุบัน */}
                         {filters.status} 
                     </button>
-                    {/* ต้องส่ง onSelect prop ไปให้ StatusDropdown ด้วย */}
                     {openStatus && <StatusDropdown 
-                        currentStatus={filters.status}
-                        onSelect={(value) => { onFilterChange('status', value); setOpenStatus(false); }} 
+                        currentValue={filters.status}
+                        onSelect={handleStatusSelect}
+                        optionalKey={option2Key}
                     />}
                 </div>
 
