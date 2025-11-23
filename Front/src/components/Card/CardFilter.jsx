@@ -1,32 +1,29 @@
 import {useState} from "react";
 import StatusDropdown from "../Dropdown/StatusDropdown";
-import ProvinceDropdown from "../Dropdown/ProvinceDropdown";
+import FilterDropdown from "../Dropdown/FilterDropdown";
 
 // รับ props เพิ่ม: filters, onFilterChange, onClear
 function CardFilter({name, placeholderName, option1Name, option2Name, filters, onFilterChange, onClear, option2Key}){
 
     const [openStatus, setOpenStatus] = useState(false);
-    const [openProvince, setOpenProvince] = useState(false);
+    const [openDropdown2, setOpenDropdown2] = useState(false);
 
     // 1. สร้าง Handler สำหรับช่องค้นหา
     const handleSearchChange = (event) => {
         onFilterChange('search', event.target.value);
     };
 
-    // 2. สร้าง Handler สำหรับ Dropdown
-    const handleOption2Select = (value) => {
-        // 💡 ใช้ option2Key ที่ส่งมาจาก Component แม่
-        onFilterChange(option2Key, value); 
-        setOpenProvince(false);
-    };
-    
     // Handler สำหรับ Dropdown ตัวที่ 1 (Status)
     const handleStatusSelect = (value) => {
         onFilterChange('status', value);
         setOpenStatus(false);
     }
 
-    const Dropdown2Component = ProvinceDropdown; 
+    const handleDropdownSelect = (value) => {
+        onFilterChange(option2Key, value);
+        setOpenDropdown2(false);
+    } 
+
 
     return(
         <>
@@ -57,17 +54,16 @@ function CardFilter({name, placeholderName, option1Name, option2Name, filters, o
                     />}
                 </div>
 
+               {/* Dropdown 2: จังหวัด/บทบาท */}
                 <div className="relative mr-3">
                     <p className="text-start">{option2Name}</p>
-                    <button className="dropdown-btn" onClick={() => setOpenProvince((prev) => !prev)}>
-                        {/* 💡 แสดงผลโดยใช้ Key ที่ส่งมา (filters[option2Key] จะเป็น filters.role หรือ filters.province) */}
+                    <button className="dropdown-btn" onClick={() => setOpenDropdown2((prev) => !prev)}>
                         {filters[option2Key]} 
                     </button>
-                    {openProvince && <Dropdown2Component 
-                        // 💡 ส่งค่าปัจจุบัน โดยใช้ Key ที่ส่งมา
-                        currentValue={filters[option2Key]} 
-                        onSelect={handleOption2Select} // ใช้ Handler ใหม่
-                        // ... props อื่นๆ ที่ Dropdown2Component ต้องการ
+                    {openDropdown2 && <FilterDropdown
+                        currentValue={filters[option2Key]}
+                        onSelect={handleDropdownSelect}
+                        optionalKey={option2Key}
                     />}
                 </div>
                 
