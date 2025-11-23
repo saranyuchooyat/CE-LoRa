@@ -92,18 +92,18 @@ function UserTable({ data }){
                     <thead className="bg-gray-50 border-b-2 border-gray-400">
                         <tr>
                             {/* Thead ใช้ Role และ Zone เป็น Header */}
-                            <th className="table-header">User Name</th>
-                            <th className="table-header">Role</th>
-                            <th className="table-header">Zone</th>
-                            <th className="table-header">Tel</th>
-                            <th className="table-header">Status</th>
-                            <th className="table-header">Menu</th>
+                            <th className="table-header">ชื่อ</th>
+                            <th className="table-header">ตำแหน่ง</th>
+                            <th className="table-header">พื้นที่ดูแล</th>
+                            <th className="table-header">เบอร์โทรศัพท์</th>
+                            <th className="table-header">สถานะ</th>
+                            <th className="table-header">เมนู</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100"> 
                         {data.map((card, index) => {
                             const isOddRow = (index % 2 === 0);
-                            const rowBgClass = isOddRow ? 'bg-gray-100' : 'bg-gray-200';
+                            const rowBgClass = isOddRow ? 'bg-gray-100' : 'bg-gray-50';
                             const statusClass = statusCheck(card.status);                             
                             return(
                                 <tr key={index} className={rowBgClass}>
@@ -118,11 +118,11 @@ function UserTable({ data }){
                                     
                                     {/* Un-commented และแก้ไขส่วนของปุ่ม Menu */}
                                     <td className="p-3 text-sm text-left whitespace-nowrap w-fit">
-                                        <button className="table-btn hover:bg-main-yellow hover:text-white">Edit</button>
-                                        <button className="table-btn hover:bg-green-500 hover:text-white">Setting</button>
+                                        <button className="table-btn hover:bg-main-yellow hover:text-white">แก้ไข</button>
+                                        <button className="table-btn hover:bg-green-500 hover:text-white">ตั้งค่า</button>
                                         <button className="table-btn hover:bg-main-red hover:text-white"
                                                 onClick={(event) => handleDeleteClick(card.userId, event)}
-                                                disabled={isPending} >{isPending ? 'ลบ...' : 'Delete'}</button>
+                                                disabled={isPending} >{isPending ? 'ลบ...' : 'ลบ'}</button>
                                     </td>
                                 </tr>
                             );

@@ -3,9 +3,9 @@ import { useLocation } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
-import CardFilter from "../../components/CardFilter";
-import Cardno2 from "../../components/Cardno2";
-import Cardno5 from "../../components/Cardno5";
+import Cardno2 from "../../components/Card/Cardno2";
+import CardFilter from "../../components/Card/CardFilter";
+import Cardno5 from "../../components/Card/Cardno5";
 import Modal from "../../components/ModalForm/Modal";
 import AddUserForm from "../../components/ModalForm/AddUserForm";
 

@@ -4,8 +4,8 @@ import { useLocation } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
-import CardFilter from "../../components/CardFilter";
-import CardFull from "../../components/Cardno5";
+import CardFilter from "../../components/Card/CardFilter";
+import CardFull from "../../components/Card/Cardno5";
 
 
 //กำหนดตัวแปรแต่ละช่อง Filter

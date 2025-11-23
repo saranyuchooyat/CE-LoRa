@@ -57,13 +57,13 @@ function ZoneTable({ data }){
                     <thead className="bg-gray-50 border-b-2 border-gray-400">
                         <tr>
                             {/* ... Table Headers ... */}
-                            <th className="table-header">Zone ID</th>
-                            <th className="table-header">Zone Name</th>
-                            <th className="table-header">Address</th>
-                            <th className="table-header">Description</th>
-                            <th className="table-header">Status</th>
+                            <th className="table-header">รหัส Zone</th>
+                            <th className="table-header">ชื่อ Zone</th>
+                            <th className="table-header">ที่อยู่</th>
+                            <th className="table-header">คำอธิบาย</th>
+                            <th className="table-header">สถานะ</th>
                             <th className="table-header">Active User</th>
-                            <th className="table-header">Menu</th>
+                            <th className="table-header">เมนู</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100"> 
@@ -91,11 +91,11 @@ function ZoneTable({ data }){
                                     <td className="table-data whitespace-nowrap">{activeUserCheck(card.activeuser)}</td>
                                     {/* ... Menu Buttons ... */}
                                     <td className="p-3 text-sm text-left hitespace-nowrap w-fit">
-                                        <button className="table-btn hover:bg-main-yellow hover:text-white">Edit</button>
-                                        <button className="table-btn hover:bg-green-500 hover:text-white">Setting</button>
+                                        <button className="table-btn hover:bg-main-yellow hover:text-white">แก้ไข</button>
+                                        <button className="table-btn hover:bg-green-500 hover:text-white">ตั้งค่า</button>
                                         <button className="table-btn hover:bg-main-red hover:text-white"
                                                 onClick={(event) => handleDeleteClick(card.zoneid, event)}
-                                                disabled={isPending} >{isPending ? 'ลบ...' : 'Delete'}</button>
+                                                disabled={isPending} >{isPending ? 'ลบ...' : 'ลบ'}</button>
                                     </td>
                                 </tr>
                             );

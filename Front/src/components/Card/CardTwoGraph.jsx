@@ -1,5 +1,5 @@
-import UserTrendGraph from './UserTrendGraph';
-import TopZonePieChart from './TopZonePieChart';
+import UserTrendGraph from '../UserTrendGraph';
+import TopZonePieChart from '../TopZonePieChart';
 
 function CardTwoGraph({graphdata,piedata}){
 

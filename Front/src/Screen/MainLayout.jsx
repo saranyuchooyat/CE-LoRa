@@ -4,7 +4,7 @@ import Menu from "../components/Menu";
 import SystemOverviewDashboard from './SystemAdminMenu/SystemOverviewDashboard';
 import ZoneManagement from './SystemAdminMenu/ZoneManagement';
 import UserManagement from './SystemAdminMenu/UserManagement';
-import HealthMonitoring from './HealthMonitoring';
+import EmergencyRespondDashboard from './EmergencyRespondDashboard';
 import ZoneDashboard from './ZoneAdminMenu/ZoneDashboard';
 import ZoneDashboardDetail from './ZoneAdminMenu/ZoneDashboardDetail';
 import DeviceManagement from './ZoneAdminMenu/DeviceManagement';
@@ -40,7 +40,7 @@ function MainLayout() {
           {/* Zone Staff Menu */}
           <Route path="/eldery-monitoring" element={<ElderlyMonitoring/>}/>
 
-          <Route path="/health-monitoring" element={<HealthMonitoring/>} />
+          <Route path="/emergency-respond" element={<EmergencyRespondDashboard/>} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>

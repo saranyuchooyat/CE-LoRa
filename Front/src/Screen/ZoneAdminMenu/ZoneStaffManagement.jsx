@@ -3,12 +3,8 @@ import { useLocation } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
-import CardFilter from "../../components/CardFilter";
-import Cardno2 from "../../components/Cardno2";
-import Cardno5 from "../../components/Cardno5";
-import CardLayouts from "../../components/CardLayouts";
-import Modal from "../../components/ModalForm/Modal";
-import AddUserForm from "../../components/ModalForm/AddUserForm";
+import CardLayouts from "../../components/Card/CardLayouts";
+
 
 const initialFilters = {
     search: '', // สำหรับช่องค้นหา ชื่อ, อีเมล, เบอร์โทร

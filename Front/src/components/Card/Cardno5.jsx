@@ -1,7 +1,7 @@
 import CardNotification from "./NotificationCard";
-import ZoneTable from "./Table/ZoneTable";
-import ZoneAdminTable from "./Table/ZoneAdminTable";
-import UserTable from "./Table/UserTable";
+import ZoneTable from "../Table/ZoneTable";
+import ZoneAdminTable from "../Table/ZoneAdminTable";
+import UserTable from "../Table/UserTable";
 
 
 function CardFull({ data }){

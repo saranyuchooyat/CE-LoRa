@@ -1,6 +1,6 @@
 import J3 from '../assets/picture/J3-Smartwatch.png';
 import { Link, useNavigate } from 'react-router-dom';
-import ApiDelete from './API-Delete';
+import ApiDelete from '../API-Delete';
 
 
 function DeviceCard({data}) {

@@ -4,9 +4,9 @@ import { useQueries } from "@tanstack/react-query";
 import api from '../../components/API';
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
 import MenuNameCard2 from '../../components/MainCardOption/MenuNameCard2';
-import Cardno8 from '../../components/Cardno8';
-import Cardno9 from '../../components/Cardno9';
-import Cardno5 from '../../components/Cardno5';
+import Cardno8 from '../../components/Card/Cardno8';
+import Cardno9 from '../../components/Card/Cardno9';
+import Cardno5 from '../../components/Card/Cardno5';
 
 
 function ZoneDashboardDetail (){

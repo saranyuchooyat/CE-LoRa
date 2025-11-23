@@ -1,6 +1,6 @@
 import {useState} from "react";
-import StatusDropdown from "./StatusDropdown";
-import ProvinceDropdown from "./ProvinceDropdown";
+import StatusDropdown from "../Dropdown/StatusDropdown";
+import ProvinceDropdown from "../Dropdown/ProvinceDropdown";
 
 // รับ props เพิ่ม: filters, onFilterChange, onClear
 function CardFilter({name, placeholderName, option1Name, option2Name, filters, onFilterChange, onClear, option2Key}){

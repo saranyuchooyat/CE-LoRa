@@ -1,4 +1,4 @@
-function HealthMonitoring(){
+function EmergencyRespondDashboard(){
     return(
         <>
             {/* <div className="mx-5">
@@ -8,4 +8,4 @@ function HealthMonitoring(){
     );
 }
 
-export default HealthMonitoring;
+export default EmergencyRespondDashboard;

@@ -1,4 +1,4 @@
-import ServerUsage from "./ServerUsageStatus";
+import ServerUsage from "../ServerUsageStatus";
 
 function Cardno4(){
     return(
