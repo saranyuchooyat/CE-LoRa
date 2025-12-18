@@ -13,7 +13,7 @@ import (
 var db *mongo.Database
 
 func ConnectMongo() {
-	uri := "mongodb://192.168.1.47:27017"
+	uri := "mongodb://admin_kmitl:kmitl123@100.118.210.62:27017/LoRa"
 	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
 	if err != nil {
 		log.Fatal("❌ Error creating Mongo client:", err)
