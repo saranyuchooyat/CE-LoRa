@@ -77,13 +77,12 @@ function UserManagement(){
             (user.phone && String(user.phone).includes(lowerSearch))));
         }
 
-        // กรองตามบทบาท (Role)
-        if (role && role !== 'ทั้งหมด') {
-            data = data.filter(user => user.role === role);
+        if (role && role !== "ทั้งหมด") {
+            data = data.filter((user) => user.role === role);
         }
 
         if (status && status !== 'ทั้งหมด') {
-            data = data.filter((zone) => zone.status === status);
+            data = data.filter((user) => user.status === status);
         }
         return data;
     }, [userData, filters]);
@@ -136,7 +135,6 @@ function UserManagement(){
                     placeholderName=" ชื่อ, อีเมล, หรือเบอร์โทรศัพท์"
                     option1Name="สถานะ"
                     option2Name="บทบาท"
-                    // ส่งค่าปัจจุบันและฟังก์ชันควบคุม
                     filters={filters}
                     onFilterChange={handleFilterChange}
                     onClear={handleClearFilters}

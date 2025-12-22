@@ -22,7 +22,10 @@ function CardFilter({name, placeholderName, option1Name, option2Name, filters, o
     const handleDropdownSelect = (value) => {
         onFilterChange(option2Key, value);
         setOpenDropdown2(false);
-    } 
+    }
+
+    console.log("status",filters.status)
+    console.log("role",filters[option2Key])
 
 
     return(

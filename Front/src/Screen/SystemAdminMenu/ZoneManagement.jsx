@@ -88,7 +88,7 @@ function ZoneManagement() {
     }
 
     if (province && province !== "ทั้งหมด") {
-      data = data.filter((zone) => zone.Province === province);
+      data = data.filter((zone) => zone.province === province);
     }
 
     if (status && status !== "ทั้งหมด") {
