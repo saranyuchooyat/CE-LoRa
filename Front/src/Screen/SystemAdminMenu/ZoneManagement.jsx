@@ -136,7 +136,14 @@ function ZoneManagement() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
       >
-        <AddZoneForm onClose={handleCloseModal} onSaveSuccess={zoneQueries} />
+
+      <AddZoneForm 
+        onClose={handleCloseModal} 
+        // 💡 ส่งฟังก์ชัน refetch เข้าไปเพื่อให้ React Query ดึงข้อมูลใหม่
+        onSaveSuccess={() => {
+        zoneQueries.refetch(); 
+        }} 
+      />
       </Modal>
     </>
   );

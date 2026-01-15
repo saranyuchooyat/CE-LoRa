@@ -15,9 +15,11 @@ function FilterDropdown({ onSelect, currentValue, optionalKey }) {
         if (optionalKey === "province") {
             // ตั้งค่าสำหรับ Zone Status
             setStatusValues(DEFAULT_OPTIONS);
+
         } else if (optionalKey === "role") {
             // ตั้งค่าสำหรับ Device Status/Role
             setStatusValues(ROLE_OPTIONS);
+            
         } else {
              // ค่า Default
              setStatusValues(DEFAULT_OPTIONS);
