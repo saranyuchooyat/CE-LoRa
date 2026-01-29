@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 
-function AddZoneForm({ onClose, onSaveSuccess }){
+function AddZoneForm({ onClose }){
 
     const [formData, setFormData] = useState({
         zonename: '',
@@ -44,9 +44,6 @@ function AddZoneForm({ onClose, onSaveSuccess }){
                 }
             }); 
             
-            if (typeof onSaveSuccess === 'function') {
-                onSaveSuccess(); 
-            }
             if (typeof onClose === 'function') {
                 onClose(); 
             }

@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
@@ -138,10 +137,9 @@ function ZoneManagement() {
       >
 
       <AddZoneForm 
-        onClose={handleCloseModal} 
-        // 💡 ส่งฟังก์ชัน refetch เข้าไปเพื่อให้ React Query ดึงข้อมูลใหม่
-        onSaveSuccess={() => {
-        zoneQueries.refetch(); 
+        onClose={() => {
+        handleCloseModal();
+        zoneQueries[0].refetch();
         }} 
       />
       </Modal>
