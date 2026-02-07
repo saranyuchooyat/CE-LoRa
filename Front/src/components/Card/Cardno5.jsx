@@ -4,7 +4,7 @@ import ZoneAdminTable from "../Table/ZoneAdminTable";
 import UserTable from "../Table/UserTable";
 
 
-function CardFull({ data, onEdit }){
+function CardFull({ data, onEdit, showActions=true }) {
 
     console.log("data",data)
 
@@ -50,7 +50,7 @@ function CardFull({ data, onEdit }){
     }
     else if(isZoneData(data)){
         console.log("ZonePass")
-        displayContent = <ZoneTable data={data} onEdit={onEdit}/>;
+        displayContent = <ZoneTable data={data} onEdit={onEdit} showActions={showActions}/>;
     }
     else if(isStaffData(data)){
         console.log("StaffPass")

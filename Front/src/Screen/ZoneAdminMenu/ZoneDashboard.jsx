@@ -121,7 +121,7 @@ function ZoneDashboard(){
                 onClear={handleClearFilters}
                 option2Key="province"
                 />
-                <CardFull data={filteredZones}/>
+                <CardFull data={filteredZones} showActions={false}/>
             </div>
         </>
     );

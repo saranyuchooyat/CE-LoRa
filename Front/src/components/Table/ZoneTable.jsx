@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import api from '../API';
 import ApiDelete from '../API-Delete';
 
-function ZoneTable({ data, onEdit}) {
+function ZoneTable({ data, onEdit, showActions=true }) {
 
     // console.log("table",data);
     const location = useLocation();
@@ -75,7 +75,7 @@ function ZoneTable({ data, onEdit}) {
                             <th className="table-header">คำอธิบาย</th>
                             <th className="table-header">สถานะ</th>
                             <th className="table-header">Active User</th>
-                            <th className="table-header">เมนู</th>
+                            {showActions && <th className="table-header">เมนู</th>}
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100"> 
@@ -102,6 +102,7 @@ function ZoneTable({ data, onEdit}) {
                                     </td>
                                     <td className="table-data whitespace-nowrap">{activeUserCheck(card.activeuser)}</td>
                                     {/* ... Menu Buttons ... */}
+                                    {showActions && (
                                     <td className="p-3 text-sm text-left whitespace-nowrap w-fit">
                                         <button className="table-btn hover:bg-main-yellow hover:text-white"
                                                 onClick={(event) => handleEditClick(card, event)}>
@@ -111,7 +112,7 @@ function ZoneTable({ data, onEdit}) {
                                                 onClick={(event) => handleDeleteClick(card.zoneid, event)}
                                                 disabled={isPending} >{isPending ? 'ลบ...' : 'ลบ'}</button>
                                     </td>
-                                </tr>
+                                )}</tr>
                             );
                         })}
                     </tbody>
