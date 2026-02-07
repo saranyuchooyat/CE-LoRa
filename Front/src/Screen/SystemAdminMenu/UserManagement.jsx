@@ -42,8 +42,6 @@ function UserManagement(){
         const tokenInStorage = localStorage.getItem('token');
         if (location.state?.token && location.state.token !== tokenInStorage) {
             localStorage.setItem('token', location.state.token);
-            // 💡 เมื่อบันทึก Token ใหม่แล้ว React Query จะทำการ Refetch ให้อัตโนมัติ
-            // เนื่องจากทุก Query จะถูก Trigger เมื่อ Token ถูกบันทึกและ Component Rerender
         }
     }, [location.state]);
     //ดึงข้อมูลหลังบ้าน
@@ -149,8 +147,11 @@ function UserManagement(){
                 onClose={handleCloseModal}>
 
                 <AddUserForm 
-                onClose={handleCloseModal} 
-                onSaveSuccess={userData}/>
+                    onClose={() => {
+                    handleCloseModal();
+                    userQueries[0].refetch();
+                    }} 
+                />
             </Modal>
 
 
