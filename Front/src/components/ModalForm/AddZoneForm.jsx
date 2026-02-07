@@ -1,15 +1,14 @@
 import { useState } from "react";
 import axios from "axios";
 
-function AddZoneForm({ onClose }){
+function AddZoneForm({ onClose, onSaveSuccess }){
 
     const [formData, setFormData] = useState({
         zonename: '',
         address: '',
         description: '',
     });
-
-    // const [openStatus, setOpenStatus] = useState(false);
+    
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleChange = (e) => {
@@ -44,6 +43,9 @@ function AddZoneForm({ onClose }){
                 }
             }); 
             
+            if (typeof onSaveSuccess === 'function') {
+                onSaveSuccess(); 
+            }
             if (typeof onClose === 'function') {
                 onClose(); 
             }

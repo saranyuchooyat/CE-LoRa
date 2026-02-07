@@ -8,6 +8,7 @@ import CardFilter from "../../components/Card/CardFilter";
 import Cardno5 from "../../components/Card/Cardno5";
 import Modal from "../../components/ModalForm/Modal";
 import AddUserForm from "../../components/ModalForm/AddUserForm";
+import EditUserForm from "../../components/ModalForm/EditUserForm";
 
 //กำหนดตัวแปรแต่ละช่อง Filter
 const initialFilters = {
@@ -25,6 +26,8 @@ function UserManagement(){
     const [isModalOpen, setIsModalOpen] = useState(false);
     const handleOpenModal = () => setIsModalOpen(true);
     const handleCloseModal = () => setIsModalOpen(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedUserId, setSelectedUserId] = useState(null);
 
     //ดึงข้อมูลหลังบ้าน
     const userQueries = useQueries({
@@ -45,6 +48,17 @@ function UserManagement(){
         }
     }, [location.state]);
     //ดึงข้อมูลหลังบ้าน
+
+    // ฟังก์ชันเปิด Modal แก้ไข
+    const handleOpenEditModal = (userId) => {
+        setSelectedUserId(userId);
+        setIsEditModalOpen(true);
+    };
+
+    const handleCloseEditModal = () => {
+        setSelectedUserId(null);
+        setIsEditModalOpen(false);
+    };
 
 
     // ระบบ filter
@@ -138,7 +152,10 @@ function UserManagement(){
                     onClear={handleClearFilters}
                     option2Key="role"
                 />
-                <Cardno5 data={filteredUsers}/> 
+                <Cardno5 
+                    data={filteredUsers}
+                    onEdit={handleOpenEditModal}
+                />
             </div>
 
             <Modal 
@@ -151,6 +168,18 @@ function UserManagement(){
                     handleCloseModal();
                     userQueries[0].refetch();
                     }} 
+                />
+            </Modal>
+
+            <Modal
+            title="แก้ไขข้อมูลผู้ใช้งาน"
+            isOpen={isEditModalOpen}
+            onClose={handleCloseEditModal}
+            >
+                <EditUserForm 
+                    userId={selectedUserId} 
+                    onClose={handleCloseEditModal}
+                    onSaveSuccess={() => userQueries[0].refetch()}
                 />
             </Modal>
 

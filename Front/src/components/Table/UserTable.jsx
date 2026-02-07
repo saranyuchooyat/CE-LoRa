@@ -4,7 +4,7 @@ import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import ApiDelete from "../API-Delete";
 
-function UserTable({ data }){
+function UserTable({ data, onEdit }){
 
     console.log("table data", data);
     const location = useLocation();
@@ -69,6 +69,13 @@ function UserTable({ data }){
     };
     // Delete Button
 
+    // Edit Button (กำลังพัฒนา)
+    const handleEditClick = (userId, event) => {
+        event.stopPropagation();
+        onEdit(userId); // 💡 ส่ง ID กลับไปที่ Component แม่
+    };
+
+
     if (!Array.isArray(data) || data.length === 0) {
         return (
             <div className="p-4 text-center text-gray-500">
@@ -118,7 +125,9 @@ function UserTable({ data }){
                                     
                                     {/* Un-commented และแก้ไขส่วนของปุ่ม Menu */}
                                     <td className="p-3 text-sm text-left whitespace-nowrap w-fit">
-                                        <button className="table-btn hover:bg-main-yellow hover:text-white">แก้ไข</button>
+                                        <button className="table-btn hover:bg-main-yellow hover:text-white"
+                                                onClick={(event) => handleEditClick(card.userId, event)}>
+                                            แก้ไข</button>
                                         <button className="table-btn hover:bg-green-500 hover:text-white">ตั้งค่า</button>
                                         <button className="table-btn hover:bg-main-red hover:text-white"
                                                 onClick={(event) => handleDeleteClick(card.userId, event)}

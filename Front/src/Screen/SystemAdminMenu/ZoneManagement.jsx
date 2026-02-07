@@ -136,12 +136,12 @@ function ZoneManagement() {
         onClose={handleCloseModal}
       >
 
-      <AddZoneForm 
-        onClose={() => {
-        handleCloseModal();
-        zoneQueries[0].refetch();
-        }} 
-      />
+        <AddZoneForm 
+          onClose={() => {
+          handleCloseModal();
+          zoneQueries[0].refetch();
+          }} 
+        />
       </Modal>
     </>
   );
