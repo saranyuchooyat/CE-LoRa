@@ -50,7 +50,7 @@ function CardFull({ data, onEdit }){
     }
     else if(isZoneData(data)){
         console.log("ZonePass")
-        displayContent = <ZoneTable data={data}/>;
+        displayContent = <ZoneTable data={data} onEdit={onEdit}/>;
     }
     else if(isStaffData(data)){
         console.log("StaffPass")

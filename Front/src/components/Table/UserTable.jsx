@@ -6,7 +6,7 @@ import ApiDelete from "../API-Delete";
 
 function UserTable({ data, onEdit }){
 
-    console.log("table data", data);
+    // console.log("table data", data);
     const location = useLocation();
 
     //ดึงข้อมูลหลังบ้าน

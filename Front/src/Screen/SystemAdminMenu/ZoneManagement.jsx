@@ -5,9 +5,9 @@ import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
 import CardFilter from "../../components/Card/CardFilter";
 import CardFull from "../../components/Card/Cardno5";
-
 import Modal from "../../components/ModalForm/Modal";
 import AddZoneForm from "../../components/ModalForm/AddZoneForm";
+import EditZoneForm from "../../components/ModalForm/EditZoneForm";
 
 //กำหนดตัวแปรแต่ละช่อง Filter
 const initialFilters = {
@@ -25,6 +25,9 @@ function ZoneManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
+
+  const [selectedZoneData, setSelectedZoneData] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   //ดึงข้อมูลหลังบ้าน
   const zoneQueries = useQueries({
@@ -47,6 +50,16 @@ function ZoneManagement() {
     }
   }, [location.state]);
   //ดึงข้อมูลหลังบ้าน
+
+  // ฟังก์ชันเปิด Modal แก้ไข
+  const handleOpenEditModal = (zone) => {
+    setSelectedZoneData(zone);
+    setIsEditModalOpen(true);
+  };
+  const handleCloseEditModal = () => {
+    setSelectedZoneData(null);
+    setIsEditModalOpen(false);
+  }
 
 
   //ระบบ filter
@@ -127,7 +140,10 @@ function ZoneManagement() {
           onClear={handleClearFilters}
           option2Key="province"
         />
-        <CardFull data={filteredZones} />
+        <CardFull 
+          data={filteredZones} 
+          onEdit={handleOpenEditModal}
+        />
       </div>
 
       <Modal
@@ -141,6 +157,19 @@ function ZoneManagement() {
           handleCloseModal();
           zoneQueries[0].refetch();
           }} 
+        />
+      </Modal>
+
+      <Modal
+        title="แก้ไขข้อมูล Zone"
+        isOpen={isEditModalOpen}
+        onClose={handleCloseEditModal}
+      >
+        <EditZoneForm
+          zoneData={selectedZoneData} 
+          zoneId={selectedZoneData?.zoneid} 
+          onClose={handleCloseEditModal}
+          onSaveSuccess={() => zoneQueries[0].refetch()}
         />
       </Modal>
     </>

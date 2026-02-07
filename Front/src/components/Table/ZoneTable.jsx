@@ -1,16 +1,20 @@
-import { Link, useNavigate } from 'react-router-dom';
 import { useLocation } from "react-router-dom";
+import { Link, useNavigate } from 'react-router-dom';
+import api from '../API';
 import ApiDelete from '../API-Delete';
 
-function ZoneTable({ data }){
+function ZoneTable({ data, onEdit}) {
 
     // console.log("table",data);
-
+    const location = useLocation();
     const navigate = useNavigate();
 
+    //ดูข้อมูลภายใน zone
     const handleRowClick = (zoneId) => {
         navigate(`/zone-details/${zoneId}`); 
     };
+
+
 
     const activeUserCheck = (data) =>{
         if(data == 0){
@@ -43,6 +47,14 @@ function ZoneTable({ data }){
         }
     };
     // Delete Button
+
+    // Edit Button (กำลังพัฒนา)
+    const handleEditClick = (zone, event) => {
+        event.stopPropagation();
+        if(onEdit){
+            onEdit(zone); // 💡 ส่ง zone object กลับไปที่ Component แม่
+        }
+    };
 
     // ตรวจสอบว่า data เป็น Array และมีข้อมูลอยู่หรือไม่
     if (!Array.isArray(data) || data.length === 0) {
@@ -90,8 +102,10 @@ function ZoneTable({ data }){
                                     </td>
                                     <td className="table-data whitespace-nowrap">{activeUserCheck(card.activeuser)}</td>
                                     {/* ... Menu Buttons ... */}
-                                    <td className="p-3 text-sm text-left hitespace-nowrap w-fit">
-                                        <button className="table-btn hover:bg-main-yellow hover:text-white">แก้ไข</button>
+                                    <td className="p-3 text-sm text-left whitespace-nowrap w-fit">
+                                        <button className="table-btn hover:bg-main-yellow hover:text-white"
+                                                onClick={(event) => handleEditClick(card, event)}>
+                                            แก้ไข</button>
                                         <button className="table-btn hover:bg-green-500 hover:text-white">ตั้งค่า</button>
                                         <button className="table-btn hover:bg-main-red hover:text-white"
                                                 onClick={(event) => handleDeleteClick(card.zoneid, event)}
