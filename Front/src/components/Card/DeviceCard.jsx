@@ -12,6 +12,30 @@ function DeviceCard({data}) {
         navigate(`/deivce-details/${deviceId}`); 
     };
 
+    const statusCheck = (status) =>{
+        console.log("status",status)
+        switch (status) {
+            case 'offline':
+                return 'text-gray-800 bg-gray-300';
+            case 'online':    
+                return 'text-green-700 bg-green-200';
+            default:
+                return 'text-gray-700 bg-gray-200';
+        }
+    };
+
+    const CardstatusCheck = (status) =>{
+        console.log("status",status)
+        switch (status) {
+            case 'offline':
+                return 'bg-gray-200 border-gray-500';
+            case 'online':    
+                return 'bg-test-color border-main-green';
+            default:
+                return 'bg-test-color border-main-green';
+        }
+    };
+
     // Delete Button
     const { mutate: deleteDevice, isPending } = ApiDelete('device'); 
 
@@ -28,9 +52,9 @@ function DeviceCard({data}) {
             {data.map((card, index) =>{
 
                 return(
-                    <button key={index} className="flex flex-col items-center bg-test-color border-l-0 border-y-5 border-main-green rounded-[15px] gap-4 p-3 drop-shadow-lg hover:bg-main-card/30 cursor-pointer transition-colors duration-150" onClick={() => handleRowClick(card.device_id)}>
+                    <button key={index} className={`flex flex-col items-center  border-l-0 border-y-5 ${CardstatusCheck(card.status)} rounded-[15px] gap-4 p-3 drop-shadow-lg hover:bg-main-card/30 cursor-pointer transition-colors duration-150`} onClick={() => handleRowClick(card.device_id)}>
                         
-                        <div className="bg-main-green font-semibold text-white rounded-full py-1 px-10 w-fit">
+                        <div className={`font-semibold rounded-full py-1 px-10 w-fit ${statusCheck(card.status)}`}>
                             <p>{card.status}</p>
                         </div>
 

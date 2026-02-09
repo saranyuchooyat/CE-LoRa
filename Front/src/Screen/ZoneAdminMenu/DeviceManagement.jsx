@@ -45,6 +45,8 @@ function DeviceManagement(){
     const deviceQueryResult = deviceQueries[0];
     //ดึงข้อมูลหลังบ้าน
 
+    console.log("deviceQueryResult.data",deviceQueryResult.data)
+
 
     //ระบบ filter
         const handleFilterChange = (key, value) => {
