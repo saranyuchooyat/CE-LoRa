@@ -14,6 +14,8 @@ function ZoneDashboardDetail (){
     const { zoneid } = useParams();
     const location = useLocation();
 
+    
+
 
     //ดึงข้อมูลหลังบ้าน
     const zoneDashboardQueries = useQueries({
@@ -26,6 +28,8 @@ function ZoneDashboardDetail (){
     const isDashboardError = zoneDashboardQueries.some(query => query.isError);
 
     const zoneDashboard = zoneDashboardQueries[0].data || [];
+
+    console.log("ZoneDashboardData",zoneDashboard)
 
 
     useEffect(() => {
@@ -70,6 +74,45 @@ function ZoneDashboardDetail (){
 
     const zoneDetail = zone;
 
+    const calculateAverages = (eldersList) => {
+        if (!eldersList || eldersList.length === 0) return { avgSpO2: 0, avgHR: 0, avgTemp: 0 };
+
+        const totals = eldersList.reduce((acc, elder) => {
+            return {
+                spo2: acc.spo2 + (elder.vitals?.spo2 || 0),
+                hr: acc.hr + (elder.vitals?.heart_rate || 0),
+                temp: acc.temp + (elder.vitals?.temperature || 0)
+            };
+        }, { spo2: 0, hr: 0, temp: 0 });
+
+        return {
+            avgSpO2: (totals.spo2 / eldersList.length).toFixed(1),
+            avgHR: (totals.hr / eldersList.length).toFixed(1),
+            avgTemp: (totals.temp / eldersList.length).toFixed(1)
+        };
+    };
+
+    const healthAverages = calculateAverages(allEldery);
+
+    const mockGraphData = [
+        { date: "2026-02-03", activeUsers: 98, avgHR: 80, avgSpO2: 96, avgTemp: 36.5 },
+        { date: "2026-02-04", activeUsers: 105, avgHR: 85, avgSpO2: 97, avgTemp: 36.7 },
+        { date: "2026-02-05", activeUsers: 95, avgHR: 82, avgSpO2: 96, avgTemp: 36.4 },
+        { date: "2026-02-06", activeUsers: 110, avgHR: 88, avgSpO2: 95, avgTemp: 36.6 },
+        { date: "2026-02-07", activeUsers: 120, avgHR: 90, avgSpO2: 96, avgTemp: 36.8 },
+        { date: "2026-02-08", activeUsers: 115, avgHR: 95, avgSpO2: 94, avgTemp: 36.3 },
+        // วันที่ 7 คือวันปัจจุบันที่ใช้ค่าจริงจากที่คุณส่งมา
+        { 
+            date: "2026-02-09", 
+            activeUsers: 125, 
+            avgHR: parseFloat(healthAverages.avgHR), 
+            avgSpO2: parseFloat(healthAverages.avgSpO2),
+            avgTemp: parseFloat(healthAverages.avgTemp)
+        }
+    ];
+
+    // console.log("Health Averages:", healthAverages);
+
 
     return(
         <>
@@ -88,7 +131,7 @@ function ZoneDashboardDetail (){
                 />
                 
                 <Cardno5 data={allAlertDetail}/>
-                <Cardno8 data={allDeviceStatus}/>
+                <Cardno8 healthdata={mockGraphData} devicedata={allDeviceStatus}/>
                 <Cardno9 data=""/>
             </div>
         </>
