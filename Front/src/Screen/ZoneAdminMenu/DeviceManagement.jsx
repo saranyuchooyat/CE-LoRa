@@ -6,6 +6,8 @@ import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
 import CardFilter from "../../components/Card/CardFilter";
 import Cardno2 from "../../components/Card/Cardno2";
 import CardLayouts from "../../components/Card/CardLayouts";
+import Modal from "../../components/ModalForm/Modal";
+import AddDeviceForm from "../../components/ModalForm/AddDeviceForm";
 
 const initialFilters = {
     search: '', // สำหรับช่องค้นหา ชื่อ, อีเมล, เบอร์โทร
@@ -130,7 +132,7 @@ function DeviceManagement(){
                 <MenuNameCard
                 title="จัดการอุปกรณ์ Smart Healthcare ภายในพื้นที่"
                 description=""
-                onButtonClick="A"
+                onButtonClick={handleOpenModal}
                 detail={false}
                 buttonText="เพิ่มอุปกรณ์ใหม่"/>
                 
@@ -152,6 +154,19 @@ function DeviceManagement(){
                 data={filteredDevices}/>
 
             </div>
+
+            <Modal
+                title="เพิ่มอุปกรณ์ใหม่"
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+            >
+                <AddDeviceForm
+                    onClose={() => {
+                        handleCloseModal();
+                        deviceQueries[0].refetch();
+                    }}
+                />
+            </Modal>
 
         </>
     );
