@@ -138,7 +138,7 @@ function UserManagement(){
                 description="ระบบจัดการบัญชีผู้ใช้และสิทธิ์การเข้าถึง"
                 onButtonClick={handleOpenModal} // ต้องเพิ่ม Prop นี้ใน MenuNameCard
                 detail={false}
-                buttonText="เพิ่มผู้ใช้งานใหม่"/>
+                buttonText="ผู้ใช้งาน"/>
 
                 <Cardno2 data={staffData}/>
 

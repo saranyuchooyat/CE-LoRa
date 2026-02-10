@@ -127,7 +127,7 @@ function ZoneManagement() {
           description="ระบบจัดการพื้นที่ใช้งาน Smart Healthcare System"
           onButtonClick={handleOpenModal}
           detail={false}
-          buttonText="เพิ่ม Zone"
+          buttonText=" Zone "
         />
 
         <CardFilter

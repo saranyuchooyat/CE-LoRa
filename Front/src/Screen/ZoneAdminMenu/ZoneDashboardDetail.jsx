@@ -26,6 +26,7 @@ function ZoneDashboardDetail (){
     const zoneDashboardQueries = useQueries({
         queries: [
             { queryKey: ['zoneDashboard'], queryFn: () => api.get(`/zones/${zoneid}/dashboard`).then(res => res.data) },
+            { queryKey: ['zoneStaffData'], queryFn: () => api.get(`/zones/${zoneid}/staff`).then(res => res.data) },
         ],
     });
 
@@ -33,9 +34,10 @@ function ZoneDashboardDetail (){
     const isDashboardError = zoneDashboardQueries.some(query => query.isError);
 
     const zoneDashboard = zoneDashboardQueries[0].data || [];
+    const zoneStaffData = zoneDashboardQueries[1].data || [];
 
     console.log("ZoneDashboardData",zoneDashboard)
-
+    console.log("ZoneStaffData",zoneStaffData)
 
     useEffect(() => {
         const tokenInStorage = localStorage.getItem('token');
@@ -125,9 +127,9 @@ function ZoneDashboardDetail (){
                 <MenuNameCard
                     title={zoneDetail?.name || "Zone Detail"}
                     description={"Zone Admin Dashboard"}
-                    onButtonClick={false}
-                    detail="2/2"
-                    buttonText="จำนวนผู้ดูแล"
+                    onButtonClick={handleOpenModal}
+                    detail= {zoneStaffData.length + " คน"}
+                    buttonText="ผู้ดูแล"
                 />
 
                 <MenuNameCard2
