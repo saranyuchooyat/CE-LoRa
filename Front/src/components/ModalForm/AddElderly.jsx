@@ -11,8 +11,9 @@ function AddElderlyform({ onClose, onSaveSuccess }){
         birthDate: '',
         phone: '',
         address: '',
-        emergencyContact: '',
-        medicalHistory: '',
+        email:'',
+        // emergencyContact: '',
+        // medicalHistory: '',
         device:'เลือกอุปกรณ์'
 
     });
@@ -91,6 +92,7 @@ function AddElderlyform({ onClose, onSaveSuccess }){
             citizenid: formData.id,
             birthDate: formData.birthDate,
             phone: formData.phone,
+            email: formData.email,
             address: formData.address,
             // emergencyContact: formData.emergencyContact,
             // medicalHistory: formData.medicalHistory,
@@ -142,6 +144,11 @@ function AddElderlyform({ onClose, onSaveSuccess }){
                 </div>
 
                 <div className="mb-2">
+                    <label className="block text-gray-700 text-sm">Email</label>
+                    <input name="email" type="text" value={formData.email} onChange={handleChange} className="border rounded w-full p-2 bg-white" required />
+                </div>
+
+                <div className="mb-2">
                     <label className="block text-gray-700 text-sm">เพศ:</label>
                     <select
                         name="gender"
@@ -185,6 +192,25 @@ function AddElderlyform({ onClose, onSaveSuccess }){
                 <label className="block text-gray-700 text-sm">ที่อยู่</label>
                 <textarea name="address" type="text" value={formData.address} onChange={handleChange} className="border rounded w-full h-20 p-2 bg-white resize-none"  required />
             </div>
+
+            {/* ปุ่มกด (Footer) */}
+            <div className="pt-4 border-t flex justify-end gap-3">
+                <button 
+                    type="submit" 
+                    disabled={isSubmitting}
+                    className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 disabled:bg-gray-400"
+                >
+                    {isSubmitting ? 'กำลังบันทึก...' : 'บันทึก'}
+                </button>
+                <button 
+                    type="button" 
+                    onClick={onClose} 
+                    className="bg-gray-200 px-6 py-2 rounded-lg hover:bg-gray-300"
+                >
+                    ยกเลิก
+                </button>
+            </div>
+            
         </form>
     );
 }
