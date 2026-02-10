@@ -134,7 +134,7 @@ function ZoneManagement() {
           name="Zone"
           placeholderName=" ชื่อ zone, รหัส zone, หรือที่อยู่"
           option1Name="สถานะ"
-          option2Name="จังหวัด"
+          option2Name={null}
           filters={filters}
           onFilterChange={handleFilterChange}
           onClear={handleClearFilters}
