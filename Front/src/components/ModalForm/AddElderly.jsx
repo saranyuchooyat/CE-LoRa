@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-function AddElderlyform({ onClose, onSaveSuccess }){
+function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
+
+    console.log("ZoneID in AddElderlyform:", typeof zoneid, zoneid);
+
     // 1. กำหนดโครงสร้าง State ให้ครบตามฟิลด์ที่ต้องการ
     const [formData, setFormData] = useState({
         firstName: '',
@@ -18,10 +21,10 @@ function AddElderlyform({ onClose, onSaveSuccess }){
 
     });
 
-    const [openGender, setOpenGender] = useState(false);
-    const [openDevice, setOpenDevice] = useState(false);
+    // const [openGender, setOpenGender] = useState(false);
+    // const [openDevice, setOpenDevice] = useState(false);
     const [devices, setDevices] = useState([]);
-    const [loadingDevices, setLoadingDevices] = useState(false);
+    // const [loadingDevices, setLoadingDevices] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
@@ -67,16 +70,16 @@ function AddElderlyform({ onClose, onSaveSuccess }){
         }));
     };
 
-    // 2. Handler สำหรับเลือก Device จาก Dropdown
-    const selectDevice = (selectedDevice) => {
-        setFormData(prev => ({ ...prev, device: selectedDevice }));
-        setOpenDevice(false);
-    };
+    // // 2. Handler สำหรับเลือก Device จาก Dropdown
+    // const selectDevice = (selectedDevice) => {
+    //     setFormData(prev => ({ ...prev, device: selectedDevice }));
+    //     setOpenDevice(false);
+    // };
 
-    const selectGender = (selectedGender) => {
-        setFormData(prev => ({ ...prev, gender: selectedGender }));
-        setOpenGender(false);
-    };
+    // const selectGender = (selectedGender) => {
+    //     setFormData(prev => ({ ...prev, gender: selectedGender }));
+    //     setOpenGender(false);
+    // };
 
     // 3. ฟังก์ชันส่งข้อมูล (ยึด Logic ตาม AddZoneForm)
     const handleSubmit = async (e) => {
@@ -89,18 +92,19 @@ function AddElderlyform({ onClose, onSaveSuccess }){
             fname: formData.firstName,
             lname: formData.lastName,
             gender: formData.gender,
-            citizenid: formData.id,
+            citizenId: formData.id,
             birthDate: formData.birthDate,
             phone: formData.phone,
             email: formData.email,
             address: formData.address,
             // emergencyContact: formData.emergencyContact,
             // medicalHistory: formData.medicalHistory,
-            device: formData.device
+            device: {deviceId: formData.device},
+            zoneId: parseInt(zoneid)
         };
 
         try {
-            const response = await axios.post('http://localhost:8080//zones/elderlyRegister', dataToSend, {
+            const response = await axios.post('http://localhost:8080/zones/elderlyRegister', dataToSend, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

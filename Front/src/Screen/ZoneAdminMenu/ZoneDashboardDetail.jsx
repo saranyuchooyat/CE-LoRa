@@ -148,9 +148,10 @@ function ZoneDashboardDetail (){
                 onClose={handleCloseModal}
             >
                 <AddElderlyform
-                    onClose={()=>{
+                    zoneid={zoneid}
+                    onSaveSuccess={() => {
                         handleCloseModal();
-                        window.location.reload(); // รีโหลดหน้าเพื่อแสดงข้อมูลใหม่หลังจากเพิ่มผู้สูงอายุ
+                        zoneDashboardQueries[0].refetch(); 
                     }}
                 />
             </Modal>
