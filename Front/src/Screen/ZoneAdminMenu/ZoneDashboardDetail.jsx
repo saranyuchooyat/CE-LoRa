@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { useQueries } from "@tanstack/react-query";
 import api from '../../components/API';
@@ -7,6 +7,8 @@ import MenuNameCard2 from '../../components/MainCardOption/MenuNameCard2';
 import Cardno8 from '../../components/Card/Cardno8';
 import Cardno9 from '../../components/Card/Cardno9';
 import Cardno5 from '../../components/Card/Cardno5';
+import Modal from '../../components/ModalForm/Modal';
+import AddElderlyform from '../../components/ModalForm/AddElderly';
 
 
 function ZoneDashboardDetail (){
@@ -14,6 +16,9 @@ function ZoneDashboardDetail (){
     const { zoneid } = useParams();
     const location = useLocation();
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const handleOpenModal = () => setIsModalOpen(true);
+    const handleCloseModal = () => setIsModalOpen(false);
     
 
 
@@ -122,18 +127,33 @@ function ZoneDashboardDetail (){
                     description={"Zone Admin Dashboard"}
                     onButtonClick={false}
                     detail="2/2"
-                    buttonText="จำนวนพื้นที่ที่ผู้ใช้งานดูแล"
+                    buttonText="จำนวนผู้ดูแล"
                 />
 
                 <MenuNameCard2
                     title={allEldery.length}
                     description="จำนวนผู้สูงอายุทั้งหมด"
+                    onButtonClick={handleOpenModal}
+                    buttonText="เพิ่มผู้สูงอายุ"
                 />
                 
                 <Cardno5 data={allAlertDetail}/>
                 <Cardno8 healthdata={mockGraphData} devicedata={allDeviceStatus}/>
                 <Cardno9 data=""/>
             </div>
+
+            <Modal
+                title="เพิ่มข้อมูลผู้สูงอายุ"
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+            >
+                <AddElderlyform
+                    onClose={()=>{
+                        handleCloseModal();
+                        window.location.reload(); // รีโหลดหน้าเพื่อแสดงข้อมูลใหม่หลังจากเพิ่มผู้สูงอายุ
+                    }}
+                />
+            </Modal>
         </>
     );
 }
