@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 // 💡 1. กำหนด Array ของตัวเลือกทั้งหมด
 const DEFAULT_OPTIONS = ['Active', 'Inactive', 'ทั้งหมด']; 
 const ROLE_OPTIONS = ['System Admin', 'Zone Admin','Zone Staff' , 'ทั้งหมด'];
+const DEVICE_TYPE_OPTIONS = ['SmartWatch', 'Gateway', 'ทั้งหมด'];
 
 function FilterDropdown({ onSelect, currentValue, optionalKey }) {
 
@@ -12,9 +13,9 @@ function FilterDropdown({ onSelect, currentValue, optionalKey }) {
     const [statusValues, setStatusValues] = useState(DEFAULT_OPTIONS); 
     
     useEffect(() => {
-        if (optionalKey === "province") {
+        if (optionalKey === "deviceType") {
             // ตั้งค่าสำหรับ Zone Status
-            setStatusValues(DEFAULT_OPTIONS);
+            setStatusValues(DEVICE_TYPE_OPTIONS);
 
         } else if (optionalKey === "role") {
             // ตั้งค่าสำหรับ Device Status/Role

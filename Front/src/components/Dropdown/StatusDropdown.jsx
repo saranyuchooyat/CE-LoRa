@@ -20,7 +20,16 @@ function StatusDropdown({ onSelect, currentValue, optionalKey }) {
                 value1: 'Online',
                 value2: 'offline'
             });
-        } else {
+        }
+        else if (optionalKey === "deviceType") {
+            // ตั้งค่าสำหรับ Device Type
+            setStatusValues({
+                value1: 'online',
+                value2: 'offline',
+                value3: 'unassigned'
+            });
+        }
+        else {
              // ค่า Default หาก optionalKey ไม่ตรง
              setStatusValues({
                 value1: 'Active',
@@ -35,26 +44,15 @@ function StatusDropdown({ onSelect, currentValue, optionalKey }) {
 
     return (
         <div className="dropdown-menu">
-            <div 
-                className={`cursor-pointer hover:bg-gray-300 p-2 ${currentValue === statusValues.value1 ? 'font-bold bg-gray-200' : ''}`}
-                onClick={() => handleItemClick(statusValues.value1)}
-            >
-                {statusValues.value1} 
-            </div>
-
-            <div 
-                className={`cursor-pointer hover:bg-gray-300 p-2 ${currentValue === statusValues.value2 ? 'font-bold bg-gray-200' : ''}`}
-                onClick={() => handleItemClick(statusValues.value2)}
-            >
-                {statusValues.value2}
-            </div>
-            
-            <div 
-                className={`cursor-pointer hover:bg-gray-300 p-2 ${currentValue === 'ทั้งหมด' ? 'font-bold bg-gray-200' : ''}`}
-                onClick={() => handleItemClick('ทั้งหมด')}
-            >
-                ทั้งหมด
-            </div>
+            {Object.values(statusValues).map((value, index) => (
+                <div 
+                    key={index}
+                    className={`cursor-pointer hover:bg-gray-300 p-2 ${currentValue === value ? 'font-bold bg-gray-200' : ''}`}
+                    onClick={() => handleItemClick(value)}
+                >
+                    {value} 
+                </div>
+            ))}
         </div>
     );
 }

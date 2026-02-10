@@ -58,17 +58,19 @@ function CardFilter({name, placeholderName, option1Name, option2Name, filters, o
                 </div>
 
                {/* Dropdown 2: จังหวัด/บทบาท */}
-                <div className="relative mr-3">
-                    <p className="text-start">{option2Name}</p>
-                    <button className="dropdown-btn" onClick={() => setOpenDropdown2((prev) => !prev)}>
-                        {filters[option2Key]} 
-                    </button>
-                    {openDropdown2 && <FilterDropdown
-                        currentValue={filters[option2Key]}
-                        onSelect={handleDropdownSelect}
-                        optionalKey={option2Key}
-                    />}
-                </div>
+                {option2Name && (
+                    <div className="relative mr-3">
+                        <p className="text-start">{option2Name}</p>
+                        <button className="dropdown-btn" onClick={() => setOpenDropdown2((prev) => !prev)}>
+                            {filters[option2Key]} 
+                        </button>
+                        {openDropdown2 && <FilterDropdown
+                            currentValue={filters[option2Key]}
+                            onSelect={handleDropdownSelect}
+                            optionalKey={option2Key}
+                        />}
+                    </div>
+                )}
                 
                 <div className="relative mr-3">
                     {/* 4. เชื่อมปุ่มเข้ากับฟังก์ชันล้างตัวกรอง */}

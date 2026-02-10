@@ -86,7 +86,7 @@ function ZoneDashboard(){
         }
 
         if (status && status !== "ทั้งหมด") {
-        data = data.filter((zone) => zone.Status === status);
+        data = data.filter((zone) => zone.status === status);
         }
 
         return data;
@@ -115,7 +115,7 @@ function ZoneDashboard(){
                 name="Zone"
                 placeholderName=" ชื่อ zone, รหัส zone, หรือที่อยู่"
                 option1Name="สถานะ"
-                option2Name="จังหวัด"
+                option2Name={null}
                 filters={filters}
                 onFilterChange={handleFilterChange}
                 onClear={handleClearFilters}

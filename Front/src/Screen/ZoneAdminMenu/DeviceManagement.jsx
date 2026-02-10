@@ -11,7 +11,7 @@ import AddDeviceForm from "../../components/ModalForm/AddDeviceForm";
 
 const initialFilters = {
     search: '', // สำหรับช่องค้นหา ชื่อ, อีเมล, เบอร์โทร
-    role: 'ทั้งหมด', // สำหรับ Role (option2Name)
+    deviceType: 'ทั้งหมด', // สำหรับ Role (option2Name)
     status: 'ทั้งหมด' // สำหรับ Status (option1Name)
 };
 
@@ -61,7 +61,7 @@ function DeviceManagement(){
         };
     
         const filteredDevices = useMemo(() => {
-            const { search, province, status } = filters;
+            const { search, deviceType, status } = filters;
             let data = deviceQueryResult.data || []; 
     
             // กรองตามช่องค้นหา (Search)
@@ -84,12 +84,12 @@ function DeviceManagement(){
             });
             }
     
-            if (province && province !== "ทั้งหมด") {
-            data = data.filter((device) => device.Province === province);
+            if (deviceType && deviceType !== "ทั้งหมด") {
+            data = data.filter((device) => device.type === deviceType);
             }
     
             if (status && status !== "ทั้งหมด") {
-            data = data.filter((device) => device.Status === status);
+            data = data.filter((device) => device.status === status);
             }
     
             return data;
@@ -140,17 +140,21 @@ function DeviceManagement(){
                 
                 <Cardno2 data={deviceStatusData}/>
 
-                <CardFilter
-                name="อุปกรณ์"
-                placeholderName="รหัสอุปกรณ์, ชื่อรุ่นอุปกรณ์"
-                option1Name="สถานะ"
-                option2Name="ประเภท"
-                filters={filters}
-                onFilterChange={handleFilterChange}
-                onClear={handleClearFilters}
-                option2Key="province"
-                />
+                <div className="relative z-10">
+                    <CardFilter
+                    name="อุปกรณ์"
+                    placeholderName="รหัสอุปกรณ์, ชื่อรุ่นอุปกรณ์"
+                    option1Name="สถานะ"
+                    option2Name="ประเภท"
+                    filters={filters}
+                    onFilterChange={handleFilterChange}
+                    onClear={handleClearFilters}
+                    option2Key="deviceType"
+                    />
+                </div>
 
+
+        
                 <CardLayouts
                 name="device"
                 data={filteredDevices}/>
