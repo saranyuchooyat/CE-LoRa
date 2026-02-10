@@ -19,6 +19,10 @@ function ZoneDashboardDetail (){
     const [isModalOpen, setIsModalOpen] = useState(false);
     const handleOpenModal = () => setIsModalOpen(true);
     const handleCloseModal = () => setIsModalOpen(false);
+
+    const [isModalOpenStaff, setIsModalOpenStaff] = useState(false);
+    const handleOpenModalStaff = () => setIsModalOpenStaff(true);
+    const handleCloseModalStaff = () => setIsModalOpenStaff(false);
     
 
 
@@ -127,7 +131,7 @@ function ZoneDashboardDetail (){
                 <MenuNameCard
                     title={zoneDetail?.name || "Zone Detail"}
                     description={"Zone Admin Dashboard"}
-                    onButtonClick={handleOpenModal}
+                    onButtonClick={handleOpenModalStaff}
                     detail= {zoneStaffData.length + " คน"}
                     buttonText="ผู้ดูแล"
                 />
@@ -156,6 +160,14 @@ function ZoneDashboardDetail (){
                         zoneDashboardQueries[0].refetch(); 
                     }}
                 />
+            </Modal>
+
+            <Modal
+                title="เพิ่มผู้ดูแลโซน"
+                isOpen={isModalOpenStaff}
+                onClose={handleCloseModalStaff}
+            >
+                
             </Modal>
         </>
     );
