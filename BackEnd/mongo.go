@@ -4,35 +4,31 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var db *mongo.Database
+var MI *mongo.Client
 
 func ConnectMongo() {
 	uri := "mongodb://admin_kmitl:kmitl123@100.118.210.62:27017/LoRa"
-	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
+	clientOptions := options.Client().ApplyURI(uri)
+
+	// เชื่อมต่อ
+	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
-		log.Fatal("❌ Error creating Mongo client:", err)
+		log.Fatal(err)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	err = client.Connect(ctx)
+	// เช็คว่าเชื่อมติดไหม (Ping)
+	err = client.Ping(context.TODO(), nil)
 	if err != nil {
-		log.Fatal("❌ Error connecting to Mongo:", err)
-	}
-
-	err = client.Ping(ctx, nil)
-	if err != nil {
-		log.Fatal("❌ Ping to Mongo failed:", err)
+		log.Fatal("❌ Ping Failed: ", err)
 	}
 
 	fmt.Println("✅ Connected to MongoDB!")
 
-	db = client.Database("LoRa")
+	// ⚠️ สำคัญ: เอา client ที่เชื่อมได้แล้ว ยัดใส่ตัวแปร Global MI
+	MI = client
 }
