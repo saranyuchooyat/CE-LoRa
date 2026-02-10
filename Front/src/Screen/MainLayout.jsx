@@ -1,12 +1,18 @@
-import { Routes, Route } from 'react-router-dom'; // เพิ่ม Routes, Route กลับเข้ามา
+import { Routes, Route } from 'react-router-dom';
 import Header from "../components/Header";
 import Menu from "../components/Menu";
-import Contents from "../components/Contents";
 import SystemOverviewDashboard from './SystemAdminMenu/SystemOverviewDashboard';
 import ZoneManagement from './SystemAdminMenu/ZoneManagement';
 import UserManagement from './SystemAdminMenu/UserManagement';
-import HealthMonitoring from './HealthMonitoring';
+import EmergencyRespondDashboard from './EmergencyRespondDashboard';
+import ZoneDashboard from './ZoneAdminMenu/ZoneDashboard';
+import ZoneDashboardDetail from './ZoneAdminMenu/ZoneDashboardDetail';
+import DeviceManagement from './ZoneAdminMenu/DeviceManagement';
+import ZoneStaffManagement from './ZoneAdminMenu/ZoneStaffManagement';
 import NotFoundPage from './NotFound';
+import LoginPage from './Login';
+import DeviceDetail from './DeviceDetail';
+import ElderlyMonitoring from './ZoneStaffMenu/ElderlyMonitoring';
 
 function MainLayout() {
   return (
@@ -15,16 +21,26 @@ function MainLayout() {
       <Menu />
       <div className="mt-4 flex-1 overflow-y-scroll">
         <Routes>
-          <Route path="/" element={<Contents/>} />
+          <Route path="/" element={<LoginPage/>} />
           
           {/*System Admin Menu*/}
           <Route path="/system-overview-dashboard" element={<SystemOverviewDashboard/>} />
           <Route path="/zone-management" element={<ZoneManagement/>} />
           <Route path="/user-management" element={<UserManagement/>} />
+
+          {/*Zone Admin Menu*/}
+          <Route path="/zone-dashboard" element={<ZoneDashboard/>}/>
+          <Route path="/zone-details/:zoneid" element={<ZoneDashboardDetail/>}/>
+          <Route path="/device-management" element={<DeviceManagement/>}/>
+          <Route path="/zone-staff-management" element={<ZoneStaffManagement/>}/>
           
+          <Route path='/deivce-details/:device_id' element={<DeviceDetail/>}/>
           {/* ... ส่วนที่เหลือ ... */}
 
-          <Route path="/health-monitoring" element={<HealthMonitoring/>} />
+          {/* Zone Staff Menu */}
+          <Route path="/eldery-monitoring" element={<ElderlyMonitoring/>}/>
+
+          <Route path="/emergency-respond" element={<EmergencyRespondDashboard/>} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>

@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # ------------------
+  # 1. Backend Service (Go)
+  # ------------------
+  backend:
+    # บอกให้ Compose ไป build image จาก Dockerfile ในโฟลเดอร์ BackEnd
+    build: 
+      context: ./BackEnd
+      dockerfile: Dockerfile
+    
+    # แมพพอร์ตของ Backend (สมมติ 8080)
+    ports:
+      - "8080:8080"
+      
+    # ตั้งค่าให้รีสตาร์ทอัตโนมัติหากล้มเหลว
+    restart: always 
+    
+    # การทำ Volume สำหรับ Development (ถ้าต้องการให้โค้ดอัปเดตอัตโนมัติ)
+    # volumes:
+    #   - ./BackEnd:/app/backend
+
+  # ------------------
+  # 2. Frontend Service (React/Vite/Nginx)
+  # ------------------
+  frontend:
+    # บอกให้ Compose ไป build image จาก Dockerfile ในโฟลเดอร์ Front
+    build: 
+      context: ./Front
+      dockerfile: Dockerfile
+      
+    # แมพพอร์ตของ Frontend (เสิร์ฟด้วย Nginx ที่พอร์ต 80, แมพไปที่พอร์ต 3000 ของ Host)
+    ports:
+      - "3000:80"
+      
+    # ตั้งค่าให้รีสตาร์ทอัตโนมัติ
+    restart: always
+    
+    # ระบุให้ Frontend รันหลังจาก Backend พร้อมแล้ว (ถ้า Backend มี dependency อื่นๆ)
+    # depends_on:
+    #   - backend 
+      
+# (ส่วนของ Network จะถูกสร้างอัตโนมัติ หากไม่มีการกำหนดเอง)

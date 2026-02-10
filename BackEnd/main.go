@@ -5,10 +5,21 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
+// @title LoraWan Service API
+// @version 1.0
+// @description ระบบจัดการช่วยเหลือผู้สูงอายุผ่าน LoraWan
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description พิมพ์ Bearer  แล้วตามด้วย token เช่น Bearer eyJhbGciOiJIUzI1NiIsInR5...
+
 func main() {
 	ConnectMongo()
 
 	app := fiber.New()
+
+	app.Get("/swagger/*", fiberSwagger.WrapHandler)
+
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
 		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
@@ -39,9 +50,11 @@ func main() {
 	// app.Get("/zones/:id/elder", getElderinZone)
 
 	app.Get("/elders", getAllElderly)
+	app.Get("/elders/:id", getElderDetail)
 
-	app.Get("/system/health/servers", getHealthservers)
-	app.Get("/system/alerts", getAlert)
+	//zone staff
+	app.Get("/zones/:id/elders", getElderinZone)
+	app.Get("/zones/:id/elders/alertandstatus", getElderAlertandstatus)
 
 	app.Get("/devices", getAllDevice)
 	// app.Post("/devices", createDevice)
