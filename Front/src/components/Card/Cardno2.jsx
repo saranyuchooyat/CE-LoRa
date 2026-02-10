@@ -1,5 +1,7 @@
 function Cardno2({data}){
 
+    console.log("data in cardno2",data)
+
     return(
         <>
             <div className="flex justify-between h-fit text-center gap-4">

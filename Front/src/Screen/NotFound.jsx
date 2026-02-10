@@ -1,5 +1,3 @@
-import Contents from "../components/Contents";
-
 function NotFoundPage(){
     return(
         <>

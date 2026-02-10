@@ -3,6 +3,15 @@ module github.com/saranyuchooyat/CE-LoRa
 go 1.24.5
 
 require (
+	github.com/gofiber/fiber/v2 v2.52.9
+	github.com/gofiber/jwt/v2 v2.2.7
+	github.com/golang-jwt/jwt/v4 v4.5.2
+	github.com/swaggo/fiber-swagger v1.3.0
+	github.com/swaggo/swag v1.16.6
+)
+
+require (
+	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/andybalholm/brotli v1.2.0 // indirect
 	github.com/gofiber/fiber/v2 v2.52.9 // indirect
 	github.com/gofiber/jwt/v2 v2.2.7 // indirect
