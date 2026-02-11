@@ -1,11 +1,12 @@
 import { useState, useEffect, useMemo } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation} from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
 import CardFilter from "../../components/Card/CardFilter";
 import CardFull from "../../components/Card/Cardno5";
 import Modal from "../../components/ModalForm/Modal";
+import AddZoneStaffForm from "../../components/ModalForm/AddZoneStaff";
 
 const initialFilters = {
     search: '', 
@@ -29,8 +30,8 @@ function ZoneStaffManagement() {
         queries: [
             { 
                 queryKey: ['zoneStaff', userid], 
-                queryFn: () => api.get(`/zones/${userid}/staff`).then(res => res.data),
-                enabled: !!userid // ทำงานเมื่อมี userid เท่านั้น
+                queryFn: () => api.get(`/zones/${3}/staff`).then(res => res.data),
+                enabled: !!userid // ทำงานเมื่อมี zoneid เท่านั้น
             },
             { 
                 queryKey: ['myzones'], 
@@ -55,9 +56,12 @@ function ZoneStaffManagement() {
     const myZones = userQueries[1].data || [];
 
     // 5. ดึงค่า zoneid ออกมาโดยใช้ useMemo เพื่อป้องกัน Infinite Loop
-    const myZoneIDs = useMemo(() => {
-        return myZones.map(zone => zone.zonename);
-    }, [myZones]);
+    const myZoneOptions = useMemo(() => {
+    return myZones.map(zone => ({ 
+        label: zone.zonename, // ใช้ชื่อ 'label' เพื่อให้ง่ายต่อการนำไปใส่ Dropdown
+        value: zone.zoneid    // ใช้ชื่อ 'value' สำหรับค่าที่จะส่งไป API
+    }));
+}, [myZones]);
 
     // 6. ระบบ Filter ข้อมูล
     const handleFilterChange = (key, value) => {
@@ -111,7 +115,7 @@ function ZoneStaffManagement() {
                 filters={filters}
                 onFilterChange={handleFilterChange}
                 onClear={handleClearFilters}
-                data={myZoneIDs}
+                data={myZoneOptions}
                 option2Key="zonestaff"
             />
 
@@ -122,7 +126,14 @@ function ZoneStaffManagement() {
             />
 
             <Modal title="เพิ่มผู้ใช้งานใหม่" isOpen={isModalOpen} onClose={handleCloseModal}>
-                {/* ใส่ฟอร์มเพิ่มเจ้าหน้าที่ตรงนี้ */}
+                <AddZoneStaffForm 
+                    myZones={myZoneOptions}
+                    onClose={handleCloseModal} 
+                    onSaveSuccess={() => {
+                        // รีเฟรชข้อมูลหลังจากเพิ่มผู้ใช้งานสำเร็จ
+                        userQueries[0].refetch();
+                    }} 
+                />
             </Modal>
         </div>
     );

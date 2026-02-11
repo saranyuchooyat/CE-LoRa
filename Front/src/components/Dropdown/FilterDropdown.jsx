@@ -23,7 +23,8 @@ function FilterDropdown({ onSelect, currentValue, optionalKey ,data}) {
             
         } else if (optionalKey === "zonestaff") {
             // สร้าง Array ของโซนจาก data ที่ส่งมา
-            setStatusValues([...data,'N/A', 'ทั้งหมด']);
+            const zoneLabels = data.map(item => item.label);
+            setStatusValues([...zoneLabels,'N/A', 'ทั้งหมด']);
 
         }
         else {

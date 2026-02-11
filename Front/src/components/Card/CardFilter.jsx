@@ -8,6 +8,8 @@ function CardFilter({name, placeholderName, option1Name, option2Name, filters, o
     const [openStatus, setOpenStatus] = useState(false);
     const [openDropdown2, setOpenDropdown2] = useState(false);
 
+    console.log("data in CardFilter:", data);
+
     // 1. สร้าง Handler สำหรับช่องค้นหา
     const handleSearchChange = (event) => {
         onFilterChange('search', event.target.value);

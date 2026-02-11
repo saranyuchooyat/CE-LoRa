@@ -7,8 +7,10 @@ import MenuNameCard2 from '../../components/MainCardOption/MenuNameCard2';
 import Cardno8 from '../../components/Card/Cardno8';
 import Cardno9 from '../../components/Card/Cardno9';
 import Cardno5 from '../../components/Card/Cardno5';
+import CardFull from '../../components/Card/Cardno5';
 import Modal from '../../components/ModalForm/Modal';
 import AddElderlyform from '../../components/ModalForm/AddElderly';
+
 
 
 function ZoneDashboardDetail (){
@@ -131,7 +133,7 @@ function ZoneDashboardDetail (){
                 <MenuNameCard
                     title={zoneDetail?.name || "Zone Detail"}
                     description={"Zone Admin Dashboard"}
-                    onButtonClick={null}
+                    onButtonClick={handleOpenModalStaff}
                     detail= {zoneStaffData.length + " คน"}
                     buttonText="ผู้ดูแล"
                 />
@@ -146,6 +148,10 @@ function ZoneDashboardDetail (){
                 <Cardno5 data={allAlertDetail}/>
                 <Cardno8 healthdata={mockGraphData} devicedata={allDeviceStatus}/>
                 <Cardno9 data=""/>
+                <CardFull 
+                    data={zoneStaffData}
+                    onEdit={(user) => console.log("Edit User:", user)}
+                />
             </div>
 
             <Modal
