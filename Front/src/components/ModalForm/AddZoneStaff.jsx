@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 
-function AddZoneStaffForm({ onClose, onSaveSuccess, myZones }) {
+function AddZoneStaffForm({ onClose, onSaveSuccess, zones }) {
     // 1. กำหนดโครงสร้าง State ให้ครบตามฟิลด์ที่ต้องการ
     const [formData, setFormData] = useState({
         firstName: '',
@@ -13,10 +13,10 @@ function AddZoneStaffForm({ onClose, onSaveSuccess, myZones }) {
         role: 'เลือกบทบาท',
         username: '',
         password:'',
-        zoneids: []
+        zoneIds: []
     });
 
-    console.log("myZones in AddZoneStaffForm:", myZones);
+    console.log("zones in AddZoneStaffForm:", zones);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -37,9 +37,10 @@ function AddZoneStaffForm({ onClose, onSaveSuccess, myZones }) {
         // ดึง Token จาก localStorage มาใช้ยืนยันตัวตน
         const token = localStorage.getItem('token'); 
 
+        const currentZoneId = formData.zoneIds[0];
+
         // จัดเตรียม Object สำหรับส่งไป API (รวมชื่อ-นามสกุล และ map ค่าให้ตรงกับ Backend)
         const dataToSend = {
-            // name: `${formData.firstName} ${formData.lastName}`.trim(),
             firstName: formData.firstName,
             lastName: formData.lastName,
             username: formData.username,
@@ -49,11 +50,11 @@ function AddZoneStaffForm({ onClose, onSaveSuccess, myZones }) {
             description: formData.description,
             position: formData.position,
             role: formData.role,
-            zoneIds: formData.zoneids || []
+            zoneIds: formData.currentZoneId
         };
-
+        console.log("Data to send:", dataToSend);
         try {
-            await axios.post(`http://localhost:8080/zones/${formData.zoneids[0]}/staff`, dataToSend, {
+            await axios.post(`http://localhost:8080/zones/${currentZoneId}/staff`, dataToSend, {
                 headers: {
                     'Authorization': `Bearer ${token}` 
                 }
@@ -112,21 +113,21 @@ function AddZoneStaffForm({ onClose, onSaveSuccess, myZones }) {
                 <div className="mb-2">
                     <label className="block text-gray-700 text-sm">โซนที่ดูแล:</label>
                     <select
-                        name="zone"
-                        // 💡 แก้ไข: เพิ่ม ? และใส่ค่า default เป็น "" เพื่อป้องกัน error กรณี zoneIds ยังไม่มีค่า
-                        value={formData.zoneIds?.length > 0 ? formData.zoneIds[0] : ""} 
+                        name="zoneIds" // 💡 ปรับชื่อให้ตรงกับ state
+                        // เช็คความยาว Array ป้องกัน Error reading '0'
+                        value={formData.zoneIds && formData.zoneIds.length > 0 ? formData.zoneIds[0] : ""} 
                         onChange={(e) => {
-                            const selectedId = Number(e.target.value);
+                            const selectedId = Number(e.target.value); // แปลงเป็นตัวเลข
                             setFormData(prev => ({
                                 ...prev,
-                                zoneIds: [selectedId]
+                                zoneIds: [selectedId] // 💡 เก็บค่า ID ลงใน Array
                             }));
                         }}
                         className="border rounded w-full p-2 bg-white"
                         required
                     >
                         <option value="" disabled>เลือกโซน</option>
-                        {myZones.map((zone) => (
+                        {zones && zones.map((zone) => (
                             <option key={zone.value} value={zone.value}>
                                 {zone.label}
                             </option>

@@ -9,9 +9,11 @@ function MenuNameCard2({title, description, onButtonClick, buttonText }){
                     <p className="text-[40px] font-bold text-start">{title}</p>
                     <p className="text-[16px] text-start self-center">{description}</p>
                 </div>
-                <div className="self-center">
-                    <Addbutton buttonText={buttonText} onButtonClick={onButtonClick}/>
-                </div>
+                {onButtonClick && (
+                    <div className="self-center">
+                        <Addbutton buttonText={buttonText} onButtonClick={onButtonClick}/>
+                    </div>
+                )}
             </div>
         </>
     )
