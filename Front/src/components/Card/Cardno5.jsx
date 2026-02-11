@@ -6,7 +6,7 @@ import UserTable from "../Table/UserTable";
 
 function CardFull({ data, onEdit, showActions=true }) {
 
-    console.log("data",data)
+    console.log("dataCardFull",data)
 
     let displayContent = null
     let displayHeader = null
@@ -39,6 +39,7 @@ function CardFull({ data, onEdit, showActions=true }) {
         if (!Array.isArray(arr) || arr.length === 0) {
             return false;
         }
+        console.log(arr[0])
         console.log("arr4",'name' in arr[0] && 'position' in arr[0])
         return 'name' in arr[0] && 'position' in arr[0];
     }
@@ -58,7 +59,7 @@ function CardFull({ data, onEdit, showActions=true }) {
     }
     else if(isZoneStaffData(data)){
         console.log("ZoneStaffPass")
-        displayContent = <ZoneAdminTable data={data}/>;
+        displayContent = <UserTable data={data}/>;
     }
 
 

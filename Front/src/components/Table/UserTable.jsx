@@ -6,7 +6,7 @@ import ApiDelete from "../API-Delete";
 
 function UserTable({ data, onEdit }){
 
-    // console.log("table data", data);
+    console.log("table data", data);
     const location = useLocation();
 
     //ดึงข้อมูลหลังบ้าน
@@ -115,7 +115,7 @@ function UserTable({ data, onEdit }){
                             return(
                                 <tr key={index} className={rowBgClass}>
                                     <td className="table-data whitespace-nowrap">{card.name}</td>
-                                    <td className="table-data whitespace-nowrap">{card.role}</td>
+                                    <td className="table-data whitespace-nowrap">{card.role || card.position}</td>
                                     {/* **สำคัญ:** ใช้ card.ZoneName หรือ card.Zone ถ้ามี Key นี้ในข้อมูล */}
                                     <td className="table-data whitespace-wrap w-[200px]">{getZoneName(card.zoneids,zoneData)}</td>
                                     <td className="table-data whitespace-nowrap">{card.phone}</td>

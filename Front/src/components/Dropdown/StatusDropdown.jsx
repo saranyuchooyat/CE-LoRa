@@ -14,7 +14,7 @@ function StatusDropdown({ onSelect, currentValue, optionalKey }) {
                 value1: 'Active',
                 value2: 'Inactive'
             });
-        } else if (optionalKey === "role") {
+        } else if (optionalKey === "role" || optionalKey === "zonestaff") {
             // ตั้งค่าสำหรับ Device Status/Role
             setStatusValues({
                 value1: 'Online',

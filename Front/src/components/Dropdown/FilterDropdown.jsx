@@ -5,7 +5,7 @@ const DEFAULT_OPTIONS = ['Active', 'Inactive', 'ทั้งหมด'];
 const ROLE_OPTIONS = ['System Admin', 'Zone Admin','Zone Staff' , 'ทั้งหมด'];
 const DEVICE_TYPE_OPTIONS = ['SmartWatch', 'Gateway', 'ทั้งหมด'];
 
-function FilterDropdown({ onSelect, currentValue, optionalKey }) {
+function FilterDropdown({ onSelect, currentValue, optionalKey ,data}) {
 
     console.log(optionalKey)
     
@@ -21,7 +21,12 @@ function FilterDropdown({ onSelect, currentValue, optionalKey }) {
             // ตั้งค่าสำหรับ Device Status/Role
             setStatusValues(ROLE_OPTIONS);
             
-        } else {
+        } else if (optionalKey === "zonestaff") {
+            // สร้าง Array ของโซนจาก data ที่ส่งมา
+            setStatusValues([...data,'N/A', 'ทั้งหมด']);
+
+        }
+        else {
              // ค่า Default
              setStatusValues(DEFAULT_OPTIONS);
         }

@@ -1,142 +1,131 @@
 import { useState, useEffect, useMemo } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
-import CardLayouts from "../../components/Card/CardLayouts";
-
+import CardFilter from "../../components/Card/CardFilter";
+import CardFull from "../../components/Card/Cardno5";
+import Modal from "../../components/ModalForm/Modal";
 
 const initialFilters = {
-    search: '', // สำหรับช่องค้นหา ชื่อ, อีเมล, เบอร์โทร
-    role: 'ทั้งหมด', // สำหรับ Role (option2Name)
-    status: 'ทั้งหมด' // สำหรับ Status (option1Name)
+    search: '', 
+    zonestaff: 'ทั้งหมด', 
+    status: 'ทั้งหมด'
 };
 
-function UserManagement(){
-    
+function ZoneStaffManagement() {
+    // 1. ดึงค่าพารามิเตอร์จาก URL ให้ถูกต้อง
+    const userid = 2; 
     const location = useLocation();
-    // const [filters, setFilters] = useState(initialFilters);
-    // const [isModalOpen, setIsModalOpen] = useState(false);
-    // const handleOpenModal = () => setIsModalOpen(true);
-    // const handleCloseModal = () => setIsModalOpen(false);
 
-    //ดึงข้อมูลหลังบ้าน
+    const [filters, setFilters] = useState(initialFilters);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    
+    const handleOpenModal = () => setIsModalOpen(true);
+    const handleCloseModal = () => setIsModalOpen(false);
+
+    // 2. ดึงข้อมูลจาก API โดยใช้ค่าที่ดึงมา
     const userQueries = useQueries({
         queries: [
-        { queryKey: ['zoneStaff'], queryFn: () => api.get(`/zones/${2}/staff`).then(res => res.data) }
+            { 
+                queryKey: ['zoneStaff', userid], 
+                queryFn: () => api.get(`/zones/${userid}/staff`).then(res => res.data),
+                enabled: !!userid // ทำงานเมื่อมี userid เท่านั้น
+            },
+            { 
+                queryKey: ['myzones'], 
+                queryFn: () => api.get('/zones/my-zones').then(res => res.data) 
+            },
         ],
     });
 
     const isSystemLoading = userQueries.some(query => query.isLoading);
     const isSystemError = userQueries.some(query => query.isError);
 
+    // 3. จัดการเรื่อง Token
     useEffect(() => {
         const tokenInStorage = localStorage.getItem('token');
         if (location.state?.token && location.state.token !== tokenInStorage) {
             localStorage.setItem('token', location.state.token);
-            // 💡 เมื่อบันทึก Token ใหม่แล้ว React Query จะทำการ Refetch ให้อัตโนมัติ
-            // เนื่องจากทุก Query จะถูก Trigger เมื่อ Token ถูกบันทึกและ Component Rerender
         }
     }, [location.state]);
 
+    // 4. เตรียมข้อมูล Data
     const zoneStaffData = userQueries[0].data || [];
-    //ดึงข้อมูลหลังบ้าน
+    const myZones = userQueries[1].data || [];
 
+    // 5. ดึงค่า zoneid ออกมาโดยใช้ useMemo เพื่อป้องกัน Infinite Loop
+    const myZoneIDs = useMemo(() => {
+        return myZones.map(zone => zone.zonename);
+    }, [myZones]);
 
-    // ระบบ filter
-    // const handleFilterChange = (key, value) => {
-    //     setFilters(prev => ({
-    //         ...prev,
-    //         [key]: value
-    //     }));
-    // };
+    // 6. ระบบ Filter ข้อมูล
+    const handleFilterChange = (key, value) => {
+        setFilters(prev => ({ ...prev, [key]: value }));
+    };
 
-    // const handleClearFilters = () => {
-    //     setFilters(initialFilters);
-    // };
+    const handleClearFilters = () => setFilters(initialFilters);
 
-    // const filteredUsers = useMemo(() => {
-    //     const { search, role, status } = filters;
-    //     let data = userQueryResult.data || []; 
+    const filteredUsers = useMemo(() => {
+        const { search, zonestaff, status } = filters;
+        let data = zoneStaffData;
 
-    //     // กรองตามช่องค้นหา (Search)
-    //     if (search) {
-    //         const lowerSearch = search.toLowerCase();
-    //         data = data.filter(user => (
-    //         //ตรวจสอบ user.username
-    //         (user.name && user.name.toLowerCase().includes(lowerSearch)) ||
-    //         //ตรวจสอบ email
-    //         (user.email && user.email.toLowerCase().includes(lowerSearch)) ||
-    //         //ตรวจสอบ phone
-    //         (user.phone && String(user.phone).includes(lowerSearch))));
-    //     }
+        if (search) {
+            const lowerSearch = search.toLowerCase();
+            data = data.filter(user => 
+                (user.name && user.name.toLowerCase().includes(lowerSearch)) ||
+                (user.email && user.email.toLowerCase().includes(lowerSearch)) ||
+                (user.phone && String(user.phone).includes(lowerSearch))
+            );
+        }
 
-    //     // กรองตามบทบาท (Role)
-    //     if (role && role !== 'ทั้งหมด') {
-    //         data = data.filter(user => user.role === role);
-    //     }
+        if (zonestaff && zonestaff !== 'ทั้งหมด') {
+            data = data.filter(user => user.zone === zonestaff);
+        }
 
-    //     // กรองตามสถานะ (Status) - *ต้องเพิ่ม Key 'status' ในข้อมูล user*
-    //     // สมมติว่า user มี Key 'status' (Active/Inactive)
-    //     if (status && status !== 'ทั้งหมด') {
-    //         data = data.filter(user => user.status === status);
-    //     }
-    //     return data;
-    // }, [userQueryResult.data, filters]);
-    // ระบบ filter
+        if (status && status !== 'ทั้งหมด') {
+            data = data.filter(user => user.status === status);
+        }
+        return data;
+    }, [zoneStaffData, filters]);
 
+    if (isSystemLoading) return <div className="mx-5 mt-10 text-center text-xl">Loading...</div>;
+    if (isSystemError) return <div className="mx-5 mt-10 text-center text-xl text-red-600">Error fetching data!</div>;
 
-    if (isSystemLoading) {
-        return <div className="mx-5 mt-10 text-center text-xl">Loading Dashboard...</div>;
-    }
-        
-    if (isSystemError) {
-        return <div className="mx-5 mt-10 text-center text-xl text-red-600">Error fetching data!</div>;
-    }
-
-    console.log("zoneStaff",zoneStaffData)
-
-    return(
-        <>
-            <div className="mx-5">
-                <MenuNameCard
-                title="จัดการ Zone Staff Smart Healthcare"
-                description=""
-                onButtonClick="{handleOpenModal}" // ต้องเพิ่ม Prop นี้ใน MenuNameCard
+    return (
+        <div className="mx-5">
+            {/* ปรับปรุง MenuNameCard ให้แสดงทั้ง Banner และปุ่ม */}
+            <MenuNameCard
+                title="จัดการ Zone Staff"
+                description={null}
+                onButtonClick={handleOpenModal}
                 detail={false}
-                buttonText="เพิ่ม Zone Staff ใหม่"/>
+                buttonText=" Zone Staff "
+            />
 
-                {/* <Cardno2 data=""/> */}
+            <CardFilter
+                name="ผู้ใช้งาน"
+                placeholderName=" ชื่อ, อีเมล, หรือเบอร์โทรศัพท์"
+                option1Name="สถานะ"
+                option2Name="พื้นที่ดูแล"
+                filters={filters}
+                onFilterChange={handleFilterChange}
+                onClear={handleClearFilters}
+                data={myZoneIDs}
+                option2Key="zonestaff"
+            />
 
-                {/* <CardFilter
-                    name="ผู้ใช้งาน"
-                    placeholderName=" ชื่อ, อีเมล, หรือเบอร์โทรศัพท์"
-                    option1Name="สถานะ"
-                    option2Name="บทบาท"
-                    // ส่งค่าปัจจุบันและฟังก์ชันควบคุม
-                    // filters={filters}
-                    onFilterChange="{handleFilterChange}"
-                    onClear="{handleClearFilters}"
-                    option2Key="role"
-                /> */}
-                <CardLayouts
-                name= "staff" 
-                data={zoneStaffData}/> 
-            </div>
+            {/* แสดงตารางข้อมูล */}
+            <CardFull 
+                data={filteredUsers} 
+                onEdit={(user) => console.log("Edit User:", user)}
+            />
 
-            {/* <Modal 
-                title="เพิ่มผู้ใช้งานใหม่" 
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}>
-
-                <AddUserForm 
-                onClose={handleCloseModal} 
-                onSaveSuccess={userQueryResult}/>
-            </Modal> */}
-
-
-        </>
+            <Modal title="เพิ่มผู้ใช้งานใหม่" isOpen={isModalOpen} onClose={handleCloseModal}>
+                {/* ใส่ฟอร์มเพิ่มเจ้าหน้าที่ตรงนี้ */}
+            </Modal>
+        </div>
     );
 }
 
-export default UserManagement;
+export default ZoneStaffManagement;

@@ -131,7 +131,7 @@ function ZoneDashboardDetail (){
                 <MenuNameCard
                     title={zoneDetail?.name || "Zone Detail"}
                     description={"Zone Admin Dashboard"}
-                    onButtonClick={handleOpenModalStaff}
+                    onButtonClick={null}
                     detail= {zoneStaffData.length + " คน"}
                     buttonText="ผู้ดูแล"
                 />
