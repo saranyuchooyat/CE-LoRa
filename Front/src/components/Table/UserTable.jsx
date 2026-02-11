@@ -4,7 +4,7 @@ import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import ApiDelete from "../API-Delete";
 
-function UserTable({ data, onEdit }){
+function UserTable({ data, onEdit, showActions = true }) {
 
     console.log("table data", data);
     const location = useLocation();
@@ -104,7 +104,7 @@ function UserTable({ data, onEdit }){
                             <th className="table-header">พื้นที่ดูแล</th>
                             <th className="table-header">เบอร์โทรศัพท์</th>
                             <th className="table-header">สถานะ</th>
-                            <th className="table-header">เมนู</th>
+                            {showActions && <th className="table-header">เมนู</th>}
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100"> 
@@ -124,6 +124,7 @@ function UserTable({ data, onEdit }){
                                     </td>
                                     
                                     {/* Un-commented และแก้ไขส่วนของปุ่ม Menu */}
+                                    {showActions && (
                                     <td className="p-3 text-sm text-left whitespace-nowrap w-fit">
                                         <button className="table-btn hover:bg-main-yellow hover:text-white"
                                                 onClick={(event) => handleEditClick(card.userId, event)}>
@@ -133,7 +134,7 @@ function UserTable({ data, onEdit }){
                                                 onClick={(event) => handleDeleteClick(card.userId, event)}
                                                 disabled={isPending} >{isPending ? 'ลบ...' : 'ลบ'}</button>
                                     </td>
-                                </tr>
+                                    )}</tr>
                             );
                         })}
                     </tbody>

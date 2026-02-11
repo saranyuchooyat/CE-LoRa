@@ -133,9 +133,14 @@ function ZoneDashboardDetail (){
                 <MenuNameCard
                     title={zoneDetail?.name || "Zone Detail"}
                     description={"Zone Admin Dashboard"}
-                    onButtonClick={handleOpenModalStaff}
+                    onButtonClick={null}
                     detail= {zoneStaffData.length + " คน"}
                     buttonText="ผู้ดูแล"
+                />
+                <CardFull 
+                    data={zoneStaffData}
+                    showActions={false}
+                    onEdit={(user) => console.log("Edit User:", user)}
                 />
 
                 <MenuNameCard2
@@ -147,11 +152,8 @@ function ZoneDashboardDetail (){
                 
                 <Cardno5 data={allAlertDetail}/>
                 <Cardno8 healthdata={mockGraphData} devicedata={allDeviceStatus}/>
-                <Cardno9 data=""/>
-                <CardFull 
-                    data={zoneStaffData}
-                    onEdit={(user) => console.log("Edit User:", user)}
-                />
+                {/* <Cardno9 data=""/> */}
+                
             </div>
 
             <Modal

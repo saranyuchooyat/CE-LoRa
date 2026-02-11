@@ -55,11 +55,11 @@ function CardFull({ data, onEdit, showActions=true }) {
     }
     else if(isStaffData(data)){
         console.log("StaffPass")
-        displayContent = <UserTable data={data} onEdit={onEdit} />;
+        displayContent = <UserTable data={data} onEdit={onEdit} showActions={showActions}/>;
     }
     else if(isZoneStaffData(data)){
         console.log("ZoneStaffPass")
-        displayContent = <UserTable data={data}/>;
+        displayContent = <UserTable data={data} showActions={showActions}/>;
     }
 
 
