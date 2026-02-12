@@ -5,48 +5,32 @@ const DEFAULT_OPTIONS = ['Active', 'Inactive', 'ทั้งหมด'];
 const ROLE_OPTIONS = ['System Admin', 'Zone Admin','Zone Staff' , 'ทั้งหมด'];
 const DEVICE_TYPE_OPTIONS = ['SmartWatch', 'Gateway', 'ทั้งหมด'];
 
-function FilterDropdown({ onSelect, currentValue, optionalKey ,data}) {
+// FilterDropdown.jsx
+function FilterDropdown({ onSelect, currentValue, optionalKey, data }) {
+    const [statusValues, setStatusValues] = useState([]);
 
-    console.log(optionalKey)
-    
-    // 💡 2. เปลี่ยน State ให้เก็บ Array ของ String
-    const [statusValues, setStatusValues] = useState(DEFAULT_OPTIONS); 
-    
     useEffect(() => {
-        if (optionalKey === "deviceType") {
-            // ตั้งค่าสำหรับ Zone Status
-            setStatusValues(DEVICE_TYPE_OPTIONS);
-
-        } else if (optionalKey === "role") {
-            // ตั้งค่าสำหรับ Device Status/Role
-            setStatusValues(ROLE_OPTIONS);
-            
-        } else if (optionalKey === "zonestaff") {
-            // สร้าง Array ของโซนจาก data ที่ส่งมา
-            const zoneLabels = data.map(item => item.label);
-            setStatusValues([...zoneLabels,'N/A', 'ทั้งหมด']);
-
+        if (optionalKey === "zonestaff") {
+            // 💡 เก็บทั้งออบเจกต์เพื่อให้มีทั้งชื่อแสดงผลและ ID สำหรับกรอง
+            const zoneOptions = data.map(item => ({ label: item.label, value: item.value }));
+            setStatusValues([{ label: 'ทั้งหมด', value: 'ทั้งหมด' }, ...zoneOptions]);
+        } else {
+            // สำหรับ Role หรือ Status ทั่วไป
+            const options = (optionalKey === "role" ? ROLE_OPTIONS : DEFAULT_OPTIONS)
+                .map(opt => ({ label: opt, value: opt }));
+            setStatusValues(options);
         }
-        else {
-             // ค่า Default
-             setStatusValues(DEFAULT_OPTIONS);
-        }
-    }, [optionalKey]); // 💡 Dependency Array ถูกต้อง
-
-    const handleItemClick = (value) => {
-        onSelect(value);
-    };
+    }, [optionalKey, data]);
 
     return (
         <div className="dropdown-menu">
-            {/* 💡 3. ใช้ .map() เพื่อวนซ้ำ Array statusValues */}
-            {statusValues.map((value, index) => (
+            {statusValues.map((item, index) => (
                 <div 
                     key={index}
-                    className={`cursor-pointer hover:bg-gray-300 p-2 ${currentValue === value ? 'font-bold bg-gray-200' : ''}`}
-                    onClick={() => handleItemClick(value)}
+                    className={`cursor-pointer hover:bg-gray-300 p-2 ${currentValue === item.value ? 'font-bold bg-gray-200' : ''}`}
+                    onClick={() => onSelect(item.value)} // 💡 ส่ง ID (value) กลับไป
                 >
-                    {value} 
+                    {item.label} 
                 </div>
             ))}
         </div>

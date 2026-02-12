@@ -15,7 +15,7 @@ import SetZoneZoneStaff from "../../components/ModalForm/SetZoneZoneStaff";
 //กำหนดตัวแปรแต่ละช่อง Filter
 const initialFilters = {
   search: "", // สำหรับช่องค้นหา ชื่อ, อีเมล, เบอร์โทร
-  role: "ทั้งหมด", // สำหรับ Role (option2Name)
+  zonestaff: "ทั้งหมด", // สำหรับ Role (option2Name)
   status: "ทั้งหมด", // สำหรับ Status (option1Name)
 };
 //กำหนดตัวแปรแต่ละช่อง Filter
@@ -87,10 +87,6 @@ function ZoneStaffManagement(){
 
     // ฟังก์ชันเปิด Modal แก้ไข
     
-
-   
-
-
     // ระบบ filter
     const handleFilterChange = (key, value) => {
         setFilters(prev => ({
@@ -104,8 +100,8 @@ function ZoneStaffManagement(){
     };
 
     const filteredUsers = useMemo(() => {
-        const { search, role, status } = filters;
-        let data = zonestaffData; 
+        const { search, zonestaff, status } = filters;
+        let data = zonestaffData;
 
         // กรองตามช่องค้นหา (Search)
         if (search) {
@@ -119,10 +115,9 @@ function ZoneStaffManagement(){
             (user.phone && String(user.phone).includes(lowerSearch))));
         }
 
-        if (role && role !== "ทั้งหมด") {
-            data = data.filter((user) => user.role === role);
+        if (zonestaff && zonestaff !== "ทั้งหมด") {
+            data = data.filter((user) => user.zoneids.includes(Number(zonestaff)));
         }
-
         if (status && status !== 'ทั้งหมด') {
             data = data.filter((user) => user.status === status);
         }
@@ -176,16 +171,17 @@ function ZoneStaffManagement(){
                     description=" จำนวน Zone Staff ทั้งหมด"
                     detail={false}
                 />
-
+ 
                 <CardFilter
                     name="ผู้ใช้งาน"
                     placeholderName=" ชื่อ, อีเมล, หรือเบอร์โทรศัพท์"
                     option1Name="สถานะ"
-                    option2Name="บทบาท"
+                    option2Name="โซนที่ดูแล"
                     filters={filters}
                     onFilterChange={handleFilterChange}
                     onClear={handleClearFilters}
-                    option2Key="role"
+                    option2Key="zonestaff"
+                    data={zoneOptions}
                 />
                 <Cardno5 
                     data={filteredUsers}
