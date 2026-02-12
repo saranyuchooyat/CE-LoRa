@@ -10,6 +10,7 @@ import Cardno5 from "../../components/Card/Cardno5";
 import Modal from "../../components/ModalForm/Modal";
 import EditUserForm from "../../components/ModalForm/EditUserForm";
 import AddZoneStaffForm from "../../components/ModalForm/AddZoneStaff";
+import SetZoneZoneStaff from "../../components/ModalForm/SetZoneZoneStaff";
 
 //กำหนดตัวแปรแต่ละช่อง Filter
 const initialFilters = {
@@ -24,11 +25,34 @@ function ZoneStaffManagement(){
     const location = useLocation();
 
     const [filters, setFilters] = useState(initialFilters);
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const handleOpenModal = () => setIsModalOpen(true);
     const handleCloseModal = () => setIsModalOpen(false);
+    
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState(null);
+    const handleOpenEditModal = (userId) => {
+        setSelectedUserId(userId);
+        setIsEditModalOpen(true);
+    };
+
+    const handleCloseEditModal = () => {
+        setSelectedUserId(null);
+        setIsEditModalOpen(false);
+    };
+
+    const [isSettingModalOpen, setIsSettingModalOpen] = useState(false);
+    const [selectedSettingUserId, setSelectedSettingUserId] = useState(null);
+     const handleOpenSettingModal = (userId) => {
+        setSelectedSettingUserId(userId);
+        setIsSettingModalOpen(true);
+    };
+
+    const handleCloseSettingModal = () => {
+        setSelectedSettingUserId(null);
+        setIsSettingModalOpen(false);
+    };
 
     //ดึงข้อมูลหลังบ้าน
     const userQueries = useQueries({
@@ -62,15 +86,9 @@ function ZoneStaffManagement(){
     //ดึงข้อมูลหลังบ้าน
 
     // ฟังก์ชันเปิด Modal แก้ไข
-    const handleOpenEditModal = (userId) => {
-        setSelectedUserId(userId);
-        setIsEditModalOpen(true);
-    };
+    
 
-    const handleCloseEditModal = () => {
-        setSelectedUserId(null);
-        setIsEditModalOpen(false);
-    };
+   
 
 
     // ระบบ filter
@@ -172,6 +190,7 @@ function ZoneStaffManagement(){
                 <Cardno5 
                     data={filteredUsers}
                     onEdit={handleOpenEditModal}
+                    onSetting={handleOpenSettingModal}
                 />
             </div>
 
@@ -190,13 +209,25 @@ function ZoneStaffManagement(){
             </Modal>
 
             <Modal
-            title="แก้ไขข้อมูลผู้ใช้งาน"
-            isOpen={isEditModalOpen}
-            onClose={handleCloseEditModal}
+                title="แก้ไขข้อมูลผู้ใช้งาน"
+                isOpen={isEditModalOpen}
+                onClose={handleCloseEditModal}
             >
                 <EditUserForm 
                     userId={selectedUserId} 
                     onClose={handleCloseEditModal}
+                    onSaveSuccess={() => userQueries[0].refetch()}
+                />
+            </Modal>
+
+            <Modal
+                title="ตั้งค่าผู้ใช้งาน"
+                isOpen={isSettingModalOpen}
+                onClose={handleCloseSettingModal}
+            >
+                <SetZoneZoneStaff 
+                    userId={selectedSettingUserId}
+                    onClose={handleCloseSettingModal}
                     onSaveSuccess={() => userQueries[0].refetch()}
                 />
             </Modal>

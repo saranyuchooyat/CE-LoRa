@@ -4,7 +4,7 @@ import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import ApiDelete from "../API-Delete";
 
-function UserTable({ data, onEdit, showActions = true }) {
+function UserTable({ data, onEdit, onSetting, showActions = true }) {
 
     console.log("table data", data);
     const location = useLocation();
@@ -75,6 +75,12 @@ function UserTable({ data, onEdit, showActions = true }) {
         onEdit(userId); // 💡 ส่ง ID กลับไปที่ Component แม่
     };
 
+    //Setting Button (กำลังพัฒนา)
+    const handleSettingClick = (userId, event) => {
+        event.stopPropagation();
+        onSetting(userId); // 💡 ส่ง ID กลับไปที่ Component แม่
+    };
+
 
     if (!Array.isArray(data) || data.length === 0) {
         return (
@@ -129,10 +135,13 @@ function UserTable({ data, onEdit, showActions = true }) {
                                         <button className="table-btn hover:bg-main-yellow hover:text-white"
                                                 onClick={(event) => handleEditClick(card.userId, event)}>
                                             แก้ไข</button>
-                                        <button className="table-btn hover:bg-green-500 hover:text-white">ตั้งค่า</button>
+                                        <button className="table-btn hover:bg-green-500 hover:text-white"
+                                                onClick={(event) => handleSettingClick(card.userId, event)}>
+                                            ตั้งค่า</button>
                                         <button className="table-btn hover:bg-main-red hover:text-white"
                                                 onClick={(event) => handleDeleteClick(card.userId, event)}
-                                                disabled={isPending} >{isPending ? 'ลบ...' : 'ลบ'}</button>
+                                                disabled={isPending} >
+                                            {isPending ? 'ลบ...' : 'ลบ'}</button>
                                     </td>
                                     )}</tr>
                             );
