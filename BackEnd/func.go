@@ -17,7 +17,7 @@ func checkMiddleWare(c *fiber.Ctx) error {
 	user := c.Locals("user").(*jwt.Token)
 	claims := user.Claims.(jwt.MapClaims)
 	fmt.Println(claims)
-	if claims["role"] == "Zone Admin" || claims["role"] == "System Admin" {
+	if claims["role"] == "Zone Admin" || claims["role"] == "System Admin" || claims["role"] == "Zone staff" {
 		return c.Next()
 	}
 	return fiber.ErrUnauthorized
@@ -447,7 +447,7 @@ func getZoneDashboard(c *fiber.Ctx) error {
 		"total":   0,
 	}
 	var alertsInZone []Alert
-
+	var emergencyAlerts []EmergencyAlert
 	for _, e := range zoneElders {
 		for _, d := range devices {
 			if e.DeviceID == d.DeviceID {
@@ -468,12 +468,24 @@ func getZoneDashboard(c *fiber.Ctx) error {
 			}
 		}
 		if e.Status == "critical" {
-			alertsInZone = append(alertsInZone, Alert{
+
+			localAlert := Alert{
 				ID:          len(alertsInZone) + 1,
 				Title:       fmt.Sprintf("Elder %s มีภาวะวิกฤต", e.Name),
 				Description: fmt.Sprintf("อัตราการเต้นหัวใจ %d bpm, BP %s", e.Vitals.HeartRate, e.Vitals.BloodPressure),
 				Type:        "critical",
 				CreatedAt:   time.Now().Format(time.RFC3339),
+			}
+			alertsInZone = append(alertsInZone, localAlert)
+
+			emergencyAlerts = append(emergencyAlerts, EmergencyAlert{
+				ID:          len(emergencyAlerts) + 1,
+				ZoneID:      zoneID,
+				Title:       localAlert.Title,
+				Description: localAlert.Description,
+				Type:        localAlert.Type,
+				CreatedAt:   localAlert.CreatedAt,
+				Status:      "new",
 			})
 		} else if e.Status == "warning" {
 			alertsInZone = append(alertsInZone, Alert{

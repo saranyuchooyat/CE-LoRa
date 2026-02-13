@@ -334,6 +334,15 @@ type Location struct {
 	Latitude  float64 `json:"lat" example:"13.738012"`
 	Longitude float64 `json:"lon" example:"100.781605"`
 }
+type EmergencyAlert struct {
+	ID          int    `json:"id"`
+	ZoneID      int    `json:"zone_id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Type        string `json:"type"`
+	CreatedAt   string `json:"created_at"`
+	Status      string `json:"status"`
+}
 
 // ---------------- Mock Data ----------------
 

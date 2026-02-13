@@ -1487,6 +1487,10 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 1
                 },
+                "status": {
+                    "type": "string",
+                    "example": "pending"
+                },
                 "title": {
                     "type": "string",
                     "example": "Elder Bua has critical condition"
@@ -1848,6 +1852,19 @@ const docTemplate = `{
                 }
             }
         },
+        "main.Location": {
+            "type": "object",
+            "properties": {
+                "lat": {
+                    "type": "number",
+                    "example": 13.738012
+                },
+                "lon": {
+                    "type": "number",
+                    "example": 100.781605
+                }
+            }
+        },
         "main.LoginRequest": {
             "type": "object",
             "properties": {
@@ -2085,6 +2102,9 @@ const docTemplate = `{
                 "team_name": {
                     "type": "string",
                     "example": "ทีม Alpha-1"
+                },
+                "vehicle_location": {
+                    "$ref": "#/definitions/main.Location"
                 }
             }
         },
