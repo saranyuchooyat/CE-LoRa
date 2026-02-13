@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	fiberSwagger "github.com/swaggo/fiber-swagger"
 )
 
 // @title LoraWan Service API
@@ -50,11 +51,11 @@ func main() {
 	// app.Get("/zones/:id/elder", getElderinZone)
 
 	app.Get("/elders", getAllElderly)
-	app.Get("/elders/:id", getElderDetail)
+	//app.Get("/elders/:id", getElderDetail)
 
 	//zone staff
-	app.Get("/zones/:id/elders", getElderinZone)
-	app.Get("/zones/:id/elders/alertandstatus", getElderAlertandstatus)
+	//app.Get("/zones/:id/elders", getElderinZone)
+	//app.Get("/zones/:id/elders/alertandstatus", getElderAlertandstatus)
 
 	app.Get("/devices", getAllDevice)
 	// app.Post("/devices", createDevice)
