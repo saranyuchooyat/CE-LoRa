@@ -17,7 +17,7 @@ func checkMiddleWare(c *fiber.Ctx) error {
 	user := c.Locals("user").(*jwt.Token)
 	claims := user.Claims.(jwt.MapClaims)
 	fmt.Println(claims)
-	if claims["role"] == "Zone Admin" || claims["role"] == "System Admin" {
+	if claims["role"] == "Zone Admin" || claims["role"] == "System Admin" || claims["role"] == "Zone Staff" {
 		return c.Next()
 	}
 	return fiber.ErrUnauthorized
