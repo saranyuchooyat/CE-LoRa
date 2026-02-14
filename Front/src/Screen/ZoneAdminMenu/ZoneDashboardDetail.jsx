@@ -42,9 +42,6 @@ function ZoneDashboardDetail (){
     const zoneDashboard = zoneDashboardQueries[0].data || [];
     const zoneStaffData = zoneDashboardQueries[1].data || [];
 
-    console.log("ZoneDashboardData",zoneDashboard)
-    console.log("ZoneStaffData",zoneStaffData)
-
     useEffect(() => {
         const tokenInStorage = localStorage.getItem('token');
         if (location.state?.token && location.state.token !== tokenInStorage) {

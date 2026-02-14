@@ -4,41 +4,56 @@ import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API"; // 💡 ใช้ตัวแปร api ที่ส่งออกมาจาก API.js
 
 function ElderlyMonitoring(){
+    
     const location = useLocation();
 
-    // 💡 1. จัดการเรื่อง Token ให้เสร็จก่อนเป็นอันดับแรก
-    useEffect(() => {
-        const tokenInState = location.state?.token;
-        const tokenInStorage = localStorage.getItem('token');
-        
-        if (tokenInState && tokenInState !== tokenInStorage) {
-            localStorage.setItem('token', tokenInState);
-        }
-    }, [location.state]);
-
-    // 💡 2. ปรับ useQueries ให้รันเมื่อมี Token เท่านั้น
-    const systemQueries = useQueries({
+    // 1. ดึงข้อมูล Zone ของผู้ใช้งานปัจจุบันก่อน
+    const zoneDataQueries = useQueries({
         queries: [
             { 
-                queryKey: ['staff'], 
-                queryFn: () => api.get('/zones/my-zones').then(res => res.data),
-                // 🛡️ สำคัญ: ถ้าไม่มี Token ใน localStorage จะยังไม่เริ่มยิง API
-                enabled: !!localStorage.getItem('token') 
+                queryKey: ['zoneData'], 
+                queryFn: () => api.get(`/zones/my-zones`).then(res => res.data) 
             },
         ],
     });
 
-    const isSystemLoading = systemQueries.some(query => query.isLoading);
-    const isSystemError = systemQueries.some(query => query.isError);
-    const zoneData = systemQueries[0]?.data || [];
+    // 2. ตรวจสอบสถานะการโหลดและข้อมูล
+    const isZoneDataLoading = zoneDataQueries[0].isLoading;
+    const isZoneDataError = zoneDataQueries[0].isError;
+    const zoneData = zoneDataQueries[0].data || [];
 
-    // 💡 3. เช็คว่าถ้ายังไม่มี Token และกำลังโหลด ให้แสดง Loading ไปก่อน
-    if (isSystemLoading || !localStorage.getItem('token')) {
-        return <div className="mx-5 mt-10 text-center text-xl">Checking Authorization...</div>;
+    // 3. ดึง ID ออกมาให้ถูกต้อง (สกัดจาก Array เป็นค่าเดียว)
+    // 💡 เปลี่ยนจาก .filter() เป็นการเข้าถึง index 0 เพราะข้อมูลมาเป็น Array ของ Object
+    const currentZoneId = zoneData.length > 0 ? zoneData[0].zoneid : null;
+
+    // 4. ใช้ useQueries อีกครั้งเพื่อดึงข้อมูล Elders โดยรอจนกว่าจะได้ ID
+    const eldersQueries = useQueries({
+        queries: [
+            { 
+                queryKey: ['eldersData', currentZoneId], 
+                queryFn: () => api.get(`/zones/${currentZoneId}/elders`).then(res => res.data),
+                // 💡 สำคัญ: enabled จะช่วยป้องกัน API พังถ้า currentZoneId ยังเป็น null
+                enabled: !!currentZoneId 
+            },
+        ],
+    });
+
+    const isEldersLoading = eldersQueries[0].isLoading;
+    const eldersData = eldersQueries[0].data || [];
+
+    // 5. จัดการ Token และสิทธิ์การเข้าถึง
+    useEffect(() => {
+        const tokenInStorage = localStorage.getItem('token');
+        if (location.state?.token && location.state.token !== tokenInStorage) {
+            localStorage.setItem('token', location.state.token);
+        }
+    }, [location.state]);
+
+    if (isZoneDataLoading) {
+        return <div className="mx-5 mt-10 text-center text-xl">Loading Zone Data...</div>;
     }
-    
-    if (isSystemError) {
-        return <div className="mx-5 mt-10 text-center text-xl text-red-600">Error fetching data!</div>;
+    if (isZoneDataError) {
+        return <div className="mx-5 mt-10 text-center text-xl text-red-600">Error fetching Zone Data</div>;
     }
 
     return(
@@ -47,6 +62,12 @@ function ElderlyMonitoring(){
                 <h1>Elderly Monitoring Dashboard</h1>
                 {/* แสดงข้อมูลที่ดึงมาได้ */}
                 <pre>{JSON.stringify(zoneData, null, 2)}</pre>
+                <h2>Elders in Zone</h2>
+                {isEldersLoading ? (
+                    <div>Loading Elders Data...</div>
+                ) : (
+                    <pre>{JSON.stringify(eldersData, null, 2)}</pre>
+                )}
             </div>
         </>
     );
