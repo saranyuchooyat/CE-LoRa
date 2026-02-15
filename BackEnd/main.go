@@ -1,8 +1,13 @@
 package main
 
 import (
+	"log"
+	"os"
+
+	jwtware "github.com/gofiber/contrib/jwt" // 👈 ต้องมีอันนี้
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	_ "github.com/saranyuchooyat/CE-LoRa/docs" // 👈 import docs ของ Swagger
 	fiberSwagger "github.com/swaggo/fiber-swagger"
 )
 
@@ -12,59 +17,75 @@ import (
 // @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
-// @description พิมพ์ Bearer  แล้วตามด้วย token เช่น Bearer eyJhbGciOiJIUzI1NiIsInR5...
+// @description พิมพ์ Bearer แล้วตามด้วย token
 
 func main() {
-	ConnectMongo()
+	ConnectMongo() // เรียกใช้ฟังก์ชันเชื่อมต่อ DB
 
 	app := fiber.New()
 
-	app.Get("/swagger/*", fiberSwagger.WrapHandler)
-
+	// CORS Setup
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
 		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
 		AllowHeaders: "Origin, Content-Type, Accept,Authorization",
 	}))
 
+	// Swagger & Public Routes
+	app.Get("/swagger/*", fiberSwagger.WrapHandler)
 	app.Post("/auth/login", login)
 
-	// app.Use(jwtware.New(jwtware.Config{
-	// 	SigningKey: []byte(os.Getenv("JWT_SECRET")),
-	// }))
+	// =====================================
+	// 🔒 Private Routes (ต้อง Login ก่อน)
+	// =====================================
 
-	// app.Use(checkMiddleWare)
+	// JWT Configuration
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		secret = "secret_lora_key_1234" // fallback secret
+	}
+	app.Use(jwtware.New(jwtware.Config{
+		SigningKey: jwtware.SigningKey{Key: []byte(secret)},
+	}))
+
+	// --- Users ---
 	app.Get("/users", getAllUser)
-	app.Get("/users/:id", getUserByID)
 	app.Post("/users", createUser)
+	app.Get("/users/:id", getUserByID)
 	app.Put("/users/:id", updateUser)
 	app.Delete("/users/:id", deleteUser)
-	// app.Post("/users/:id/reset-password", resetPassword)
+	app.Post("/users/:id/reset-password", resetPassword)
 
+	// --- Zones ---
+	// ⚠️ ลำดับสำคัญ: เอา path เฉพาะเจาะจงไว้ก่อน :id
 	app.Get("/zones", getAllZone)
-	// app.Get("/zones/my-zones", getMyZone)
+	app.Get("/zones/my-zones", getMyZone)
+	app.Post("/zones/elderlyRegister", addEldertoZone)
 	app.Post("/zones", createZone)
+
+	// Dynamic Routes for Zones
 	app.Put("/zones/:id", updateZone)
 	app.Delete("/zones/:id", deleteZone)
-	// app.Get("/zones/:id/dashboard", getZoneDashboard)
-	// app.Post("zones/elderlyRegister", addEldertoZone)
-	// app.Get("/zones/:id/elder", getElderinZone)
+	app.Get("/zones/:id/dashboard", getZoneDashboard)
+	app.Get("/zones/:id/elder", getElderinZone)
 
+	// --- Elders ---
 	app.Get("/elders", getAllElderly)
-	//app.Get("/elders/:id", getElderDetail)
+	// app.Get("/elders/:id", getElderDetail)
 
-	//zone staff
-	//app.Get("/zones/:id/elders", getElderinZone)
-	//app.Get("/zones/:id/elders/alertandstatus", getElderAlertandstatus)
-
+	// --- Devices ---
 	app.Get("/devices", getAllDevice)
-	// app.Post("/devices", createDevice)
-	// app.Put("/devices/:id", updateDevice)
-	// app.Delete("/devices/:id", deleteDevice)
+	app.Post("/devices", createDevice)
+	app.Put("/devices/:id", updateDevice)
+	app.Delete("/devices/:id", deleteDevice)
 	app.Get("/device_data/:device_id", getDeviceDataByDeviceID)
 
+	// --- System Dashboard ---
 	app.Get("/dashboard/usage-trend", getUserTrend)
-	// app.Get("/dashboard/summary", getDashSum)
-	// app.Get("/dashboard/top-zones", getTopZones)
-	app.Listen(":8080")
+	app.Get("/dashboard/summary", getDashSum)
+	app.Get("/dashboard/top-zones", getTopZones)
+	app.Get("/system/health/servers", getSystemHealth)
+
+	// Start Server
+	log.Fatal(app.Listen(":8080"))
 }

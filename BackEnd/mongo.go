@@ -4,31 +4,44 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var MI *mongo.Client
+// MongoInstance struct เก็บทั้ง Client และ Database
+type MongoInstance struct {
+	Client *mongo.Client
+	DB     *mongo.Database
+}
+
+var MI MongoInstance
 
 func ConnectMongo() {
-	uri := "mongodb://admin_kmitl:kmitl123@100.118.210.62:27017/LoRa"
-	clientOptions := options.Client().ApplyURI(uri)
+	// ⚠️ แก้ authSource=LoRa ตามที่คุณตั้งไว้ตอนสร้าง User
+	uri := "mongodb://admin_kmitl:kmitl123@100.118.210.62:27017/LoRa?authSource=LoRa"
 
-	// เชื่อมต่อ
-	client, err := mongo.Connect(context.TODO(), clientOptions)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	clientOptions := options.Client().ApplyURI(uri)
+	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("❌ Connect Error: ", err)
 	}
 
-	// เช็คว่าเชื่อมติดไหม (Ping)
-	err = client.Ping(context.TODO(), nil)
+	// Ping Check
+	err = client.Ping(ctx, nil)
 	if err != nil {
 		log.Fatal("❌ Ping Failed: ", err)
 	}
 
 	fmt.Println("✅ Connected to MongoDB!")
 
-	// ⚠️ สำคัญ: เอา client ที่เชื่อมได้แล้ว ยัดใส่ตัวแปร Global MI
-	MI = client
+	// เก็บลงตัวแปร Global
+	MI = MongoInstance{
+		Client: client,
+		DB:     client.Database("LoRa"), // เลือก Database ชื่อ "LoRa"
+	}
 }

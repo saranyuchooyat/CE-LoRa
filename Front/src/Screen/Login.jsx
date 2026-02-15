@@ -6,7 +6,7 @@ function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate(); // เพิ่ม useNavigate
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -19,24 +19,32 @@ function LoginPage() {
 
       console.log("Response:", res.data);
 
-      localStorage.setItem("user", JSON.stringify(res.data));
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
 
       setError("");
 
-    
-      if (res.data.role == "System Admin"){
-        navigate('/system-overview-dashboard', {state: { user:res.data.username ,role: res.data.role, token: res.data.token} }); 
-      }
-      else if (res.data.role == "Zone Admin"){
-        navigate('/zone-dashboard', {state: { user:res.data.username ,role: res.data.role, token: res.data.token} }); 
-      }
-      else if (res.data.role == "Zone Staff"){
-        navigate('/eldery-monitoring', {state: { user:res.data.username ,role: res.data.role, token: res.data.token} }); 
+      const userRole = res.data.user.role;
+      const userData = res.data.user;
+      const token = res.data.token;
+
+      console.log("User Role found:", userRole);
+
+      if (userRole === "System Admin") {
+        navigate('/system-overview-dashboard', { state: { user: userData.username, role: userRole, token: token } });
+      } 
+      else if (userRole === "Zone Admin") {
+        navigate('/zone-dashboard', { state: { user: userData.username, role: userRole, token: token } });
+      } 
+      else if (userRole === "Zone Staff") {
+        navigate('/eldery-monitoring', { state: { user: userData.username, role: userRole, token: token } });
+      } else {
+        setError("User role not recognized!");
       }
 
     } catch (err) {
       console.error("Login error:", err);
-      setError(err.response?.data?.error || "Login failed");
+      setError(err.response?.data?.error || "Login failed. Please check username/password.");
     }
   };
 

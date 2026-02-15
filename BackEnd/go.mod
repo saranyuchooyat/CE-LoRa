@@ -3,13 +3,17 @@ module github.com/saranyuchooyat/CE-LoRa
 go 1.24.5
 
 require (
+	github.com/gofiber/contrib/jwt v1.1.2
 	github.com/gofiber/fiber/v2 v2.52.9
+	github.com/golang-jwt/jwt/v5 v5.3.1
+	github.com/swaggo/fiber-swagger v1.3.0
 	github.com/swaggo/swag v1.16.6
 	go.mongodb.org/mongo-driver v1.17.4
 )
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
+	github.com/MicahParks/keyfunc/v2 v2.1.0 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/andybalholm/brotli v1.2.0 // indirect
@@ -27,7 +31,6 @@ require (
 	github.com/mattn/go-runewidth v0.0.17 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
-	github.com/swaggo/fiber-swagger v1.3.0 // indirect
 	github.com/swaggo/files v0.0.0-20220610200504-28940afbdbfe // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.66.0 // indirect

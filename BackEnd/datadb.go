@@ -22,23 +22,6 @@ type User struct {
 	LastLogin     time.Time          `bson:"last_login" json:"last_login"`
 	AccountStatus string             `bson:"account_status" json:"account_status"`
 }
-
-// type User struct {
-// 	UserID    string `json:"user_id" bson:"user_id"`
-// 	ZoneID    string `json:"zone_id" bson:"zone_id"`
-// 	Role      string `json:"role" bson:"role"`
-// 	Username  string `json:"username" bson:"username"`
-// 	Password  string `json:"password" bson:"password"`
-// 	FirstName string `json:"first_name" bson:"first_name"`
-// 	LastName  string `json:"last_name" bson:"last_name"`
-// 	Age       int    `json:"age" bson:"age"`
-// 	Phone     string `json:"phone" bson:"phone"`
-// 	Email     string `json:"email" bson:"email"`
-// 	Status    string `json:"status"`
-// 	LastLogin string `json:"lastLogin"`
-// 	CreatedAt string `json:"createdAt"`
-// }
-
 type Zone struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty" json:"_id"` // Mongo ID
 	ZoneID      string             `bson:"zone_id" json:"zone_id"`
@@ -47,16 +30,6 @@ type Zone struct {
 	ActiveUser  int                `bson:"active_user" json:"active_user"`
 	Status      string             `bson:"status" json:"status"`
 }
-
-// type Zone struct {
-// 	ZoneID      string `json:"zone_id" bson:"zone_id"`
-// 	ZoneName    string `json:"zone_name" bson:"zone_name"`
-// 	Subdistrict string `json:"zone_subdistrict" bson:"zone_subdistrict"`
-// 	Province    string `json:"zone_province" bson:"zone_province"`
-// 	Region      string `json:"zone_region" bson:"zone_region"`
-// 	ActiveUser  int    `json:"active_user" bson:"active_user"`
-// 	Status      string `json:"status" bson:"status"`
-// }
 
 type Elder struct {
 	ID                primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
@@ -76,36 +49,12 @@ type Elder struct {
 	HealthStatus      string             `bson:"health_status" json:"health_status"`
 	Address           string             `bson:"address" json:"address"`
 }
-
-// type Elder struct {
-// 	ElderID          string  `json:"elder_id" bson:"elder_id"`
-// 	DeviceID         string  `json:"device_id" bson:"device_id"`
-// 	ZoneID           string  `json:"zone_id" bson:"zone_id"`
-// 	FirstName        string  `json:"first_name" bson:"first_name"`
-// 	LastName         string  `json:"last_name" bson:"last_name"`
-// 	Sex              string  `json:"sex" bson:"sex"`
-// 	Age              int     `json:"age" bson:"age"`
-// 	Weight           float64 `json:"weight" bson:"weight"`
-// 	Height           float64 `json:"height" bson:"height"`
-// 	Congenital       string  `json:"congenital_disease" bson:"congenital_disease"`
-// 	Medicine         string  `json:"personal_medicine" bson:"personal_medicine"`
-// 	EmergencyContact string  `json:"emergency_contacts" bson:"emergency_contacts"`
-// 	HealthStatus     string  `json:"health_status" bson:"health_status"`
-// 	Address          string  `json:"address" bson:"address"`
-// }
-
 type Device struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
 	DeviceID    string             `bson:"device_id" json:"device_id"`
 	DeviceName  string             `bson:"device_name" json:"device_name"`
 	Description string             `bson:"description" json:"description"`
 }
-
-// type Device struct {
-// 	DeviceID    string `json:"device_id" bson:"device_id"`
-// 	DeviceName  string `json:"device_name" bson:"device_name"`
-// 	Description string `json:"description" bson:"description"`
-// }
 
 type DeviceData struct {
 	DeviceID string `json:"device_id" bson:"device_id"`
