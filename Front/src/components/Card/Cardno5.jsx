@@ -58,7 +58,7 @@ function CardFull({ data, onEdit, onSetting, showActions=true }) {
     if(isNotiData(data)){
         console.log("NotiPass")
         displayHeader = "System Alerts & Notifications";
-        displayContent = <CardNotification data={data}/>;
+        displayContent = <div className="h-[250px]"><CardNotification data={data}/></div>;
     }
     else if(isZoneData(data)){
         console.log("ZonePass")

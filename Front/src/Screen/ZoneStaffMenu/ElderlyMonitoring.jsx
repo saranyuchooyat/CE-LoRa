@@ -1,13 +1,21 @@
-import { useEffect } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
 import Cardno2 from "../../components/Card/Cardno2";
 import CardFull from "../../components/Card/Cardno5";
+import CardFilter from "../../components/Card/CardFilter";
+
+const initialFilters ={
+    search:"",
+    status: "ทั้งหมด"
+};
 
 function ElderlyMonitoring() {
+
     const location = useLocation();
+    const [filters, setFilters] = useState(initialFilters);
 
     // 1. ดึงข้อมูล Zone พื้นฐาน
     const zoneQueries = useQueries({
@@ -25,6 +33,9 @@ function ElderlyMonitoring() {
 
     // 2. สกัด Zone ID (ใช้ Optional Chaining เพื่อความปลอดภัย)
     const currentZoneId = zoneData[0]?.zoneid || null;
+
+    
+
 
     // 3. ดึงข้อมูล Elders และ Dashboard โดยใช้ Dependent Queries
     const detailQueries = useQueries({
@@ -55,12 +66,47 @@ function ElderlyMonitoring() {
             localStorage.setItem('token', location.state.token);
         }
     }, [location.state]);
+    //ดึงข้อมูลหลังบ้าน
 
-    // 💡 5. จัดการข้อมูลสำหรับ Cardno2 (เพิ่ม Check ป้องกันข้อมูลล่ม)
-    // ปรับ logic ให้รองรับ deviceStatus เป็น object
-    const totalDevices = zoneDashboardData && zoneDashboardData.deviceStatus && typeof zoneDashboardData.deviceStatus.total === 'number'
-        ? zoneDashboardData.deviceStatus.total
-        : 0;
+    //ระบบ Filter
+    const handleFilterChange = (key, value) => {
+        setFilters((prev) => ({
+        ...prev,
+        [key]: value,
+        }));
+    };
+
+    const handleClearFilters = () => {
+        setFilters(initialFilters);
+    };
+
+    const filteredElderly = useMemo(() =>{
+        const { search, status} = filters;
+        let data = eldersData;
+
+        // กรองตามช่องค้นหา
+        if(search){
+            const lowerSearch = search.toLowerCase();
+            data = data.filter((elder) => {
+                const elderIdSearch = elder.id ? String(elder.id).includes(lowerSearch) : false;
+                const nameSearch = elder.name && elder.name.toLowerCase().includes(lowerSearch);
+                const addressSearch = elder.address && elder.address.toLowerCase().includes(lowerSearch);
+                return elderIdSearch || nameSearch || addressSearch;
+            });
+        }
+
+        if(status && status !== "ทั้งหมด"){
+            data = data.filter((elder) => elder.status === status);
+        }
+
+        return data;
+    }, [eldersData, filters]);
+
+    const { alerts, deviceStatus, elders, zone } = zoneDashboardData || {};
+
+    const allAlertDetail = alerts;
+    
+    const allDeviceStatus = deviceStatus;
 
     const CardNo2Data = [
         {
@@ -73,7 +119,7 @@ function ElderlyMonitoring() {
         },
         {
             name: "อุปกรณ์ที่เชื่อมต่อทั้งหมด",
-            value: isDashLoading ? "..." : `${totalDevices} ชิ้น`
+            value: isDashLoading ? "..." : `${allDeviceStatus?.total || 0} ชิ้น`
         }
     ];
 
@@ -88,10 +134,24 @@ function ElderlyMonitoring() {
             <Cardno2 data={CardNo2Data} />
 
             <CardFull
-                data={eldersData}
-                />
+                data={allAlertDetail}/>
 
-            {/* ส่วน Debug ข้อมูล (ซ่อนได้เมื่อใช้งานจริง) */}
+            <CardFilter
+                name="Elder"
+                placeholderName="ชื่อผู้สูงอายุ, รหัสผู้สูงอายุ, ที่อยู่"
+                option1Name="สถานะ"
+                option2Name={null}
+                filters={filters}
+                onFilterChange={handleFilterChange}
+                onClear={handleClearFilters}
+                option2Key="Elder"
+            />
+
+            <CardFull
+                data={filteredElderly}
+            />
+
+            {/* ส่วน Debug ข้อมูล (ซ่อนได้เมื่อใช้งานจริง)*/}
             <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono bg-gray-100 p-4 rounded">
                 <div>
                     <h3 className="font-bold mb-2">Elders Data (Raw)</h3>
@@ -101,7 +161,7 @@ function ElderlyMonitoring() {
                     <h3 className="font-bold mb-2">Dashboard Data (Raw)</h3>
                     <pre className="overflow-auto max-h-40">{JSON.stringify(zoneDashboardData, null, 2)}</pre>
                 </div>
-            </div>
+            </div> 
         </div>
     );
 }

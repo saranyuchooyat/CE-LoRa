@@ -29,6 +29,14 @@ function StatusDropdown({ onSelect, currentValue, optionalKey }) {
                 value3: 'unassigned'
             });
         }
+        else if (optionalKey === "Elder") {
+            // ตั้งค่าสำหรับ Device Type
+            setStatusValues({
+                value1: 'stable',
+                value2: 'warning',
+                value3: 'critical'
+            });
+        }
         else {
              // ค่า Default หาก optionalKey ไม่ตรง
              setStatusValues({
