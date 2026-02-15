@@ -2,6 +2,7 @@ import CardNotification from "./NotificationCard";
 import ZoneTable from "../Table/ZoneTable";
 import ZoneAdminTable from "../Table/ZoneAdminTable";
 import UserTable from "../Table/UserTable";
+import ElderlyDataTable from "../Table/ElderlyDataTable";
 
 
 function CardFull({ data, onEdit, onSetting, showActions=true }) {
@@ -44,6 +45,16 @@ function CardFull({ data, onEdit, onSetting, showActions=true }) {
         return 'name' in arr[0] && 'position' in arr[0];
     }
 
+
+    const isElderlyData = (arr) => {
+        if (!Array.isArray(arr) || arr.length === 0) {
+            return false;
+        }
+        // ตรวจสอบว่ามีฟิลด์ที่เฉพาะกับ elderly เช่น id, name, age, device_id
+        return 'id' in arr[0] && 'name' in arr[0] && 'age' in arr[0] && 'device_id' in arr[0];
+    }
+
+
     if(isNotiData(data)){
         console.log("NotiPass")
         displayHeader = "System Alerts & Notifications";
@@ -60,6 +71,10 @@ function CardFull({ data, onEdit, onSetting, showActions=true }) {
     else if(isZoneStaffData(data)){
         console.log("ZoneStaffPass")
         displayContent = <UserTable data={data} showActions={showActions}/>;
+    }
+    else if(isElderlyData(data)){
+        console.log("ElderlyPass")
+        displayContent = <ElderlyDataTable data={data} showActions={null}/>
     }
 
 

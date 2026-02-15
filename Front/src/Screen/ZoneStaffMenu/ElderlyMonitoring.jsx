@@ -1,14 +1,16 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
-import api from "../../components/API"; // 💡 ใช้ตัวแปร api ที่ส่งออกมาจาก API.js
+import api from "../../components/API";
+import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
+import Cardno2 from "../../components/Card/Cardno2";
+import CardFull from "../../components/Card/Cardno5";
 
-function ElderlyMonitoring(){
-    
+function ElderlyMonitoring() {
     const location = useLocation();
 
-    // 1. ดึงข้อมูล Zone ของผู้ใช้งานปัจจุบันก่อน
-    const zoneDataQueries = useQueries({
+    // 1. ดึงข้อมูล Zone พื้นฐาน
+    const zoneQueries = useQueries({
         queries: [
             { 
                 queryKey: ['zoneData'], 
@@ -17,31 +19,36 @@ function ElderlyMonitoring(){
         ],
     });
 
-    // 2. ตรวจสอบสถานะการโหลดและข้อมูล
-    const isZoneDataLoading = zoneDataQueries[0].isLoading;
-    const isZoneDataError = zoneDataQueries[0].isError;
-    const zoneData = zoneDataQueries[0].data || [];
+    const isZoneLoading = zoneQueries[0].isLoading;
+    const isZoneError = zoneQueries[0].isError;
+    const zoneData = zoneQueries[0].data || [];
 
-    // 3. ดึง ID ออกมาให้ถูกต้อง (สกัดจาก Array เป็นค่าเดียว)
-    // 💡 เปลี่ยนจาก .filter() เป็นการเข้าถึง index 0 เพราะข้อมูลมาเป็น Array ของ Object
-    const currentZoneId = zoneData.length > 0 ? zoneData[0].zoneid : null;
+    // 2. สกัด Zone ID (ใช้ Optional Chaining เพื่อความปลอดภัย)
+    const currentZoneId = zoneData[0]?.zoneid || null;
 
-    // 4. ใช้ useQueries อีกครั้งเพื่อดึงข้อมูล Elders โดยรอจนกว่าจะได้ ID
-    const eldersQueries = useQueries({
+    // 3. ดึงข้อมูล Elders และ Dashboard โดยใช้ Dependent Queries
+    const detailQueries = useQueries({
         queries: [
             { 
                 queryKey: ['eldersData', currentZoneId], 
                 queryFn: () => api.get(`/zones/${currentZoneId}/elders`).then(res => res.data),
-                // 💡 สำคัญ: enabled จะช่วยป้องกัน API พังถ้า currentZoneId ยังเป็น null
+                enabled: !!currentZoneId 
+            },
+            { 
+                queryKey: ['zoneDashboardData', currentZoneId], 
+                queryFn: () => api.get(`/zones/${currentZoneId}/dashboard`).then(res => res.data),
                 enabled: !!currentZoneId 
             },
         ],
     });
 
-    const isEldersLoading = eldersQueries[0].isLoading;
-    const eldersData = eldersQueries[0].data || [];
+    const eldersData = detailQueries[0].data || [];
+    const isEldersLoading = detailQueries[0].isLoading;
+    
+    const zoneDashboardData = detailQueries[1].data || null;
+    const isDashLoading = detailQueries[1].isLoading;
 
-    // 5. จัดการ Token และสิทธิ์การเข้าถึง
+    // 4. จัดการ Token
     useEffect(() => {
         const tokenInStorage = localStorage.getItem('token');
         if (location.state?.token && location.state.token !== tokenInStorage) {
@@ -49,27 +56,53 @@ function ElderlyMonitoring(){
         }
     }, [location.state]);
 
-    if (isZoneDataLoading) {
-        return <div className="mx-5 mt-10 text-center text-xl">Loading Zone Data...</div>;
-    }
-    if (isZoneDataError) {
-        return <div className="mx-5 mt-10 text-center text-xl text-red-600">Error fetching Zone Data</div>;
-    }
+    // 💡 5. จัดการข้อมูลสำหรับ Cardno2 (เพิ่ม Check ป้องกันข้อมูลล่ม)
+    // ปรับ logic ให้รองรับ deviceStatus เป็น object
+    const totalDevices = zoneDashboardData && zoneDashboardData.deviceStatus && typeof zoneDashboardData.deviceStatus.total === 'number'
+        ? zoneDashboardData.deviceStatus.total
+        : 0;
 
-    return(
-        <>
-            <div className="mx-5">
-                <h1>Elderly Monitoring Dashboard</h1>
-                {/* แสดงข้อมูลที่ดึงมาได้ */}
-                <pre>{JSON.stringify(zoneData, null, 2)}</pre>
-                <h2>Elders in Zone</h2>
-                {isEldersLoading ? (
-                    <div>Loading Elders Data...</div>
-                ) : (
-                    <pre>{JSON.stringify(eldersData, null, 2)}</pre>
-                )}
+    const CardNo2Data = [
+        {
+            name: zoneData[0]?.address ? `ที่อยู่โซน: ${zoneData[0]?.address}` : "ชื่อโซน (ไม่พบข้อมูล)",
+            value: zoneData[0]?.zonename || (isZoneLoading ? "กำลังโหลด..." : "ไม่พบข้อมูล")
+        },
+        {
+            name: "จำนวนผู้สูงอายุในโซน",
+            value: isEldersLoading ? "..." : `${eldersData.length} คน`
+        },
+        {
+            name: "อุปกรณ์ที่เชื่อมต่อทั้งหมด",
+            value: isDashLoading ? "..." : `${totalDevices} ชิ้น`
+        }
+    ];
+
+    if (isZoneLoading) return <div className="text-center mt-10">กำลังโหลดข้อมูลพื้นที่...</div>;
+    if (isZoneError) return <div className="text-center mt-10 text-red-500">เกิดข้อผิดพลาดในการดึงข้อมูลโซน</div>;
+
+    return (
+        <div className="mx-5">
+            <MenuNameCard title="ติดตามข้อมูลผู้สูงอายุ" />
+
+            {/* แสดงการ์ดสรุปข้อมูล 3 ชุด */}
+            <Cardno2 data={CardNo2Data} />
+
+            <CardFull
+                data={eldersData}
+                />
+
+            {/* ส่วน Debug ข้อมูล (ซ่อนได้เมื่อใช้งานจริง) */}
+            <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono bg-gray-100 p-4 rounded">
+                <div>
+                    <h3 className="font-bold mb-2">Elders Data (Raw)</h3>
+                    <pre className="overflow-auto max-h-40">{JSON.stringify(eldersData, null, 2)}</pre>
+                </div>
+                <div>
+                    <h3 className="font-bold mb-2">Dashboard Data (Raw)</h3>
+                    <pre className="overflow-auto max-h-40">{JSON.stringify(zoneDashboardData, null, 2)}</pre>
+                </div>
             </div>
-        </>
+        </div>
     );
 }
 
