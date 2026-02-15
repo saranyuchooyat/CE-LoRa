@@ -108,6 +108,11 @@ function ElderlyMonitoring() {
     
     const allDeviceStatus = deviceStatus;
 
+    // นับจำนวน critical alert
+    const criticalAlertCount = Array.isArray(alerts)
+        ? alerts.filter(a => a.type === 'critical').length
+        : 0;
+
     const CardNo2Data = [
         {
             name: zoneData[0]?.address ? `ที่อยู่โซน: ${zoneData[0]?.address}` : "ชื่อโซน (ไม่พบข้อมูล)",
@@ -120,6 +125,10 @@ function ElderlyMonitoring() {
         {
             name: "อุปกรณ์ที่เชื่อมต่อทั้งหมด",
             value: isDashLoading ? "..." : `${allDeviceStatus?.total || 0} ชิ้น`
+        },
+        {
+            name: "แจ้งเตือนวิกฤต (Critical Alert)",
+            value: isDashLoading ? "..." : `${criticalAlertCount} รายการ`
         }
     ];
 
