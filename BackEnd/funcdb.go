@@ -293,13 +293,51 @@ func createZone(c *fiber.Ctx) error {
 	if err := c.BodyParser(zone); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
 	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	_, err := getCollection("zones").InsertOne(ctx, zone)
-	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Create zone failed"})
+
+	// 👇 LOGIC สร้าง ID ใหม่ (Auto Increment Z001, Z002...)
+	// 1. ค้นหา Zone ล่าสุด ที่ขึ้นต้นด้วยตัว "Z" โดยเรียงจากมากไปน้อย
+	filter := bson.M{"zone_id": bson.M{"$regex": "^Z"}}      // หาเฉพาะที่ขึ้นต้นด้วย Z
+	opts := options.FindOne().SetSort(bson.M{"zone_id": -1}) // เรียง Z005, Z004... เอาตัวแรก
+
+	var lastZone Zone
+	err := getCollection("zones").FindOne(ctx, filter, opts).Decode(&lastZone)
+
+	if err == nil {
+		// กรณีเจอตัวล่าสุด (เช่น Z002)
+		var lastNum int
+		// แกะตัวเลขออกมา: Z002 -> ได้เลข 2
+		_, scanErr := fmt.Sscanf(lastZone.ZoneID, "Z%03d", &lastNum)
+		if scanErr == nil {
+			// สร้างเลขใหม่: Z + (2+1) -> Z003
+			zone.ZoneID = fmt.Sprintf("Z%03d", lastNum+1)
+		} else {
+			// กรณีแกะไม่ออก (กันเหนียว)
+			zone.ZoneID = fmt.Sprintf("Z%03d", rand.Intn(999))
+		}
+	} else {
+		// กรณีไม่เจอสักตัวใน Database (เป็นตัวแรกสุด)
+		zone.ZoneID = "Z001"
 	}
-	return c.JSON(zone)
+	// 👆 จบ Logic สร้าง ID
+
+	// ตั้งค่า Default อื่นๆ
+	if zone.Status == "" {
+		zone.Status = "active"
+	}
+	// ถ้า active_user ไม่ส่งมา มันจะเป็น 0 โดยอัตโนมัติ (เพราะเป็น int)
+
+	// บันทึกลง DB
+	_, err = getCollection("zones").InsertOne(ctx, zone)
+	if err != nil {
+		fmt.Println("❌ Insert Zone Error:", err)
+		return c.Status(500).JSON(fiber.Map{"error": "Create zone failed: " + err.Error()})
+	}
+
+	fmt.Println("✅ Create Zone Success:", zone.ZoneID)
+	return c.Status(201).JSON(zone)
 }
 
 func updateZone(c *fiber.Ctx) error {

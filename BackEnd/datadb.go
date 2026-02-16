@@ -23,10 +23,11 @@ type User struct {
 	AccountStatus string             `bson:"account_status" json:"account_status"`
 }
 type Zone struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty" json:"_id"` // Mongo ID
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
 	ZoneID      string             `bson:"zone_id" json:"zone_id"`
 	ZoneName    string             `bson:"zone_name" json:"zone_name"`
 	ZoneAddress string             `bson:"zone_address" json:"zone_address"`
+	Description string             `bson:"description" json:"description"` // 👈 เพิ่มบรรทัดนี้
 	ActiveUser  int                `bson:"active_user" json:"active_user"`
 	Status      string             `bson:"status" json:"status"`
 }

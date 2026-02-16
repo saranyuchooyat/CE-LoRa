@@ -29,9 +29,11 @@ function AddZoneForm({ onClose, onSaveSuccess }){
         const token = localStorage.getItem('token'); 
 
         const dataToSend = {
-            zoneName: formData.zonename,
-            description: formData.description,
-            address: formData.address
+            zone_name: formData.zonename,    // แก้จาก zoneName -> zone_name
+            zone_address: formData.address,  // แก้จาก address -> zone_address
+            description: formData.description, // อันนี้ตรงแล้ว
+            active_user: 0,                  // ✅ เพิ่มอันนี้ (ส่งเลข 0 ไป)
+            status: "active"                 // ✅ เพิ่มอันนี้ (บอกสถานะ)
         };
 
         try {
