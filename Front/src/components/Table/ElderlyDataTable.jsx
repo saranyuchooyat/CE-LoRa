@@ -4,58 +4,21 @@ import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import ApiDelete from "../API-Delete";
 
-function UserTable({ data, onEdit, onSetting, showActions = true }) {
+function ElderlyDataTable({ data, onEdit, onSetting, showActions = true }) {
 
     console.log("table data", data);
-    const location = useLocation();
-
-    //ดึงข้อมูลหลังบ้าน
-    const userQueries = useQueries({
-        queries: [
-        { queryKey: ['zone'], queryFn: () => api.get('/zones').then(res => res.data) },
-        ],
-    });
-
-    const isSystemLoading = userQueries.some(query => query.isLoading);
-    const isSystemError = userQueries.some(query => query.isError);
-
-    useEffect(() => {
-        const tokenInStorage = localStorage.getItem('token');
-        if (location.state?.token && location.state.token !== tokenInStorage) {
-            localStorage.setItem('token', location.state.token);
-            // 💡 เมื่อบันทึก Token ใหม่แล้ว React Query จะทำการ Refetch ให้อัตโนมัติ
-            // เนื่องจากทุก Query จะถูก Trigger เมื่อ Token ถูกบันทึกและ Component Rerender
-        }
-    }, [location.state]);
-
-    const zoneData = userQueries[0].data || [];
-    //ดึงข้อมูลหลังบ้าน
-
     
-
-    const getZoneName = (userZone,zoneData) => {
-        if (!userZone) {
-            return "N/A"; 
-        }
-
-        const matchedZones = zoneData.filter(zone => userZone.includes(zone.zoneid));
-
-        if(matchedZones.length > 0){
-            return matchedZones.map(zone => zone.zonename).join(', ');
-        } 
-        return "N/A";
-    };
-
     const statusCheck = (status) => {
-        console.log("user",status)
         switch (status) {
-            case 'Online':
-                return 'text-main-blue bg-complete-bg';
-            case 'offline':
-                return 'text-gray-800 bg-gray-300';
-            default:
-                return 'text-gray-700 bg-gray-200';
-        } 
+                case 'critical':
+                    return 'bg-red-100 text-red-700 border border-red-400';
+                case 'warning':
+                    return 'bg-yellow-100 text-yellow-800 border border-yellow-400';
+                case 'stable':
+                    return 'bg-green-100 text-green-700 border border-green-400';
+                default:
+                    return 'bg-gray-100 text-gray-700 border border-gray-300';
+            } 
     };
 
     // Delete Button
@@ -81,35 +44,19 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
         onSetting(userId); // 💡 ส่ง ID กลับไปที่ Component แม่
     };
 
-
-    if (!Array.isArray(data) || data.length === 0) {
-        return (
-            <div className="p-4 text-center text-gray-500">
-                No User data available.
-            </div>
-        );
-    }
-
-    if (isSystemLoading) {
-        return <div className="mx-5 mt-10 text-center text-xl">Loading Dashboard...</div>;
-    }
-        
-    if (isSystemError) {
-        return <div className="mx-5 mt-10 text-center text-xl text-red-600">Error fetching data!</div>;
-    }
-
     return(
         <>
             <div className="overflow-auto rounded-lg shadow">
                 <table className="w-full">
                     <thead className="bg-gray-50 border-b-2 border-gray-400">
                         <tr>
-                            {/* Thead ใช้ Role และ Zone เป็น Header */}
+                            <th className="table-header">รหัส</th>
                             <th className="table-header">ชื่อ</th>
-                            <th className="table-header">ตำแหน่ง</th>
-                            <th className="table-header">พื้นที่ดูแล</th>
-                            <th className="table-header">เบอร์โทรศัพท์</th>
+                            <th className="table-header">อายุ</th>
+                            <th className="table-header">ข้อมูลสุขภาพ</th>
                             <th className="table-header">สถานะ</th>
+                            <th className="table-header">แบตเตอรี่</th>
+                            <th className="table-header">อัเดตข้อมูลล่าสุด</th>
                             {showActions && <th className="table-header">เมนู</th>}
                         </tr>
                     </thead>
@@ -120,14 +67,23 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
                             const statusClass = statusCheck(card.status);                             
                             return(
                                 <tr key={index} className={rowBgClass}>
+                                    <td className="table-data whitespace-nowrap">{card.id}</td>
                                     <td className="table-data whitespace-nowrap">{card.name}</td>
-                                    <td className="table-data whitespace-nowrap">{card.role || card.position}</td>
-                                    {/* **สำคัญ:** ใช้ card.ZoneName หรือ card.Zone ถ้ามี Key นี้ในข้อมูล */}
-                                    <td className="table-data whitespace-wrap w-[200px]">{getZoneName(card.zoneids,zoneData)}</td>
-                                    <td className="table-data whitespace-nowrap">{card.phone}</td>
+                                    <td className="table-data whitespace-nowrap">{card.age}</td>
+                                    <td className="table-data whitespace-nowrap">
+                                        <div className="flex flex-col items-start gap-1">
+                                            <span>อัตราการเต้นหัวใจ: <b>{card.vitals?.heart_rate ?? "-"}</b></span>
+                                            <span>ความดันโลหิต: <b>{card.vitals?.blood_pressure ?? "-"}</b></span>
+                                            <span>SpO₂: <b>{card.vitals?.spo2 ?? "-"}</b></span>
+                                            <span>อุณหภูมิ: <b>{card.vitals?.temperature ?? "-"}</b></span>
+                                        </div>
+                                    </td>
                                     <td className="table-data whitespace-nowrap">
                                         <span className={`table-status ${statusClass}`}>{card.status}</span>
                                     </td>
+                                    <td className="table-data whitespace-nowrap">{card.battery}</td>
+                                    <td className="table-data whitespace-nowrap">{card.last_updated}</td>
+
                                     
                                     {/* Un-commented และแก้ไขส่วนของปุ่ม Menu */}
                                     {showActions && (
@@ -153,4 +109,4 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
     )
 }
 
-export default UserTable;
+export default ElderlyDataTable;

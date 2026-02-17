@@ -14,7 +14,7 @@ function StatusDropdown({ onSelect, currentValue, optionalKey }) {
                 value1: 'active',
                 value2: 'inactive'
             });
-        } else if (optionalKey === "role") {
+        } else if (optionalKey === "role" || optionalKey === "zonestaff") {
             // ตั้งค่าสำหรับ Device Status/Role
             setStatusValues({
                 value1: 'Online',
@@ -27,6 +27,14 @@ function StatusDropdown({ onSelect, currentValue, optionalKey }) {
                 value1: 'online',
                 value2: 'offline',
                 value3: 'unassigned'
+            });
+        }
+        else if (optionalKey === "Elder") {
+            // ตั้งค่าสำหรับ Device Type
+            setStatusValues({
+                value1: 'stable',
+                value2: 'warning',
+                value3: 'critical'
             });
         }
         else {

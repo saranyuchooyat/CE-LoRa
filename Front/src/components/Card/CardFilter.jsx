@@ -3,10 +3,12 @@ import StatusDropdown from "../Dropdown/StatusDropdown";
 import FilterDropdown from "../Dropdown/FilterDropdown";
 
 // รับ props เพิ่ม: filters, onFilterChange, onClear
-function CardFilter({name, placeholderName, option1Name, option2Name, filters, onFilterChange, onClear, option2Key}){
+function CardFilter({name, placeholderName, option1Name, option2Name, filters, onFilterChange, onClear, data, option2Key}){
 
     const [openStatus, setOpenStatus] = useState(false);
     const [openDropdown2, setOpenDropdown2] = useState(false);
+
+    console.log("data in CardFilter:", data);
 
     // 1. สร้าง Handler สำหรับช่องค้นหา
     const handleSearchChange = (event) => {
@@ -68,6 +70,7 @@ function CardFilter({name, placeholderName, option1Name, option2Name, filters, o
                             currentValue={filters[option2Key]}
                             onSelect={handleDropdownSelect}
                             optionalKey={option2Key}
+                            data={data}
                         />}
                     </div>
                 )}

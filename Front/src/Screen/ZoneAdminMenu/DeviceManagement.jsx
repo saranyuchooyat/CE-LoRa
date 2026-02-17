@@ -136,7 +136,7 @@ function DeviceManagement(){
                 description=""
                 onButtonClick={handleOpenModal}
                 detail={false}
-                buttonText="เพิ่มอุปกรณ์ใหม่"/>
+                buttonText="อุปกรณ์"/>
                 
                 <Cardno2 data={deviceStatusData}/>
 

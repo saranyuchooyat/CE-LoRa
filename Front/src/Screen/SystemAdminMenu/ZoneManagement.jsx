@@ -128,14 +128,14 @@ function ZoneManagement() {
           description="ระบบจัดการพื้นที่ใช้งาน Smart Healthcare System"
           onButtonClick={handleOpenModal}
           detail={false}
-          buttonText="เพิ่ม Zone"
+          buttonText=" Zone "
         />
 
         <CardFilter
           name="Zone"
           placeholderName=" ชื่อ zone, รหัส zone, หรือที่อยู่"
           option1Name="สถานะ"
-          option2Name="จังหวัด"
+          option2Name={null}
           filters={filters}
           onFilterChange={handleFilterChange}
           onClear={handleClearFilters}

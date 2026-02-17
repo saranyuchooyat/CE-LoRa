@@ -13,7 +13,7 @@ import EditUserForm from "../../components/ModalForm/EditUserForm";
 //กำหนดตัวแปรแต่ละช่อง Filter
 const initialFilters = {
   search: "", // สำหรับช่องค้นหา ชื่อ, อีเมล, เบอร์โทร
-  province: "ทั้งหมด", // สำหรับ Role (option2Name)
+  role: "ทั้งหมด", // สำหรับ Role (option2Name)
   status: "ทั้งหมด", // สำหรับ Status (option1Name)
 };
 //กำหนดตัวแปรแต่ละช่อง Filter
@@ -138,7 +138,7 @@ function UserManagement(){
                 description="ระบบจัดการบัญชีผู้ใช้และสิทธิ์การเข้าถึง"
                 onButtonClick={handleOpenModal} // ต้องเพิ่ม Prop นี้ใน MenuNameCard
                 detail={false}
-                buttonText="เพิ่มผู้ใช้งานใหม่"/>
+                buttonText="ผู้ใช้งาน"/>
 
                 <Cardno2 data={staffData}/>
 

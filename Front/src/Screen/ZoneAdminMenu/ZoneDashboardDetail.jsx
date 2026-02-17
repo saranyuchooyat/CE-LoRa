@@ -7,8 +7,10 @@ import MenuNameCard2 from '../../components/MainCardOption/MenuNameCard2';
 import Cardno8 from '../../components/Card/Cardno8';
 import Cardno9 from '../../components/Card/Cardno9';
 import Cardno5 from '../../components/Card/Cardno5';
+import CardFull from '../../components/Card/Cardno5';
 import Modal from '../../components/ModalForm/Modal';
 import AddElderlyform from '../../components/ModalForm/AddElderly';
+
 
 
 function ZoneDashboardDetail (){
@@ -19,6 +21,10 @@ function ZoneDashboardDetail (){
     const [isModalOpen, setIsModalOpen] = useState(false);
     const handleOpenModal = () => setIsModalOpen(true);
     const handleCloseModal = () => setIsModalOpen(false);
+
+    const [isModalOpenStaff, setIsModalOpenStaff] = useState(false);
+    const handleOpenModalStaff = () => setIsModalOpenStaff(true);
+    const handleCloseModalStaff = () => setIsModalOpenStaff(false);
     
 
 
@@ -26,6 +32,7 @@ function ZoneDashboardDetail (){
     const zoneDashboardQueries = useQueries({
         queries: [
             { queryKey: ['zoneDashboard'], queryFn: () => api.get(`/zones/${zoneid}/dashboard`).then(res => res.data) },
+            { queryKey: ['zoneStaffData'], queryFn: () => api.get(`/zones/${zoneid}/staff`).then(res => res.data) },
         ],
     });
 
@@ -33,9 +40,7 @@ function ZoneDashboardDetail (){
     const isDashboardError = zoneDashboardQueries.some(query => query.isError);
 
     const zoneDashboard = zoneDashboardQueries[0].data || [];
-
-    console.log("ZoneDashboardData",zoneDashboard)
-
+    const zoneStaffData = zoneDashboardQueries[1].data || [];
 
     useEffect(() => {
         const tokenInStorage = localStorage.getItem('token');
@@ -125,9 +130,14 @@ function ZoneDashboardDetail (){
                 <MenuNameCard
                     title={zoneDetail?.name || "Zone Detail"}
                     description={"Zone Admin Dashboard"}
-                    onButtonClick={false}
-                    detail="2/2"
-                    buttonText="จำนวนผู้ดูแล"
+                    onButtonClick={null}
+                    detail= {zoneStaffData.length + " คน"}
+                    buttonText="ผู้ดูแล"
+                />
+                <CardFull 
+                    data={zoneStaffData}
+                    showActions={false}
+                    onEdit={(user) => console.log("Edit User:", user)}
                 />
 
                 <MenuNameCard2
@@ -139,7 +149,8 @@ function ZoneDashboardDetail (){
                 
                 <Cardno5 data={allAlertDetail}/>
                 <Cardno8 healthdata={mockGraphData} devicedata={allDeviceStatus}/>
-                <Cardno9 data=""/>
+                {/* <Cardno9 data=""/> */}
+                
             </div>
 
             <Modal
@@ -148,11 +159,20 @@ function ZoneDashboardDetail (){
                 onClose={handleCloseModal}
             >
                 <AddElderlyform
-                    onClose={()=>{
+                    zoneid={zoneid}
+                    onSaveSuccess={() => {
                         handleCloseModal();
-                        window.location.reload(); // รีโหลดหน้าเพื่อแสดงข้อมูลใหม่หลังจากเพิ่มผู้สูงอายุ
+                        zoneDashboardQueries[0].refetch(); 
                     }}
                 />
+            </Modal>
+
+            <Modal
+                title="เพิ่มผู้ดูแลโซน"
+                isOpen={isModalOpenStaff}
+                onClose={handleCloseModalStaff}
+            >
+                
             </Modal>
         </>
     );

@@ -13,6 +13,7 @@ import NotFoundPage from './NotFound';
 import LoginPage from './Login';
 import DeviceDetail from './DeviceDetail';
 import ElderlyMonitoring from './ZoneStaffMenu/ElderlyMonitoring';
+import AlertManagement from './ZoneStaffMenu/AlertManagement';
 
 function MainLayout() {
   return (
@@ -39,6 +40,7 @@ function MainLayout() {
 
           {/* Zone Staff Menu */}
           <Route path="/eldery-monitoring" element={<ElderlyMonitoring/>}/>
+          <Route path="/alert-management" element={<AlertManagement/>}/>
 
           <Route path="/emergency-respond" element={<EmergencyRespondDashboard/>} />
           <Route path="*" element={<NotFoundPage />} />
