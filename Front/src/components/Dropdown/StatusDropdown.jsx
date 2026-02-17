@@ -11,8 +11,8 @@ function StatusDropdown({ onSelect, currentValue, optionalKey }) {
         if (optionalKey === "province") {
             // ตั้งค่าสำหรับ Zone Status
             setStatusValues({
-                value1: 'Active',
-                value2: 'Inactive'
+                value1: 'active',
+                value2: 'inactive'
             });
         } else if (optionalKey === "role") {
             // ตั้งค่าสำหรับ Device Status/Role

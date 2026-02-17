@@ -97,7 +97,8 @@ type Alert struct {
 	ID          int    `json:"id"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
-	CreatedAt   string `json:"createdAt"`
+	CreatedAt   string `json:"created_at"`
+	Severity    string `json:"severity"`
 }
 
 type UsageTrend struct {

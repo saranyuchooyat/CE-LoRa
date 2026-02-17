@@ -40,6 +40,7 @@ function ZoneManagement() {
   const isSystemError = zoneQueries.some(query => query.isError);
 
   const zoneData = zoneQueries[0].data || [];
+  console.log("Zone Data:", zoneData);
 
   console.log(zoneQueries.status)
 
@@ -76,7 +77,7 @@ function ZoneManagement() {
 
   const filteredZones = useMemo(() => {
     const { search, province, status } = filters;
-    let data = zoneData; 
+    let data = zoneData || []; 
 
     // กรองตามช่องค้นหา (Search)
     if (search) {
@@ -84,15 +85,15 @@ function ZoneManagement() {
       data = data.filter((zone) => {
 
         // 1. การค้นหาด้วย ID (ต้องแปลงเป็น String ก่อน)
-        const zoneIdSearch = zone.zoneid
-          ? String(zone.zoneid).includes(lowerSearch)
+        const zoneIdSearch = zone.zone_id
+          ? String(zone.zone_id).toLowerCase().includes(lowerSearch)
           : false;
 
         // 2. การค้นหาด้วยชื่อและรหัส (ป้องกันค่าเป็น null/undefined ก่อนเรียก toLowerCase)
         const nameSearch =
-          zone.zonename && zone.zonename.toLowerCase().includes(lowerSearch);
+          zone.zone_name && zone.zone_name.toLowerCase().includes(lowerSearch);
         const addressSearch =
-          zone.address && zone.address.toLowerCase().includes(lowerSearch);
+          zone.zone_address && zone.zone_address.toLowerCase().includes(lowerSearch);
 
         // รวมผลลัพธ์การค้นหาทั้งหมด
         return zoneIdSearch || nameSearch || addressSearch;
@@ -167,7 +168,7 @@ function ZoneManagement() {
       >
         <EditZoneForm
           zoneData={selectedZoneData} 
-          zoneId={selectedZoneData?.zoneid} 
+          zoneId={selectedZoneData?.zone_id} 
           onClose={handleCloseEditModal}
           onSaveSuccess={() => zoneQueries[0].refetch()}
         />

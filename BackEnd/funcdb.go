@@ -22,7 +22,7 @@ func getCollection(collectionName string) *mongo.Collection {
 	return MI.DB.Collection(collectionName)
 }
 
-// 🔐 AUTHENTICATION
+// AUTHENTICATION
 func login(c *fiber.Ctx) error {
 	type LoginRequest struct {
 		Username string `json:"username"`
@@ -75,14 +75,14 @@ func login(c *fiber.Ctx) error {
 	})
 }
 
-// 📊 DASHBOARD FUNCTIONS
+// DASHBOARD FUNCTIONS
 func getDashSum(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	usersCount, _ := getCollection("users").CountDocuments(ctx, bson.M{})
 	zonesCount, _ := getCollection("zones").CountDocuments(ctx, bson.M{})
-	eldersCount, _ := getCollection("elderlys").CountDocuments(ctx, bson.M{})
+	eldersCount, _ := getCollection("elders").CountDocuments(ctx, bson.M{})
 	devicesCount, _ := getCollection("devices").CountDocuments(ctx, bson.M{})
 
 	return c.JSON(fiber.Map{
@@ -95,24 +95,45 @@ func getDashSum(c *fiber.Ctx) error {
 
 func getTopZones(c *fiber.Ctx) error {
 	limit := c.QueryInt("limit", 5)
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
+	pipeline := mongo.Pipeline{
+		{{Key: "$lookup", Value: bson.D{
+			{Key: "from", Value: "elders"},
+			{Key: "localField", Value: "zone_id"},
+			{Key: "foreignField", Value: "zone_id"},
+			{Key: "as", Value: "elder_list"},
+		}}},
 
-	opts := options.Find().SetSort(bson.M{"active_user": -1}).SetLimit(int64(limit))
+		{{Key: "$addFields", Value: bson.D{
+			{Key: "active_user", Value: bson.D{{Key: "$size", Value: "$elder_list"}}},
+		}}},
 
-	cursor, err := getCollection("zones").Find(ctx, bson.M{}, opts)
+		{{Key: "$project", Value: bson.D{
+			{Key: "elder_list", Value: 0},
+		}}},
+
+		{{Key: "$sort", Value: bson.D{{Key: "active_user", Value: -1}}}},
+
+		{{Key: "$limit", Value: limit}},
+	}
+
+	cursor, err := getCollection("zones").Aggregate(ctx, pipeline)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Error fetching top zones"})
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
 	defer cursor.Close(ctx)
 
-	var topZones []Zone = []Zone{}
-	cursor.All(ctx, &topZones)
+	var topZones []Zone
+	if err = cursor.All(ctx, &topZones); err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+
 	return c.JSON(fiber.Map{"topzones": topZones})
 }
 
 func getSystemHealth(c *fiber.Ctx) error {
-	// ส่งกลับเป็น Array ([]) ของ Object แทนที่จะเป็น Object เดี่ยวๆ
 	return c.JSON([]fiber.Map{
 		{
 			"name":        "LoRaWAN Server",
@@ -152,7 +173,7 @@ func getUserTrend(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"trend": trends})
 }
 
-// 👤 USER MANAGEMENT
+// USER MANAGEMENT
 func getAllUser(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -182,20 +203,42 @@ func createUser(c *fiber.Ctx) error {
 	if err := c.BodyParser(user); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
 	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	filter := bson.M{"user_id": bson.M{"$regex": "^UID"}}
+	opts := options.FindOne().SetSort(bson.M{"user_id": -1})
+
+	var lastUser User
+	err := getCollection("users").FindOne(ctx, filter, opts).Decode(&lastUser)
+
+	if err == nil {
+		var lastNum int
+		_, scanErr := fmt.Sscanf(lastUser.UserID, "UID%03d", &lastNum)
+		if scanErr == nil {
+			user.UserID = fmt.Sprintf("UID%03d", lastNum+1)
+		} else {
+			user.UserID = fmt.Sprintf("UID%03d", rand.Intn(9999))
+		}
+	} else {
+		user.UserID = "UID001"
+	}
+
+	if user.ID.IsZero() {
+		user.ID = primitive.NewObjectID()
+	}
+
 	count, _ := getCollection("users").CountDocuments(ctx, bson.M{"user_id": user.UserID})
 	if count > 0 {
-		return c.Status(400).JSON(fiber.Map{"error": "User ID already exists"})
+		return c.Status(400).JSON(fiber.Map{"error": "User ID already exists (System Error)"})
 	}
-	if user.UserID == "" {
-		user.UserID = primitive.NewObjectID().Hex()
-	}
-	_, err := getCollection("users").InsertOne(ctx, user)
+
+	_, err = getCollection("users").InsertOne(ctx, user)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to create user"})
 	}
+
 	return c.Status(201).JSON(user)
 }
 
@@ -251,7 +294,7 @@ func deleteUser(c *fiber.Ctx) error {
 	return c.SendStatus(204)
 }
 
-// 🏙️ ZONE MANAGEMENT
+// ZONE MANAGEMENT
 func getAllZone(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -297,39 +340,28 @@ func createZone(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	// 👇 LOGIC สร้าง ID ใหม่ (Auto Increment Z001, Z002...)
-	// 1. ค้นหา Zone ล่าสุด ที่ขึ้นต้นด้วยตัว "Z" โดยเรียงจากมากไปน้อย
-	filter := bson.M{"zone_id": bson.M{"$regex": "^Z"}}      // หาเฉพาะที่ขึ้นต้นด้วย Z
-	opts := options.FindOne().SetSort(bson.M{"zone_id": -1}) // เรียง Z005, Z004... เอาตัวแรก
+	filter := bson.M{"zone_id": bson.M{"$regex": "^Z"}}
+	opts := options.FindOne().SetSort(bson.M{"zone_id": -1})
 
 	var lastZone Zone
 	err := getCollection("zones").FindOne(ctx, filter, opts).Decode(&lastZone)
 
 	if err == nil {
-		// กรณีเจอตัวล่าสุด (เช่น Z002)
 		var lastNum int
-		// แกะตัวเลขออกมา: Z002 -> ได้เลข 2
 		_, scanErr := fmt.Sscanf(lastZone.ZoneID, "Z%03d", &lastNum)
 		if scanErr == nil {
-			// สร้างเลขใหม่: Z + (2+1) -> Z003
 			zone.ZoneID = fmt.Sprintf("Z%03d", lastNum+1)
 		} else {
-			// กรณีแกะไม่ออก (กันเหนียว)
 			zone.ZoneID = fmt.Sprintf("Z%03d", rand.Intn(999))
 		}
 	} else {
-		// กรณีไม่เจอสักตัวใน Database (เป็นตัวแรกสุด)
 		zone.ZoneID = "Z001"
 	}
-	// 👆 จบ Logic สร้าง ID
 
-	// ตั้งค่า Default อื่นๆ
 	if zone.Status == "" {
 		zone.Status = "active"
 	}
-	// ถ้า active_user ไม่ส่งมา มันจะเป็น 0 โดยอัตโนมัติ (เพราะเป็น int)
 
-	// บันทึกลง DB
 	_, err = getCollection("zones").InsertOne(ctx, zone)
 	if err != nil {
 		fmt.Println("❌ Insert Zone Error:", err)
@@ -370,31 +402,86 @@ func deleteZone(c *fiber.Ctx) error {
 	return c.SendStatus(204)
 }
 
-// 👴 ELDERLY & DEVICES
+// ELDERLY & DEVICES
 func getAllElderly(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
+
 	var elders []Elder = []Elder{}
-	cursor, _ := getCollection("elderlys").Find(ctx, bson.M{})
-	cursor.All(ctx, &elders)
+
+	cursor, err := getCollection("elders").Find(ctx, bson.M{})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Database error: " + err.Error()})
+	}
+	defer cursor.Close(ctx)
+
+	if err = cursor.All(ctx, &elders); err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Error decoding data"})
+	}
+
 	return c.JSON(elders)
 }
 
 func getElderinZone(c *fiber.Ctx) error {
-	// รับ id zone
 	zoneID := c.Params("id")
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
+
 	var elders []Elder = []Elder{}
-	cursor, _ := getCollection("elderlys").Find(ctx, bson.M{"zone_id": zoneID})
-	cursor.All(ctx, &elders)
+
+	cursor, err := getCollection("elders").Find(ctx, bson.M{"zone_id": zoneID})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch elders"})
+	}
+	defer cursor.Close(ctx)
+
+	if err = cursor.All(ctx, &elders); err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to decode elders"})
+	}
 	return c.JSON(elders)
 }
 
 func addEldertoZone(c *fiber.Ctx) error {
-	// Implement การเพิ่มคนแก่ลง Zone (คล้าย createUser)
-	// ตอนนี้ return success ไปก่อน หรือใส่ logic เพิ่มตามต้องการ
-	return c.JSON(fiber.Map{"message": "Elder added (Logic pending)"})
+	elder := new(Elder)
+	if err := c.BodyParser(elder); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid data format"})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	filter := bson.M{"elder_id": bson.M{"$regex": "^E"}}
+	opts := options.FindOne().SetSort(bson.M{"elder_id": -1})
+
+	var lastElder Elder
+	err := getCollection("elders").FindOne(ctx, filter, opts).Decode(&lastElder)
+
+	if err == nil {
+		var lastNum int
+		_, scanErr := fmt.Sscanf(lastElder.ElderID, "E%03d", &lastNum)
+		if scanErr == nil {
+			elder.ElderID = fmt.Sprintf("E%03d", lastNum+1)
+		} else {
+			elder.ElderID = fmt.Sprintf("E%03d", rand.Intn(999))
+		}
+	} else {
+		elder.ElderID = "E001"
+	}
+
+	if elder.ID.IsZero() {
+		elder.ID = primitive.NewObjectID()
+	}
+
+	_, err = getCollection("elders").InsertOne(ctx, elder)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to add elder: " + err.Error()})
+	}
+
+	return c.Status(201).JSON(fiber.Map{
+		"message": "Elder added successfully",
+		"elder":   elder,
+	})
 }
 
 func getAllDevice(c *fiber.Ctx) error {
@@ -443,47 +530,65 @@ func getZoneDashboard(c *fiber.Ctx) error {
 	zoneID := c.Params("id")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
+
 	var zone Zone
 	err := getCollection("zones").FindOne(ctx, bson.M{"zone_id": zoneID}).Decode(&zone)
 	if err != nil {
 		return c.Status(404).JSON(fiber.Map{"error": "Zone not found"})
 	}
+
 	var zoneElders []Elder = []Elder{}
-	cursor, _ := getCollection("elderlys").Find(ctx, bson.M{"zone_id": zoneID})
-	cursor.All(ctx, &zoneElders)
+	cursor, err := getCollection("elders").Find(ctx, bson.M{"zone_id": zoneID})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Error fetching elders"})
+	}
+	if err = cursor.All(ctx, &zoneElders); err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Error decoding elders"})
+	}
+
 	deviceStatus := map[string]int{"online": 0, "offline": 0, "total": 0}
 	var alertsInZone []Alert = []Alert{}
+
 	for _, e := range zoneElders {
 		if e.DeviceID != "" {
 			deviceStatus["total"]++
-			status := "online" // Mockup
+
+			status := "online"
+			if rand.Intn(10) < 2 {
+				status = "offline"
+			}
+
 			if status == "online" {
 				deviceStatus["online"]++
 			} else {
 				deviceStatus["offline"]++
 				alertsInZone = append(alertsInZone, Alert{
-					ID:          rand.Intn(1000),
+					ID:          rand.Intn(10000),
 					Title:       "Device Offline",
-					Description: fmt.Sprintf("Device of %s %s is offline", e.FirstName, e.LastName),
+					Description: fmt.Sprintf("อุปกรณ์ของ %s %s ขาดการเชื่อมต่อ", e.FirstName, e.LastName),
 					CreatedAt:   time.Now().Format(time.RFC3339),
+					Severity:    "High", // เพิ่มความรุนแรง (ถ้ามี field นี้)
 				})
 			}
 		}
+
 		if e.HealthStatus == "Critical" {
 			alertsInZone = append(alertsInZone, Alert{
-				ID:          rand.Intn(1000),
+				ID:          rand.Intn(10000),
 				Title:       "Critical Health",
-				Description: fmt.Sprintf("Elder %s %s is in critical condition", e.FirstName, e.LastName),
+				Description: fmt.Sprintf("ผู้สูงอายุ %s %s อยู่ในภาวะวิกฤต", e.FirstName, e.LastName),
 				CreatedAt:   time.Now().Format(time.RFC3339),
+				Severity:    "Critical",
 			})
 		}
 	}
+
 	return c.JSON(fiber.Map{
 		"zone": fiber.Map{
 			"id":          zone.ZoneID,
 			"name":        zone.ZoneName,
 			"status":      zone.Status,
-			"activeUsers": zone.ActiveUser,
+			"activeUsers": len(zoneElders),
 		},
 		"elderlyCount": len(zoneElders),
 		"deviceStatus": deviceStatus,
@@ -492,7 +597,7 @@ func getZoneDashboard(c *fiber.Ctx) error {
 	})
 }
 
-// 📧 UTILS
+// UTILS
 func resetPassword(c *fiber.Ctx) error {
 	id := c.Params("id")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

@@ -49,42 +49,42 @@ func main() {
 	}))
 
 	// --- Users ---
-	app.Get("/users", getAllUser)
-	app.Post("/users", createUser)
-	app.Get("/users/:id", getUserByID)
-	app.Put("/users/:id", updateUser)
-	app.Delete("/users/:id", deleteUser)
+	app.Get("/users", getAllUser)        //✅
+	app.Post("/users", createUser)       //✅
+	app.Get("/users/:id", getUserByID)   //✅
+	app.Put("/users/:id", updateUser)    //✅
+	app.Delete("/users/:id", deleteUser) //✅
 	app.Post("/users/:id/reset-password", resetPassword)
 
 	// --- Zones ---
 	// ⚠️ ลำดับสำคัญ: เอา path เฉพาะเจาะจงไว้ก่อน :id
-	app.Get("/zones", getAllZone)
-	app.Get("/zones/my-zones", getMyZone)
-	app.Post("/zones/elderlyRegister", addEldertoZone)
-	app.Post("/zones", createZone)
+	app.Get("/zones", getAllZone)                      //✅
+	app.Get("/zones/my-zones", getMyZone)              //✅
+	app.Post("/zones/elderlyRegister", addEldertoZone) //✅
+	app.Post("/zones", createZone)                     //✅
 
 	// Dynamic Routes for Zones
-	app.Put("/zones/:id", updateZone)
-	app.Delete("/zones/:id", deleteZone)
-	app.Get("/zones/:id/dashboard", getZoneDashboard)
-	app.Get("/zones/:id/elder", getElderinZone)
+	app.Put("/zones/:id", updateZone)                 //✅
+	app.Delete("/zones/:id", deleteZone)              //✅
+	app.Get("/zones/:id/dashboard", getZoneDashboard) //✅
+	app.Get("/zones/:id/elder", getElderinZone)       //✅
 
 	// --- Elders ---
-	app.Get("/elders", getAllElderly)
+	app.Get("/elders", getAllElderly) //✅
 	// app.Get("/elders/:id", getElderDetail)
 
 	// --- Devices ---
-	app.Get("/devices", getAllDevice)
+	app.Get("/devices", getAllDevice) //✅
 	app.Post("/devices", createDevice)
 	app.Put("/devices/:id", updateDevice)
 	app.Delete("/devices/:id", deleteDevice)
 	app.Get("/device_data/:device_id", getDeviceDataByDeviceID)
 
 	// --- System Dashboard ---
-	app.Get("/dashboard/usage-trend", getUserTrend)
-	app.Get("/dashboard/summary", getDashSum)
-	app.Get("/dashboard/top-zones", getTopZones)
-	app.Get("/system/health/servers", getSystemHealth)
+	app.Get("/dashboard/usage-trend", getUserTrend)    //mock
+	app.Get("/dashboard/summary", getDashSum)          //✅
+	app.Get("/dashboard/top-zones", getTopZones)       //✅
+	app.Get("/system/health/servers", getSystemHealth) //mock
 
 	// Start Server
 	log.Fatal(app.Listen(":8080"))
