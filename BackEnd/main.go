@@ -4,10 +4,10 @@ import (
 	"log"
 	"os"
 
-	jwtware "github.com/gofiber/contrib/jwt" // 👈 ต้องมีอันนี้
+	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	_ "github.com/saranyuchooyat/CE-LoRa/docs" // 👈 import docs ของ Swagger
+	_ "github.com/saranyuchooyat/CE-LoRa/docs"
 	fiberSwagger "github.com/swaggo/fiber-swagger"
 )
 
@@ -36,7 +36,7 @@ func main() {
 	app.Post("/auth/login", login)
 
 	// =====================================
-	// 🔒 Private Routes (ต้อง Login ก่อน)
+	// Private Routes (ต้อง Login ก่อน)
 	// =====================================
 
 	// JWT Configuration
@@ -57,7 +57,6 @@ func main() {
 	app.Post("/users/:id/reset-password", resetPassword)
 
 	// --- Zones ---
-	// ⚠️ ลำดับสำคัญ: เอา path เฉพาะเจาะจงไว้ก่อน :id
 	app.Get("/zones", getAllZone)                      //✅
 	app.Get("/zones/my-zones", getMyZone)              //✅
 	app.Post("/zones/elderlyRegister", addEldertoZone) //✅
@@ -74,10 +73,10 @@ func main() {
 	// app.Get("/elders/:id", getElderDetail)
 
 	// --- Devices ---
-	app.Get("/devices", getAllDevice) //✅
-	app.Post("/devices", createDevice)
-	app.Put("/devices/:id", updateDevice)
-	app.Delete("/devices/:id", deleteDevice)
+	app.Get("/devices", getAllDevice)        //✅
+	app.Post("/devices", createDevice)       //✅
+	app.Put("/devices/:id", updateDevice)    //✅
+	app.Delete("/devices/:id", deleteDevice) //✅
 	app.Get("/device_data/:device_id", getDeviceDataByDeviceID)
 
 	// --- System Dashboard ---

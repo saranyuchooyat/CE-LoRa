@@ -498,22 +498,101 @@ func createDevice(c *fiber.Ctx) error {
 	if err := c.BodyParser(device); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
 	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	getCollection("devices").InsertOne(ctx, device)
-	return c.JSON(device)
+
+	filter := bson.M{"device_id": bson.M{"$regex": "^D"}}
+	opts := options.FindOne().SetSort(bson.M{"device_id": -1})
+
+	var lastDevice Device
+	err := getCollection("devices").FindOne(ctx, filter, opts).Decode(&lastDevice)
+
+	if err == nil {
+		var lastNum int
+		_, scanErr := fmt.Sscanf(lastDevice.DeviceID, "D%03d", &lastNum)
+		if scanErr == nil {
+			device.DeviceID = fmt.Sprintf("D%03d", lastNum+1)
+		} else {
+			device.DeviceID = fmt.Sprintf("D%03d", rand.Intn(999))
+		}
+	} else {
+		device.DeviceID = "D001"
+	}
+
+	if device.ID.IsZero() {
+		device.ID = primitive.NewObjectID()
+	}
+
+	_, err = getCollection("devices").InsertOne(ctx, device)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to create device"})
+	}
+
+	return c.Status(201).JSON(device)
 }
 
 func updateDevice(c *fiber.Ctx) error {
-	// Implement update logic
-	return c.JSON(fiber.Map{"message": "Device updated"})
+	id := c.Params("id")
+	deviceUpdate := new(Device)
+
+	if err := c.BodyParser(deviceUpdate); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "ข้อมูลไม่ถูกต้อง"})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	updateFields := bson.M{}
+
+	if deviceUpdate.DeviceName != "" {
+		updateFields["device_name"] = deviceUpdate.DeviceName
+	}
+
+	if deviceUpdate.Description != "" {
+		updateFields["description"] = deviceUpdate.Description
+	}
+
+	if len(updateFields) == 0 {
+		return c.Status(400).JSON(fiber.Map{"error": "กรุณาระบุข้อมูลที่ต้องการแก้ไข"})
+	}
+
+	result, err := getCollection("devices").UpdateOne(
+		ctx,
+		bson.M{"device_id": id},
+		bson.M{"$set": updateFields},
+	)
+
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "ไม่สามารถอัปเดตข้อมูลได้"})
+	}
+
+	if result.MatchedCount == 0 {
+		return c.Status(404).JSON(fiber.Map{"error": "ไม่พบอุปกรณ์รหัส " + id})
+	}
+
+	return c.JSON(fiber.Map{
+		"message":   "อัปเดตอุปกรณ์สำเร็จ",
+		"device_id": id,
+	})
 }
 
 func deleteDevice(c *fiber.Ctx) error {
 	id := c.Params("id")
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	getCollection("devices").DeleteOne(ctx, bson.M{"device_id": id})
+
+	result, err := getCollection("devices").DeleteOne(ctx, bson.M{"device_id": id})
+
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "ไม่สามารถเชื่อมต่อฐานข้อมูลได้"})
+	}
+
+	if result.DeletedCount == 0 {
+		return c.Status(404).JSON(fiber.Map{"error": "ไม่พบอุปกรณ์รหัส " + id})
+	}
+
 	return c.SendStatus(204)
 }
 
