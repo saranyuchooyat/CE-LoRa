@@ -67,6 +67,7 @@ func main() {
 	app.Delete("/zones/:id", deleteZone)              //✅
 	app.Get("/zones/:id/dashboard", getZoneDashboard) //✅
 	app.Get("/zones/:id/elder", getElderinZone)       //✅
+	app.Get("/zones/:id/staff", getZoneStaff)         //✅
 
 	// --- Elders ---
 	app.Get("/elders", getAllElderly) //✅

@@ -29,12 +29,12 @@ function CardFull({ data, onEdit, onSetting, showActions=true }) {
     };
 
     const isStaffData = (arr) => {
-        if (!Array.isArray(arr) || arr.length === 0) {
-            return false;
-        }
-        console.log("arr3",'userId' in arr[0] && 'name' in arr[0])
-        return 'userId' in arr[0] && 'name' in arr[0];
+    if (!Array.isArray(arr) || arr.length === 0) {
+        return false;
     }
+    console.log("arr3 check:", 'user_id' in arr[0] && 'username' in arr[0]);
+    return 'user_id' in arr[0] && 'username' in arr[0];
+}
 
     const isZoneStaffData = (arr) => {
         if (!Array.isArray(arr) || arr.length === 0) {

@@ -3,15 +3,15 @@ import api from "../API";
 
 function EditUserForm({ userId, onClose, onSaveSuccess }) {
     const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
+        first_name: '', 
+        last_name: '',  
         email: '',
         phone: '',
         description: '',
         position: '',
         role: 'เลือกบทบาท',
         username: '',
-        password: '', // 💡 ใส่ไว้เผื่อกรณีต้องการเปลี่ยนรหัสผ่าน
+        password: '', 
         zoneids: []
     });
     
@@ -19,7 +19,6 @@ function EditUserForm({ userId, onClose, onSaveSuccess }) {
     const [openRole, setOpenRole] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // 1. ดึงข้อมูลเดิมมาแสดง
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -29,20 +28,17 @@ function EditUserForm({ userId, onClose, onSaveSuccess }) {
                 });
                 const user = response.data;
                 
-                // แยกชื่อ-นามสกุล
-                const nameParts = user.name ? user.name.split(' ') : ['', ''];
-                
                 setFormData({
-                    firstName: nameParts[0],
-                    lastName: nameParts[1] || '',
+                    first_name: user.first_name || '',
+                    last_name: user.last_name || '',
                     email: user.email || '',
                     phone: user.phone || '',
                     description: user.description || '',
                     position: user.position || '',
                     role: user.role || 'เลือกบทบาท',
                     username: user.username || '',
-                    password: '', // 💡 เว้นว่างไว้ (Security Best Practice)
-                    zoneids: user.zoneIds || []
+                    password: '', 
+                    zoneids: user.zone_id || user.zoneIds || []
                 });
             } catch (error) {
                 console.error("Error fetching user:", error);
@@ -53,7 +49,6 @@ function EditUserForm({ userId, onClose, onSaveSuccess }) {
         if (userId) fetchUserData();
     }, [userId]);
 
-    // 2. จัดการการเปลี่ยนแปลงข้อมูลใน Input
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -64,24 +59,23 @@ function EditUserForm({ userId, onClose, onSaveSuccess }) {
         setOpenRole(false);
     };
 
-    // 3. ส่งข้อมูลที่แก้ไขกลับไป
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
         const token = localStorage.getItem('token');
 
         const dataToSend = {
-            name: `${formData.firstName} ${formData.lastName}`.trim(),
+            first_name: formData.first_name.trim(),
+            last_name: formData.last_name.trim(),
             username: formData.username,
             email: formData.email,
             phone: formData.phone,
             description: formData.description,
             position: formData.position,
             role: formData.role,
-            zoneIds: formData.zoneids
+            zone_id: formData.zoneids
         };
 
-        // 💡 ส่ง password ไปเฉพาะเมื่อมีการกรอกใหม่เท่านั้น
         if (formData.password) {
             dataToSend.password = formData.password;
         }
@@ -90,8 +84,8 @@ function EditUserForm({ userId, onClose, onSaveSuccess }) {
             await api.put(`/users/${userId}`, dataToSend, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            onSaveSuccess(); // รีเฟรชตาราง
-            onClose(); // ปิด Modal
+            onSaveSuccess(); 
+            onClose(); 
         } catch (error) {
             console.error("Update failed:", error.response?.data || error.message);
             alert("บันทึกการแก้ไขไม่สำเร็จ");
@@ -105,14 +99,15 @@ function EditUserForm({ userId, onClose, onSaveSuccess }) {
     return (
         <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                {/* แถวที่ 1: ชื่อ - นามสกุล */}
+                {/* ✅ แก้ไข 4: เปลี่ยน name และ value เป็น first_name */}
                 <div className="mb-2">
                     <label className="block text-gray-700 text-sm font-bold">ชื่อ</label>
-                    <input name="firstName" type="text" value={formData.firstName} onChange={handleChange} className="border rounded w-full p-2 bg-white" required />
+                    <input name="first_name" type="text" value={formData.first_name} onChange={handleChange} className="border rounded w-full p-2 bg-white" required />
                 </div>
+                {/* ✅ แก้ไข 5: เปลี่ยน name และ value เป็น last_name */}
                 <div className="mb-2">
                     <label className="block text-gray-700 text-sm font-bold">นามสกุล</label>
-                    <input name="lastName" type="text" value={formData.lastName} onChange={handleChange} className="border rounded w-full p-2 bg-white" required />
+                    <input name="last_name" type="text" value={formData.last_name} onChange={handleChange} className="border rounded w-full p-2 bg-white" required />
                 </div>
 
                 {/* แถวที่ 2: อีเมล - เบอร์โทร */}
@@ -132,7 +127,7 @@ function EditUserForm({ userId, onClose, onSaveSuccess }) {
                 </div>
                 <div className="mb-2">
                     <label className="block text-gray-700 text-sm font-bold">เปลี่ยนรหัสผ่าน</label>
-                    <label className="block text-gray-700 text-sm font-bold">(เว้นว่างไว้หากไม่ต้องการเปลี่ยน)</label>
+                    <label className="block text-gray-700 text-sm font-bold text-gray-400">(เว้นว่างไว้หากไม่ต้องการเปลี่ยน)</label>
                     <input name="password" type="password" value={formData.password} onChange={handleChange} className="border rounded w-full p-2 bg-white" placeholder="รหัสผ่านใหม่" />
                 </div>
 

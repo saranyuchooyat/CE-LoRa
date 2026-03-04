@@ -9,7 +9,7 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
     console.log("table data", data);
     const location = useLocation();
 
-    //ดึงข้อมูลหลังบ้าน
+    // ดึงข้อมูลโซนจากหลังบ้านเพื่อเอามาจับคู่ชื่อ
     const userQueries = useQueries({
         queries: [
         { queryKey: ['zone'], queryFn: () => api.get('/zones').then(res => res.data) },
@@ -23,42 +23,46 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
         const tokenInStorage = localStorage.getItem('token');
         if (location.state?.token && location.state.token !== tokenInStorage) {
             localStorage.setItem('token', location.state.token);
-            // 💡 เมื่อบันทึก Token ใหม่แล้ว React Query จะทำการ Refetch ให้อัตโนมัติ
-            // เนื่องจากทุก Query จะถูก Trigger เมื่อ Token ถูกบันทึกและ Component Rerender
         }
     }, [location.state]);
 
     const zoneData = userQueries[0].data || [];
-    //ดึงข้อมูลหลังบ้าน
 
-    
+    // ✅ แก้ไข 1: ปรับฟังก์ชันดึงชื่อโซนให้รองรับ zone_id และ zone_name แบบใหม่
+    const getZoneName = (userZoneId, zoneData) => {
+        if (!userZoneId) return "N/A"; 
 
-    const getZoneName = (userZone,zoneData) => {
-        if (!userZone) {
-            return "N/A"; 
+        // กรณีที่ Backend ส่ง zone_id เป็น Array (เช่น [ "Z001", "Z002" ])
+        if (Array.isArray(userZoneId)) {
+            const matchedZones = zoneData.filter(zone => userZoneId.includes(zone.zone_id));
+            if(matchedZones.length > 0){
+                return matchedZones.map(zone => zone.zone_name).join(', ');
+            }
+            return "N/A";
         }
 
-        const matchedZones = zoneData.filter(zone => userZone.includes(zone.zoneid));
-
-        if(matchedZones.length > 0){
-            return matchedZones.map(zone => zone.zonename).join(', ');
-        } 
-        return "N/A";
+        // กรณีที่ Backend ส่ง zone_id มาเป็น String เดี่ยวๆ (เช่น "Z001")
+        const matchedZone = zoneData.find(zone => zone.zone_id === userZoneId);
+        return matchedZone ? matchedZone.zone_name : "N/A";
     };
 
+    // ✅ แก้ไข 2: ปรับ Status ให้รองรับตัวพิมพ์เล็ก-ใหญ่ และ active/inactive
     const statusCheck = (status) => {
-        console.log("user",status)
-        switch (status) {
-            case 'Online':
+        if (!status) return 'text-gray-700 bg-gray-200';
+        
+        const lowerStatus = status.toLowerCase();
+        switch (lowerStatus) {
+            case 'online':
+            case 'active':
                 return 'text-main-blue bg-complete-bg';
             case 'offline':
+            case 'inactive':
                 return 'text-gray-800 bg-gray-300';
             default:
                 return 'text-gray-700 bg-gray-200';
         } 
     };
 
-    // Delete Button
     const { mutate: deleteUser, isPending } = ApiDelete('user'); 
 
     const handleDeleteClick = (userId, event) => {
@@ -67,20 +71,16 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
             deleteUser(userId); 
         }
     };
-    // Delete Button
 
-    // Edit Button (กำลังพัฒนา)
     const handleEditClick = (userId, event) => {
         event.stopPropagation();
-        onEdit(userId); // 💡 ส่ง ID กลับไปที่ Component แม่
+        onEdit(userId); 
     };
 
-    //Setting Button (กำลังพัฒนา)
     const handleSettingClick = (userId, event) => {
         event.stopPropagation();
-        onSetting(userId); // 💡 ส่ง ID กลับไปที่ Component แม่
+        onSetting(userId); 
     };
-
 
     if (!Array.isArray(data) || data.length === 0) {
         return (
@@ -104,7 +104,6 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
                 <table className="w-full">
                     <thead className="bg-gray-50 border-b-2 border-gray-400">
                         <tr>
-                            {/* Thead ใช้ Role และ Zone เป็น Header */}
                             <th className="table-header">ชื่อ</th>
                             <th className="table-header">ตำแหน่ง</th>
                             <th className="table-header">พื้นที่ดูแล</th>
@@ -117,33 +116,39 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
                         {data.map((card, index) => {
                             const isOddRow = (index % 2 === 0);
                             const rowBgClass = isOddRow ? 'bg-gray-100' : 'bg-gray-50';
-                            const statusClass = statusCheck(card.status);                             
+                            const statusClass = statusCheck(card.status);                            
                             return(
-                                <tr key={index} className={rowBgClass}>
-                                    <td className="table-data whitespace-nowrap">{card.name}</td>
+                                // ใช้ card.user_id เป็น Key เพื่อความเสถียร
+                                <tr key={card.user_id || index} className={rowBgClass}>
+                                    
+                                    {/* ✅ แก้ไข 3: เปลี่ยนชื่อ Key เป็นแบบมี Underscore ให้ตรงกับ Backend */}
+                                    <td className="table-data whitespace-nowrap">{card.username}</td>
                                     <td className="table-data whitespace-nowrap">{card.role || card.position}</td>
-                                    {/* **สำคัญ:** ใช้ card.ZoneName หรือ card.Zone ถ้ามี Key นี้ในข้อมูล */}
-                                    <td className="table-data whitespace-wrap w-[200px]">{getZoneName(card.zoneids,zoneData)}</td>
-                                    <td className="table-data whitespace-nowrap">{card.phone}</td>
+                                    
+                                    {/* ส่ง zone_id ไปหาชื่อโซน */}
+                                    <td className="table-data whitespace-wrap w-[200px]">{getZoneName(card.zone_id, zoneData)}</td>
+                                    
+                                    <td className="table-data whitespace-nowrap">{card.phone || "-"}</td>
                                     <td className="table-data whitespace-nowrap">
                                         <span className={`table-status ${statusClass}`}>{card.status}</span>
                                     </td>
                                     
-                                    {/* Un-commented และแก้ไขส่วนของปุ่ม Menu */}
                                     {showActions && (
                                     <td className="p-3 text-sm text-left whitespace-nowrap w-fit">
+                                        {/* ✅ แก้ไข 4: เปลี่ยน card.userId เป็น card.user_id ในปุ่มกด */}
                                         <button className="table-btn hover:bg-main-yellow hover:text-white"
-                                                onClick={(event) => handleEditClick(card.userId, event)}>
+                                                onClick={(event) => handleEditClick(card.user_id, event)}>
                                             แก้ไข</button>
                                         <button className="table-btn hover:bg-green-500 hover:text-white"
-                                                onClick={(event) => handleSettingClick(card.userId, event)}>
+                                                onClick={(event) => handleSettingClick(card.user_id, event)}>
                                             ตั้งค่า</button>
                                         <button className="table-btn hover:bg-main-red hover:text-white"
-                                                onClick={(event) => handleDeleteClick(card.userId, event)}
+                                                onClick={(event) => handleDeleteClick(card.user_id, event)}
                                                 disabled={isPending} >
                                             {isPending ? 'ลบ...' : 'ลบ'}</button>
                                     </td>
-                                    )}</tr>
+                                    )}
+                                </tr>
                             );
                         })}
                     </tbody>

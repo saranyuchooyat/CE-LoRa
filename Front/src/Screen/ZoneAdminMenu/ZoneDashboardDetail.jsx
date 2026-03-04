@@ -31,8 +31,16 @@ function ZoneDashboardDetail (){
     //ดึงข้อมูลหลังบ้าน
     const zoneDashboardQueries = useQueries({
         queries: [
-            { queryKey: ['zoneDashboard'], queryFn: () => api.get(`/zones/${zoneid}/dashboard`).then(res => res.data) },
-            { queryKey: ['zoneStaffData'], queryFn: () => api.get(`/zones/${zoneid}/staff`).then(res => res.data) },
+            { 
+                queryKey: ['zoneDashboard', zoneid], 
+                queryFn: () => api.get(`/zones/${zoneid}/dashboard`).then(res => res.data),
+                retry: false
+            },
+            { 
+                queryKey: ['zoneStaffData', zoneid], 
+                queryFn: () => api.get(`/zones/${zoneid}/staff`).then(res => res.data),
+                retry: false
+            },
         ],
     });
 
@@ -46,15 +54,12 @@ function ZoneDashboardDetail (){
         const tokenInStorage = localStorage.getItem('token');
         if (location.state?.token && location.state.token !== tokenInStorage) {
              localStorage.setItem('token', location.state.token);
-             // 💡 เมื่อบันทึก Token ใหม่แล้ว React Query จะทำการ Refetch ให้อัตโนมัติ
-             // เนื่องจากทุก Query จะถูก Trigger เมื่อ Token ถูกบันทึกและ Component Rerender
         }
     }, [location.state]);
-    //ดึงข้อมูลหลังบ้าน
 
     console.log("ZoneData",zoneDashboard)
 
-    if (isDashboardLoading || !zoneid) { // ตรวจสอบ isLoading และ zoneid
+    if (isDashboardLoading || !zoneid) {
         return <div className="mx-5 mt-10 text-center text-xl">Loading Zone Dashboard...</div>;
     }
     
@@ -68,7 +73,6 @@ function ZoneDashboardDetail (){
 
 
 
-    // 💡 สมมติ Key ที่จำเป็นสำหรับ MenuNameCard
     const { alerts, deviceStatus, elders, zone } = zoneDashboard;
 
     const allAlertDetail = alerts;
@@ -111,7 +115,6 @@ function ZoneDashboardDetail (){
         { date: "2026-02-06", activeUsers: 110, avgHR: 88, avgSpO2: 95, avgTemp: 36.6 },
         { date: "2026-02-07", activeUsers: 120, avgHR: 90, avgSpO2: 96, avgTemp: 36.8 },
         { date: "2026-02-08", activeUsers: 115, avgHR: 95, avgSpO2: 94, avgTemp: 36.3 },
-        // วันที่ 7 คือวันปัจจุบันที่ใช้ค่าจริงจากที่คุณส่งมา
         { 
             date: "2026-02-09", 
             activeUsers: 125, 
