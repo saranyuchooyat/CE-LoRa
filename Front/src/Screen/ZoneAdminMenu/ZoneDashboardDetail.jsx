@@ -50,12 +50,39 @@ function ZoneDashboardDetail (){
     const zoneDashboard = zoneDashboardQueries[0].data || [];
     const zoneStaffData = zoneDashboardQueries[1].data || [];
 
+    // ตั้งค่า user role
+    const [userRole, setUserRole] = useState(null);
+    useEffect(() => {
+        let role = null;
+        if (location.state?.role) {
+            role = location.state.role;
+        } else {
+            const storedUser = localStorage.getItem("user");
+            if (storedUser) {
+                try {
+                    const userData = JSON.parse(storedUser);
+                    role = userData.role;
+                } catch (e) {
+                    console.error("Failed to parse user data from localStorage:", e);
+                }
+            }
+        }
+        setUserRole(role);
+    }, [location.state]);
+
     useEffect(() => {
         const tokenInStorage = localStorage.getItem('token');
         if (location.state?.token && location.state.token !== tokenInStorage) {
              localStorage.setItem('token', location.state.token);
         }
     }, [location.state]);
+
+    const filteredZoneStaffData = zoneStaffData.filter(user => {
+        if (userRole === "Zone Admin") {
+            return user.position === "Zone Staff";
+        }
+        return true;
+    });
 
     console.log("ZoneData",zoneDashboard)
 
@@ -134,11 +161,11 @@ function ZoneDashboardDetail (){
                     title={zoneDetail?.name || "Zone Detail"}
                     description={"Zone Admin Dashboard"}
                     onButtonClick={null}
-                    detail= {zoneStaffData.length + " คน"}
+                    detail= {filteredZoneStaffData.length + " คน"}
                     buttonText="ผู้ดูแล"
                 />
                 <CardFull 
-                    data={zoneStaffData}
+                    data={filteredZoneStaffData}
                     showActions={false}
                     onEdit={(user) => console.log("Edit User:", user)}
                 />
@@ -149,9 +176,11 @@ function ZoneDashboardDetail (){
                     onButtonClick={handleOpenModal}
                     buttonText="เพิ่มผู้สูงอายุ"
                 />
+                <CardFull data={allEldery} showActions={false} />
                 
                 <Cardno5 data={allAlertDetail}/>
                 <Cardno8 healthdata={mockGraphData} devicedata={allDeviceStatus}/>
+                
                 {/* <Cardno9 data=""/> */}
                 
             </div>

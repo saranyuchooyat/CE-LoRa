@@ -94,13 +94,15 @@ function UserManagement(){
         // กรองตามช่องค้นหา (Search)
         if (search) {
             const lowerSearch = search.toLowerCase();
-            data = data.filter(user => (
-            //ตรวจสอบ user.username
-            (user.name && user.name.toLowerCase().includes(lowerSearch)) ||
-            //ตรวจสอบ email
-            (user.email && user.email.toLowerCase().includes(lowerSearch)) ||
-            //ตรวจสอบ phone
-            (user.phone && String(user.phone).includes(lowerSearch))));
+            data = data.filter(user => {
+                const fullName = user.first_name ? `${user.first_name} ${user.last_name || ''}`.toLowerCase() : '';
+                const nameMatch = fullName.includes(lowerSearch) || (user.name && user.name.toLowerCase().includes(lowerSearch));
+                const usernameMatch = user.username && user.username.toLowerCase().includes(lowerSearch);
+                const emailMatch = user.email && user.email.toLowerCase().includes(lowerSearch);
+                const phoneMatch = user.phone && String(user.phone).includes(lowerSearch);
+                
+                return nameMatch || usernameMatch || emailMatch || phoneMatch;
+            });
         }
 
         if (role && role !== "ทั้งหมด") {
@@ -108,7 +110,7 @@ function UserManagement(){
         }
 
         if (status && status !== 'ทั้งหมด') {
-            data = data.filter((user) => user.status === status);
+            data = data.filter((user) => user.account_status === status || user.status === status);
         }
         return data;
     }, [userData, filters]);

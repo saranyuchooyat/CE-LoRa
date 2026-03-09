@@ -64,11 +64,11 @@ function ElderlyDataTable({ data, onEdit, onSetting, showActions = true }) {
                         {data.map((card, index) => {
                             const isOddRow = (index % 2 === 0);
                             const rowBgClass = isOddRow ? 'bg-gray-100' : 'bg-gray-50';
-                            const statusClass = statusCheck(card.status);                             
+                            const statusClass = statusCheck(card.health_status);                             
                             return(
                                 <tr key={index} className={rowBgClass}>
-                                    <td className="table-data whitespace-nowrap">{card.id}</td>
-                                    <td className="table-data whitespace-nowrap">{card.name}</td>
+                                    <td className="table-data whitespace-nowrap">{card.elder_id}</td>
+                                    <td className="table-data whitespace-nowrap">{card.first_name} {card.last_name}</td>
                                     <td className="table-data whitespace-nowrap">{card.age}</td>
                                     <td className="table-data whitespace-nowrap">
                                         <div className="flex flex-col items-start gap-1">
@@ -79,23 +79,23 @@ function ElderlyDataTable({ data, onEdit, onSetting, showActions = true }) {
                                         </div>
                                     </td>
                                     <td className="table-data whitespace-nowrap">
-                                        <span className={`table-status ${statusClass}`}>{card.status}</span>
+                                        <span className={`table-status ${statusClass}`}>{card.health_status}</span>
                                     </td>
-                                    <td className="table-data whitespace-nowrap">{card.battery}</td>
-                                    <td className="table-data whitespace-nowrap">{card.last_updated}</td>
+                                    <td className="table-data whitespace-nowrap">{card.battery || "-"}</td>
+                                    <td className="table-data whitespace-nowrap">{card.last_updated || "-"}</td>
 
                                     
                                     {/* Un-commented และแก้ไขส่วนของปุ่ม Menu */}
                                     {showActions && (
                                     <td className="p-3 text-sm text-left whitespace-nowrap w-fit">
                                         <button className="table-btn hover:bg-main-yellow hover:text-white"
-                                                onClick={(event) => handleEditClick(card.userId, event)}>
+                                                onClick={(event) => handleEditClick(card.elder_id, event)}>
                                             แก้ไข</button>
                                         <button className="table-btn hover:bg-green-500 hover:text-white"
-                                                onClick={(event) => handleSettingClick(card.userId, event)}>
+                                                onClick={(event) => handleSettingClick(card.elder_id, event)}>
                                             ตั้งค่า</button>
                                         <button className="table-btn hover:bg-main-red hover:text-white"
-                                                onClick={(event) => handleDeleteClick(card.userId, event)}
+                                                onClick={(event) => handleDeleteClick(card.elder_id, event)}
                                                 disabled={isPending} >
                                             {isPending ? 'ลบ...' : 'ลบ'}</button>
                                     </td>

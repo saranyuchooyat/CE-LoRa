@@ -717,51 +717,16 @@ func getZoneStaff(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	// 1. ค้นหาใน Collection "users" ที่สังกัด zone_id นี้
-	// (ถ้าคุณเก็บตารางผู้ใช้ชื่ออื่น ให้เปลี่ยนคำว่า "users" เป็นชื่อตารางนั้นครับ)
+	var users []User = []User{}
 	cursor, err := getCollection("users").Find(ctx, bson.M{"zone_id": zoneID})
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "ไม่สามารถดึงข้อมูลผู้ดูแลได้"})
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch staff"})
 	}
 	defer cursor.Close(ctx) // ป้องกัน Memory Leak
 
-	// 2. ดึงข้อมูลทั้งหมดมาไว้ในตัวแปรแบบยืดหยุ่น (bson.M)
-	var users []bson.M
 	if err = cursor.All(ctx, &users); err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "เกิดข้อผิดพลาดในการแปลงข้อมูลผู้ดูแล"})
+		return c.Status(500).JSON(fiber.Map{"error": "Error decoding data"})
 	}
 
-	// 3. แปลงข้อมูล (Format) ให้ตรงกับที่ React ต้องการ (name, position)
-	var staffList []fiber.Map
-	for _, u := range users {
-
-		// 🔍 หา "ชื่อ" จาก Database (สมมติว่าคุณเก็บเป็น username หรือ first_name)
-		name := "Unknown Name"
-		if val, ok := u["username"].(string); ok && val != "" {
-			name = val
-		} else if first, ok := u["first_name"].(string); ok {
-			// ถ้าเก็บแยก first_name, last_name ก็เอามาต่อกัน
-			last, _ := u["last_name"].(string)
-			name = first + " " + last
-		}
-
-		// 🔍 หา "ตำแหน่ง" จาก Database (สมมติว่าคุณเก็บในฟิลด์ role)
-		position := "Caregiver" // ค่า Default เผื่อหาไม่เจอ
-		if val, ok := u["role"].(string); ok && val != "" {
-			position = val
-		}
-
-		// ยัดใส่ Array พร้อมส่งกลับไปให้หน้าบ้าน
-		staffList = append(staffList, fiber.Map{
-			"name":     name,
-			"position": position,
-		})
-	}
-
-	// 4. ถ้าไม่มีข้อมูลเลย ให้ส่ง Array ว่าง "[]" กลับไป หน้าบ้านจะได้ไม่ขึ้น Error
-	if staffList == nil {
-		staffList = make([]fiber.Map, 0)
-	}
-
-	return c.JSON(staffList)
+	return c.JSON(users)
 }

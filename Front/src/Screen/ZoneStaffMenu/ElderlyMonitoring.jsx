@@ -32,7 +32,7 @@ function ElderlyMonitoring() {
     const zoneData = zoneQueries[0].data || [];
 
     // 2. สกัด Zone ID (ใช้ Optional Chaining เพื่อความปลอดภัย)
-    const currentZoneId = zoneData[0]?.zoneid || null;
+    const currentZoneId = zoneData[0]?.zone_id || null;
 
     
 
@@ -42,7 +42,7 @@ function ElderlyMonitoring() {
         queries: [
             { 
                 queryKey: ['eldersData', currentZoneId], 
-                queryFn: () => api.get(`/zones/${currentZoneId}/elders`).then(res => res.data),
+                queryFn: () => api.get(`/zones/${currentZoneId}/elder`).then(res => res.data),
                 enabled: !!currentZoneId 
             },
             { 
@@ -88,15 +88,15 @@ function ElderlyMonitoring() {
         if(search){
             const lowerSearch = search.toLowerCase();
             data = data.filter((elder) => {
-                const elderIdSearch = elder.id ? String(elder.id).includes(lowerSearch) : false;
-                const nameSearch = elder.name && elder.name.toLowerCase().includes(lowerSearch);
+                const elderIdSearch = elder.elder_id ? String(elder.elder_id).includes(lowerSearch) : false;
+                const nameSearch = (elder.first_name || elder.last_name) ? `${elder.first_name} ${elder.last_name}`.toLowerCase().includes(lowerSearch) : false;
                 const addressSearch = elder.address && elder.address.toLowerCase().includes(lowerSearch);
                 return elderIdSearch || nameSearch || addressSearch;
             });
         }
 
         if(status && status !== "ทั้งหมด"){
-            data = data.filter((elder) => elder.status === status);
+            data = data.filter((elder) => elder.health_status === status);
         }
 
         return data;
@@ -115,8 +115,8 @@ function ElderlyMonitoring() {
 
     const CardNo2Data = [
         {
-            name: zoneData[0]?.address ? `ที่อยู่โซน: ${zoneData[0]?.address}` : "ชื่อโซน (ไม่พบข้อมูล)",
-            value: zoneData[0]?.zonename || (isZoneLoading ? "กำลังโหลด..." : "ไม่พบข้อมูล")
+            name: zoneData[0]?.zone_address ? `ที่อยู่โซน: ${zoneData[0]?.zone_address}` : "ชื่อโซน (ไม่พบข้อมูล)",
+            value: zoneData[0]?.zone_name || (isZoneLoading ? "กำลังโหลด..." : "ไม่พบข้อมูล")
         },
         {
             name: "จำนวนผู้สูงอายุในโซน",

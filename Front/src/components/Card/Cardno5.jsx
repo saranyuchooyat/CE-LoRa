@@ -50,8 +50,8 @@ function CardFull({ data, onEdit, onSetting, showActions=true }) {
         if (!Array.isArray(arr) || arr.length === 0) {
             return false;
         }
-        // ตรวจสอบว่ามีฟิลด์ที่เฉพาะกับ elderly เช่น id, name, age, device_id
-        return 'id' in arr[0] && 'name' in arr[0] && 'age' in arr[0] && 'device_id' in arr[0];
+        // ตรวจสอบว่ามีฟิลด์ที่เฉพาะกับ elderly เช่น elder_id, first_name, age, device_id
+        return 'elder_id' in arr[0] && 'first_name' in arr[0] && 'age' in arr[0] && 'device_id' in arr[0];
     }
 
 

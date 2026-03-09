@@ -175,7 +175,6 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
                         value={formData.device}
                         onChange={handleChange}
                         className="border rounded w-full p-2 bg-white"
-                        required
                     >
                         <option value="">เลือกอุปกรณ์</option>
                             {devices.length > 0 ? (
@@ -194,7 +193,7 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
 
             <div className="mb-2">
                 <label className="block text-gray-700 text-sm">ที่อยู่</label>
-                <textarea name="address" type="text" value={formData.address} onChange={handleChange} className="border rounded w-full h-20 p-2 bg-white resize-none"  required />
+                <textarea name="address" type="text" value={formData.address} onChange={handleChange} className="border rounded w-full h-20 p-2 bg-white resize-none"/>
             </div>
 
             {/* ปุ่มกด (Footer) */}

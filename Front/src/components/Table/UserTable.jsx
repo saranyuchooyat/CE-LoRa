@@ -116,13 +116,15 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
                         {data.map((card, index) => {
                             const isOddRow = (index % 2 === 0);
                             const rowBgClass = isOddRow ? 'bg-gray-100' : 'bg-gray-50';
-                            const statusClass = statusCheck(card.status);                            
+                            const statusClass = statusCheck(card.account_status || card.status);                            
                             return(
                                 // ใช้ card.user_id เป็น Key เพื่อความเสถียร
                                 <tr key={card.user_id || index} className={rowBgClass}>
                                     
                                     {/* ✅ แก้ไข 3: เปลี่ยนชื่อ Key เป็นแบบมี Underscore ให้ตรงกับ Backend */}
-                                    <td className="table-data whitespace-nowrap">{card.username}</td>
+                                    <td className="table-data whitespace-nowrap">
+                                        {card.first_name ? `${card.first_name} ${card.last_name || ''}`.trim() : (card.username || card.name || "ไม่ระบุชื่อ")}
+                                    </td>
                                     <td className="table-data whitespace-nowrap">{card.role || card.position}</td>
                                     
                                     {/* ส่ง zone_id ไปหาชื่อโซน */}
@@ -130,7 +132,7 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
                                     
                                     <td className="table-data whitespace-nowrap">{card.phone || "-"}</td>
                                     <td className="table-data whitespace-nowrap">
-                                        <span className={`table-status ${statusClass}`}>{card.status}</span>
+                                        <span className={`table-status ${statusClass}`}>{card.account_status || card.status || "-"}</span>
                                     </td>
                                     
                                     {showActions && (
