@@ -24,8 +24,8 @@ function CardFull({ data, onEdit, onSetting, showActions=true }) {
         if (!Array.isArray(arr) || arr.length === 0) {
             return false;
         }
-        console.log("arr2",'zoneid' in arr[0] && 'zonename' in arr[0])
-        return 'zoneid' in arr[0] && 'zonename' in arr[0];
+        console.log("arr2",'zone_id' in arr[0] && 'zone_name' in arr[0])
+        return 'zone_id' in arr[0] && 'zone_name' in arr[0];
     };
 
     const isStaffData = (arr) => {

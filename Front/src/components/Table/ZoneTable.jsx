@@ -5,58 +5,51 @@ import ApiDelete from '../API-Delete';
 
 function ZoneTable({ data, onEdit, showActions=true }) {
 
-    // console.log("table",data);
     const location = useLocation();
     const navigate = useNavigate();
 
-    //ดูข้อมูลภายใน zone
+    // ✅ แก้ไข: ใช้ zone_id ให้ตรงกับ Backend
     const handleRowClick = (zoneId) => {
         navigate(`/zone-details/${zoneId}`); 
     };
 
-
-
     const activeUserCheck = (data) =>{
-        if(data == 0){
-            return 'N/A'
+        if(data === 0 || !data){
+            return '0' // หรือ 'N/A' ตามความชอบครับ
         }
-        else
-            return data
+        return data
     }
 
     const statusCheck = (status) =>{
-        console.log("status",status)
-        switch (status) {
-            case 'Active':
+        // ✅ ปรับให้รองรับ "active" (ตัวเล็ก) ที่ส่งมาจาก Go
+        const lowerStatus = status?.toLowerCase();
+        switch (lowerStatus) {
+            case 'active':
                 return 'text-main-blue bg-complete-bg';
-            case 'Inactive':
+            case 'inactive':
                 return 'text-gray-800 bg-gray-300';
             default:
                 return 'text-gray-700 bg-gray-200';
         }
     };
 
-
-    // Delete Button
     const { mutate: deleteZone, isPending } = ApiDelete('zone'); 
 
+    // ✅ แก้ไข: ใช้ zone_id สำหรับการลบ
     const handleDeleteClick = (zoneId, event) => {
         event.stopPropagation(); 
         if (window.confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบ Zone ID: ${zoneId}?`)) {
             deleteZone(zoneId); 
         }
     };
-    // Delete Button
 
-    // Edit Button (กำลังพัฒนา)
     const handleEditClick = (zone, event) => {
         event.stopPropagation();
         if(onEdit){
-            onEdit(zone); // 💡 ส่ง zone object กลับไปที่ Component แม่
+            onEdit(zone);
         }
     };
 
-    // ตรวจสอบว่า data เป็น Array และมีข้อมูลอยู่หรือไม่
     if (!Array.isArray(data) || data.length === 0) {
         return <p className="p-4 text-center text-gray-500">No Zone data available.</p>;
     }
@@ -65,10 +58,8 @@ function ZoneTable({ data, onEdit, showActions=true }) {
         <>
             <div className="overflow-auto rounded-lg shadow">
                 <table className="w-full">
-                    {/* ... Thead code ... */}
                     <thead className="bg-gray-50 border-b-2 border-gray-400">
                         <tr>
-                            {/* ... Table Headers ... */}
                             <th className="table-header">รหัส Zone</th>
                             <th className="table-header">ชื่อ Zone</th>
                             <th className="table-header">ที่อยู่</th>
@@ -80,7 +71,6 @@ function ZoneTable({ data, onEdit, showActions=true }) {
                     </thead>
                     <tbody className="divide-y divide-gray-100"> 
                         {data.map((card, index) => {
-                            // สลับสีแถว: แถวแรก (index 0) จะเป็น bg-white, แถวที่สอง (index 1) เป็น bg-gray-100
                             const isOddRow = (index % 2 === 0);
                             const rowBgClass = isOddRow ? 'bg-gray-100' : 'bg-gray-200'; 
                             
@@ -88,20 +78,22 @@ function ZoneTable({ data, onEdit, showActions=true }) {
 
                             return(
                                 <tr 
-                                    key={index} 
+                                    key={card.zone_id || index} 
                                     className={`${rowBgClass} hover:bg-main-blue/10 cursor-pointer transition-colors duration-150`} 
-                                    onClick={() => handleRowClick(card.zoneid)}
+                                    // ✅ แก้ไข: ใช้ card.zone_id
+                                    onClick={() => handleRowClick(card.zone_id)}
                                 >
-                                    {console.log(card)}
-                                    <td className="table-data whitespace-nowrap">{card.zoneid}</td>
-                                    <td className="table-data whitespace-nowrap">{card.zonename}</td>
-                                    <td className="table-data whitespace-wrap w-[200px]">{card.address}</td>
+                                    {/* ✅ เปลี่ยนทุกช่องให้ใช้ Key ที่มี Underscore (_) ตาม Backend */}
+                                    <td className="table-data whitespace-nowrap">{card.zone_id}</td>
+                                    <td className="table-data whitespace-nowrap">{card.zone_name}</td>
+                                    <td className="table-data whitespace-wrap w-[200px]">{card.zone_address}</td>
                                     <td className="table-data whitespace-wrap w-[500px]">{card.description}</td>
                                     <td className="table-data whitespace-nowrap">
                                         <span className={`table-status ${statusClass}`}>{card.status}</span>
                                     </td>
-                                    <td className="table-data whitespace-nowrap">{activeUserCheck(card.activeuser)}</td>
-                                    {/* ... Menu Buttons ... */}
+                                    {/* ✅ แก้ไข: ใช้ active_user */}
+                                    <td className="table-data whitespace-nowrap">{activeUserCheck(card.active_user)}</td>
+                                    
                                     {showActions && (
                                     <td className="p-3 text-sm text-left whitespace-nowrap w-fit">
                                         <button className="table-btn hover:bg-main-yellow hover:text-white"
@@ -109,7 +101,8 @@ function ZoneTable({ data, onEdit, showActions=true }) {
                                             แก้ไข</button>
                                         <button className="table-btn hover:bg-green-500 hover:text-white">ตั้งค่า</button>
                                         <button className="table-btn hover:bg-main-red hover:text-white"
-                                                onClick={(event) => handleDeleteClick(card.zoneid, event)}
+                                                // ✅ แก้ไข: ใช้ card.zone_id
+                                                onClick={(event) => handleDeleteClick(card.zone_id, event)}
                                                 disabled={isPending} >{isPending ? 'ลบ...' : 'ลบ'}</button>
                                     </td>
                                 )}</tr>
