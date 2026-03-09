@@ -9,7 +9,6 @@ import Cardno5 from "../../components/Card/Cardno5";
 import Modal from "../../components/ModalForm/Modal";
 import AddUserForm from "../../components/ModalForm/AddUserForm";
 import EditUserForm from "../../components/ModalForm/EditUserForm";
-import SetZoneZoneStaff from "../../components/ModalForm/SetZoneZoneStaff";
 
 //กำหนดตัวแปรแต่ละช่อง Filter
 const initialFilters = {
@@ -29,19 +28,6 @@ function UserManagement(){
     const handleCloseModal = () => setIsModalOpen(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState(null);
-
-    const [isSettingModalOpen, setIsSettingModalOpen] = useState(false);
-    const [selectedSettingUserId, setSelectedSettingUserId] = useState(null);
-
-    const handleOpenSettingModal = (userId) => {
-        setSelectedSettingUserId(userId);
-        setIsSettingModalOpen(true);
-    };
-
-    const handleCloseSettingModal = () => {
-        setSelectedSettingUserId(null);
-        setIsSettingModalOpen(false);
-    };
 
     //ดึงข้อมูลหลังบ้าน
     const userQueries = useQueries({
@@ -169,7 +155,6 @@ function UserManagement(){
                 <Cardno5 
                     data={filteredUsers}
                     onEdit={handleOpenEditModal}
-                    onSetting={handleOpenSettingModal}
                 />
             </div>
 
@@ -194,18 +179,6 @@ function UserManagement(){
                 <EditUserForm 
                     userId={selectedUserId} 
                     onClose={handleCloseEditModal}
-                    onSaveSuccess={() => userQueries[0].refetch()}
-                />
-            </Modal>
-
-            <Modal
-                title="ตั้งค่าสิทธิ์พื้นที่ดูแล"
-                isOpen={isSettingModalOpen}
-                onClose={handleCloseSettingModal}
-            >
-                <SetZoneZoneStaff 
-                    userId={selectedSettingUserId}
-                    onClose={handleCloseSettingModal}
                     onSaveSuccess={() => userQueries[0].refetch()}
                 />
             </Modal>

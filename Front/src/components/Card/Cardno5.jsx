@@ -70,7 +70,7 @@ function CardFull({ data, onEdit, onSetting, showActions=true }) {
     }
     else if(isZoneStaffData(data)){
         console.log("ZoneStaffPass")
-        displayContent = <UserTable data={data} onEdit={onEdit} onSetting={onSetting} showActions={showActions}/>;
+        displayContent = <UserTable data={data} showActions={showActions}/>;
     }
     else if(isElderlyData(data)){
         console.log("ElderlyPass")
