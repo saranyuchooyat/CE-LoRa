@@ -44,7 +44,8 @@ function AddUserForm({ onClose, onSaveSuccess }){
 
         // จัดเตรียม Object สำหรับส่งไป API (รวมชื่อ-นามสกุล และ map ค่าให้ตรงกับ Backend)
         const dataToSend = {
-            name: `${formData.firstName} ${formData.lastName}`.trim(),
+            first_name: formData.firstName.trim(),
+            last_name: formData.lastName.trim(),
             username: formData.username,
             password: formData.password,
             email: formData.email,
@@ -52,7 +53,7 @@ function AddUserForm({ onClose, onSaveSuccess }){
             description: formData.description,
             position: formData.position,
             role: formData.role,
-            zoneIds: formData.zoneids || []
+            zone_id: formData.zoneids || []
         };
 
         try {

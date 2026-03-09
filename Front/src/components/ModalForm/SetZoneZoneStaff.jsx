@@ -18,22 +18,32 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
                 ]);
 
                 const zoneOptions = zonesRes.data.map(zone => ({
-                    label: zone.zonename,
-                    value: zone.zoneid
+                    label: zone.zone_name,
+                    value: zone.zone_id
                 }));
                 setZones(zoneOptions);
 
                 setUserData(userRes.data);
                 
                 // Initialize selected zones
-                if (userRes.data.zoneids && userRes.data.zoneids.length > 0) {
-                    if (['Zone Admin', 'System Admin'].includes(userRes.data.role)) {
-                        setSelectedZoneIds(userRes.data.zoneids);
-                    } else {
-                        setSelectedZoneId(userRes.data.zoneids[0].toString());
+                let userZones = [];
+                if (userRes.data.zone_id) {
+                    if (Array.isArray(userRes.data.zone_id)) {
+                        userZones = userRes.data.zone_id;
+                    } else if (typeof userRes.data.zone_id === 'string') {
+                        // In case it's a comma separated string like "Z001,Z002"
+                        userZones = userRes.data.zone_id.includes(',') 
+                                        ? userRes.data.zone_id.split(',').map(z => z.trim()) 
+                                        : [userRes.data.zone_id];
                     }
-                } else if (userRes.data.zoneId) {
-                    setSelectedZoneId(userRes.data.zoneId.toString());
+                }
+
+                if (userZones.length > 0) {
+                    if (['Zone Admin', 'System Admin'].includes(userRes.data.role)) {
+                        setSelectedZoneIds(userZones);
+                    } else {
+                        setSelectedZoneId(userZones[0]);
+                    }
                 }
 
             } catch (error) {
@@ -50,7 +60,7 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
         setIsSubmitting(true);
 
         try {
-            const uId = Number(userId);
+            const uId = userId;
             
             let finalZoneIds = [];
             if (['Zone Admin', 'System Admin'].includes(userData?.role)) {
@@ -66,11 +76,11 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
                     setIsSubmitting(false);
                     return;
                 }
-                finalZoneIds = [Number(selectedZoneId)];
+                finalZoneIds = [selectedZoneId];
             }
 
             const requestBody = {
-                zoneids: finalZoneIds
+                zone_id: finalZoneIds
             };
 
             await api.put(`/users/${uId}`, requestBody);
@@ -100,7 +110,7 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
     return (
         <form onSubmit={handleSubmit} className="p-4">
             <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
-                <p className="text-sm text-blue-800 font-semibold">ผู้ใช้งาน: {userData?.name}</p>
+                <p className="text-sm text-blue-800 font-semibold">ผู้ใช้งาน: {userData?.first_name} {userData?.last_name || userData?.name}</p>
                 <p className="text-xs text-blue-600">อีเมล: {userData?.email}</p>
                 <p className="text-xs text-blue-600">บทบาท: {userData?.role}</p>
             </div>
