@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import ApiDelete from '../API-Delete';
 
 
-function DeviceCard({data, onSetting}) {
+function DeviceCard({data, onSetting, onEdit}) {
 
     console.log("device",data)
     const navigate = useNavigate();
@@ -39,6 +39,11 @@ function DeviceCard({data, onSetting}) {
     const handleSettingClick = (deviceId, event) => {
         event.stopPropagation();
         onSetting(deviceId); // 💡 ส่ง ID กลับไปที่ Component แม่
+    };
+
+    const handleEditClick = (cardData, event) => {
+        event.stopPropagation();
+        onEdit(cardData);
     };
 
     // Delete Button
@@ -124,7 +129,8 @@ function DeviceCard({data, onSetting}) {
                         </div>
 
                         <div className='flex w-full gap-4'>
-                            <button className="table-btn hover:bg-main-yellow hover:text-white">แก้ไข</button>
+                            <button className="table-btn hover:bg-main-yellow hover:text-white"
+                                    onClick={(event) => handleEditClick(card, event)}>แก้ไข</button>
                             <button className="table-btn hover:bg-green-500 hover:text-white"
                                     onClick={(event) => handleSettingClick(card.device_id, event)}>ตั้งค่า</button>
                             <button className="table-btn hover:bg-main-red hover:text-white"

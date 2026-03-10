@@ -9,6 +9,7 @@ import CardLayouts from "../../components/Card/CardLayouts";
 import Modal from "../../components/ModalForm/Modal";
 import AddDeviceForm from "../../components/ModalForm/AddDeviceForm";
 import SetDeviceForm from "../../components/ModalForm/SetDeviceForm";
+import EditDeviceForm from "../../components/ModalForm/EditDeviceForm";
 
 const initialFilters = {
     search: '', // สำหรับช่องค้นหา ชื่อ, อีเมล, เบอร์โทร
@@ -33,6 +34,17 @@ function DeviceManagement(){
     const handleCloseSetModal = () => {
         setSelectedSettingDeviceId(null);
         setIsSetModalOpen(false);
+    };
+
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedEditDevice, setSelectedEditDevice] = useState(null);
+    const handleOpenEditModal = (deviceData) => {
+        setSelectedEditDevice(deviceData);
+        setIsEditModalOpen(true);
+    };
+    const handleCloseEditModal = () => {
+        setSelectedEditDevice(null);
+        setIsEditModalOpen(false);
     };
 
     //ดึงข้อมูลหลังบ้าน
@@ -168,7 +180,8 @@ function DeviceManagement(){
                 <CardLayouts
                 name="device"
                 data={filteredDevices}
-                onSetting={handleOpenSetModal}/>
+                onSetting={handleOpenSetModal}
+                onEdit={handleOpenEditModal}/>
 
             </div>
 
@@ -194,6 +207,20 @@ function DeviceManagement(){
                     deviceId={selectedSettingDeviceId}
                     onClose={() => {
                         handleCloseSetModal();
+                        deviceQueries[0].refetch();
+                    }}
+                />
+            </Modal>
+
+            <Modal
+                title="แก้ไขข้อมูลอุปกรณ์"
+                isOpen={isEditModalOpen}
+                onClose={handleCloseEditModal}
+            >
+                <EditDeviceForm
+                    deviceData={selectedEditDevice}
+                    onClose={() => {
+                        handleCloseEditModal();
                         deviceQueries[0].refetch();
                     }}
                 />
