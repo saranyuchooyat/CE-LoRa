@@ -4,7 +4,7 @@ import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import ApiDelete from "../API-Delete";
 
-function ElderlyDataTable({ data, onEdit, onSetting, showActions = true }) {
+function ElderlyDataTable({ data, onEdit, onSetting, onDeleteSuccess, showActions = true }) {
 
     console.log("table data", data);
     
@@ -22,26 +22,27 @@ function ElderlyDataTable({ data, onEdit, onSetting, showActions = true }) {
     };
 
     // Delete Button
-    const { mutate: deleteUser, isPending } = ApiDelete('user'); 
+    const { mutate: deleteElder, isPending } = ApiDelete('elder', onDeleteSuccess); 
 
-    const handleDeleteClick = (userId, event) => {
+    const handleDeleteClick = (elderId, event) => {
         event.stopPropagation(); 
-        if (window.confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบ User ID: ${userId}?`)) {
-            deleteUser(userId); 
+        if (window.confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลผู้สูงอายุรหัส: ${elderId}?`)) {
+            // Because ApiDelete takes an ID directly and prefixes the base table name internally, we just pass ID.
+            deleteElder(elderId); 
         }
     };
     // Delete Button
 
-    // Edit Button (กำลังพัฒนา)
-    const handleEditClick = (userId, event) => {
+    // Edit Button
+    const handleEditClick = (cardData, event) => {
         event.stopPropagation();
-        onEdit(userId); // 💡 ส่ง ID กลับไปที่ Component แม่
+        onEdit(cardData); // ส่ง data โยนไปให้ modal
     };
 
     //Setting Button (กำลังพัฒนา)
-    const handleSettingClick = (userId, event) => {
+    const handleSettingClick = (elderId, event) => {
         event.stopPropagation();
-        onSetting(userId); // 💡 ส่ง ID กลับไปที่ Component แม่
+        if (onSetting) onSetting(elderId); // ป้องกัน Error หาก onSetting ไม่มีค่า
     };
 
     return(
@@ -56,7 +57,7 @@ function ElderlyDataTable({ data, onEdit, onSetting, showActions = true }) {
                             <th className="table-header">ข้อมูลสุขภาพ</th>
                             <th className="table-header">สถานะ</th>
                             <th className="table-header">แบตเตอรี่</th>
-                            <th className="table-header">อัเดตข้อมูลล่าสุด</th>
+                            <th className="table-header">อัพดตข้อมูลล่าสุด</th>
                             {showActions && <th className="table-header">เมนู</th>}
                         </tr>
                     </thead>
@@ -89,7 +90,7 @@ function ElderlyDataTable({ data, onEdit, onSetting, showActions = true }) {
                                     {showActions && (
                                     <td className="p-3 text-sm text-left whitespace-nowrap w-fit">
                                         <button className="table-btn hover:bg-main-yellow hover:text-white"
-                                                onClick={(event) => handleEditClick(card.elder_id, event)}>
+                                                onClick={(event) => handleEditClick(card, event)}>
                                             แก้ไข</button>
                                         <button className="table-btn hover:bg-green-500 hover:text-white"
                                                 onClick={(event) => handleSettingClick(card.elder_id, event)}>

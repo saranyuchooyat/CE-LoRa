@@ -6,6 +6,7 @@ const ENDPOINTS = {
     'zone': '/zones',
     'user': '/users',
     'device': '/devices',
+    'elder': '/elders',
 };
 
 // 💡 Custom Hook ที่รับประเภทการลบ (deleteType) และ QueryKey ที่จะ Invalidate

@@ -1,48 +1,41 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import api from "../API";
 
-function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
+function EditElderlyForm({ elderData, onClose, onSaveSuccess }) {
 
     const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        gender: 'เลือกเพศ',
-        age: '',
-        weight: '',
-        height: '',
-        congenitalDisease: '',
-        personalMedicine: '',
-        emergencyContacts: '',
-        address: '',
-        device: 'เลือกอุปกรณ์'
+        elderId: elderData?.elder_id || '',
+        firstName: elderData?.first_name || '',
+        lastName: elderData?.last_name || '',
+        gender: elderData?.sex || 'เลือกเพศ',
+        age: elderData?.age || 0,
+        weight: elderData?.weight || 0,
+        height: elderData?.height || 0,
+        congenitalDisease: elderData?.congenital_disease || '',
+        personalMedicine: elderData?.personal_medicine || '',
+        emergencyContacts: elderData?.emergency_contacts || '',
+        address: elderData?.address || ''
     });
 
-    const [devices, setDevices] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
-        const fetchAvailableDevices = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                if (!token) return;
-
-                const response = await axios.get('http://localhost:8080/devices', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                
-                const allDevices = response.data;
-                const availableOnly = allDevices.filter(dev => 
-                    !dev.assigned_to || dev.assigned_to === ''
-                );
-                setDevices(availableOnly);
-            } catch (error) {
-                console.error("Error fetching devices:", error);
-            }
-        };
-
-        fetchAvailableDevices();
-    }, []);
+        if (elderData) {
+            setFormData({
+                elderId: elderData.elder_id || '',
+                firstName: elderData.first_name || '',
+                lastName: elderData.last_name || '',
+                gender: elderData.sex || 'เลือกเพศ',
+                age: elderData.age || 0,
+                weight: elderData.weight || 0,
+                height: elderData.height || 0,
+                congenitalDisease: elderData.congenital_disease || '',
+                personalMedicine: elderData.personal_medicine || '',
+                emergencyContacts: elderData.emergency_contacts || '',
+                address: elderData.address || ''
+            });
+        }
+    }, [elderData]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -56,58 +49,45 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
         e.preventDefault();
         setIsSubmitting(true);
 
-        const token = localStorage.getItem('token');
-
         const dataToSend = {
             first_name: formData.firstName,
             last_name: formData.lastName,
             sex: formData.gender,
-            age: Number(formData.age),
-            weight: Number(formData.weight),
-            height: Number(formData.height),
+            age: formData.age,
+            weight: formData.weight,
+            height: formData.height,
             congenital_disease: formData.congenitalDisease,
             personal_medicine: formData.personalMedicine,
             emergency_contacts: formData.emergencyContacts,
-            address: formData.address,
-            device_id: (formData.device === 'เลือกอุปกรณ์' || !formData.device) ? "" : formData.device,
-            zone_id: String(zoneid)
+            address: formData.address
         };
 
         try {
-            // 1. เพิ่มผู้สูงอายุ (หัวใจหลักต้องสำเร็จ)
-            await axios.post('http://localhost:8080/zones/elderlyRegister', dataToSend, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            // 💡 2. เงื่อนไขการผูกอุปกรณ์: ต้องมี ID และ ID ต้องไม่ใช่ค่าว่าง
-            if (dataToSend.device_id && dataToSend.device_id.trim() !== "") {
-                try {
-                    await api.put(`/devices/${dataToSend.device_id}`, {
-                        status: "offline",
-                        assigned_to: `${formData.firstName} ${formData.lastName}`
-                    });
-                    console.log("Device linked!");
-                } catch (devErr) {
-                    console.warn("Elderly added, but device link failed:", devErr);
+            await api.put(`/elders/${formData.elderId}`, dataToSend, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
-            }
-
-            // 3. แจ้งเตือนสำเร็จและปิด Modal
-            alert("เพิ่มข้อมูลผู้สูงอายุสำเร็จเรียบร้อยแล้ว");
-            onSaveSuccess();
-            onClose();
-
+            });
+            if (onSaveSuccess) onSaveSuccess();
+            if (onClose) onClose();
         } catch (error) {
-            console.error("Primary Error:", error);
-            alert("ไม่สามารถเพิ่มข้อมูลได้ กรุณาตรวจสอบการเชื่อมต่อหรือข้อมูลอีกครั้ง");
+            console.error("Error updating elderly:", error);
+            alert("ไม่สามารถบันทึกการแก้ไขได้");
         } finally {
             setIsSubmitting(false);
         }
     };
 
+    if (!elderData) return null;
+
     return (
         <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                 <div className="col-span-2 mb-2">
+                    <label className="block text-gray-700 text-sm">รหัสผู้สูงอายุ (Elder ID):</label>
+                    <input type="text" value={formData.elderId} className="border rounded w-full p-2 bg-gray-100" readOnly />
+                </div>
+
                 <div className="mb-2">
                     <label className="block text-gray-700 text-sm">ชื่อ</label>
                     <input name="firstName" type="text" value={formData.firstName} onChange={handleChange} className="border rounded w-full p-2 bg-white" required />
@@ -141,33 +121,12 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
                 
                 <div className="mb-2">
                     <label className="block text-gray-700 text-sm">น้ำหนัก (kg)</label>
-                    <input name="weight" type="number" step="0.1" value={formData.weight} onChange={handleChange} className="border rounded w-full p-2 bg-white" min="0" required/>
+                    <input name="weight" type="number" step="0.1" value={formData.weight} onChange={handleChange} className="border rounded w-full p-2 bg-white" min="0"/>
                 </div>
 
                 <div className="mb-2">
                     <label className="block text-gray-700 text-sm">ส่วนสูง (cm)</label>
-                    <input name="height" type="number" step="0.1" value={formData.height} onChange={handleChange} className="border rounded w-full p-2 bg-white" min="0" required/>
-                </div>
-
-                <div className="mb-2 col-span-2">
-                    <label className="block text-gray-700 text-sm">เลือกอุปกรณ์:</label>
-                    <select
-                        name="device"
-                        value={formData.device}
-                        onChange={handleChange}
-                        className="border rounded w-full p-2 bg-white"
-                    >
-                        <option value="เลือกอุปกรณ์">เลือกอุปกรณ์</option>
-                            {devices.length > 0 ? (
-                                devices.map(device => (
-                                    <option key={device.id} value={device.device_id}>
-                                        {device.device_id} - {device.model}
-                                    </option>
-                                ))
-                            ) : (
-                                <option disabled>ไม่มีอุปกรณ์ว่างในระบบ</option>
-                            )}
-                    </select>
+                    <input name="height" type="number" step="0.1" value={formData.height} onChange={handleChange} className="border rounded w-full p-2 bg-white" min="0"/>
                 </div>
             </div>
 
@@ -198,7 +157,7 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
                     disabled={isSubmitting}
                     className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 disabled:bg-gray-400"
                 >
-                    {isSubmitting ? 'กำลังบันทึก...' : 'บันทึก'}
+                    {isSubmitting ? 'กำลังบันทึก...' : 'บันทึกการแก้ไข'}
                 </button>
                 <button 
                     type="button" 
@@ -212,6 +171,4 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
         </form>
     );
 }
-export default AddElderlyform;
-
-   
+export default EditElderlyForm;

@@ -8,10 +8,10 @@ function Modal({ title, isOpen, onClose, children }) {
         // Overlay (พื้นหลังสีทึบ)
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
             {/* Modal Box */}
-            <div className="bg-main-card p-6 rounded-lg shadow-xl w-full max-w-lg mx-4">
+            <div className="bg-main-card p-6 rounded-lg shadow-xl w-full max-w-lg mx-4 max-h-[90vh] flex flex-col">
                 
                 {/* Header ส่วนหัว */}
-                <div className="flex justify-between items-center border-b pb-3 mb-4">
+                <div className="flex justify-between items-center border-b pb-3 mb-4 shrink-0">
                     <h2 className="text-xl font-bold text-gray-800">{title}</h2>
                     <button 
                         className="text-gray-400 hover:text-gray-600 text-2xl font-semibold"
@@ -21,7 +21,7 @@ function Modal({ title, isOpen, onClose, children }) {
                 </div>
 
                 {/* Body ส่วนเนื้อหา */}
-                <div className="modal-body">
+                <div className="modal-body overflow-y-auto pr-1">
                     {children}
                 </div>               
             </div>

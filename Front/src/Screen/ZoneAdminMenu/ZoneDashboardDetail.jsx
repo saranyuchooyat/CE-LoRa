@@ -10,6 +10,7 @@ import Cardno5 from '../../components/Card/Cardno5';
 import CardFull from '../../components/Card/Cardno5';
 import Modal from '../../components/ModalForm/Modal';
 import AddElderlyform from '../../components/ModalForm/AddElderly';
+import EditElderlyForm from '../../components/ModalForm/EditElderlyForm';
 
 
 
@@ -25,6 +26,17 @@ function ZoneDashboardDetail (){
     const [isModalOpenStaff, setIsModalOpenStaff] = useState(false);
     const handleOpenModalStaff = () => setIsModalOpenStaff(true);
     const handleCloseModalStaff = () => setIsModalOpenStaff(false);
+    
+    const [isEditElderlyModalOpen, setIsEditElderlyModalOpen] = useState(false);
+    const [selectedElderly, setSelectedElderly] = useState(null);
+    const handleOpenEditElderlyModal = (elderData) => {
+        setSelectedElderly(elderData);
+        setIsEditElderlyModalOpen(true);
+    };
+    const handleCloseEditElderlyModal = () => {
+        setSelectedElderly(null);
+        setIsEditElderlyModalOpen(false);
+    };
     
 
 
@@ -176,7 +188,12 @@ function ZoneDashboardDetail (){
                     onButtonClick={handleOpenModal}
                     buttonText="เพิ่มผู้สูงอายุ"
                 />
-                <CardFull data={allEldery} showActions={false} />
+                <CardFull 
+                    data={allEldery} 
+                    showActions={userRole === "Zone Admin" || true} 
+                    onEdit={handleOpenEditElderlyModal}
+                    onDeleteSuccess={() => zoneDashboardQueries[0].refetch()}
+                />
                 
                 <Cardno5 data={allAlertDetail}/>
                 <Cardno8 healthdata={mockGraphData} devicedata={allDeviceStatus}/>
@@ -205,6 +222,21 @@ function ZoneDashboardDetail (){
                 onClose={handleCloseModalStaff}
             >
                 
+            </Modal>
+
+            <Modal
+                title="แก้ไขข้อมูลผู้สูงอายุ"
+                isOpen={isEditElderlyModalOpen}
+                onClose={handleCloseEditElderlyModal}
+            >
+                <EditElderlyForm
+                    elderData={selectedElderly}
+                    onClose={handleCloseEditElderlyModal}
+                    onSaveSuccess={() => {
+                        handleCloseEditElderlyModal();
+                        zoneDashboardQueries[0].refetch();
+                    }}
+                />
             </Modal>
         </>
     );

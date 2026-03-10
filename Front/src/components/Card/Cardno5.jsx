@@ -5,7 +5,7 @@ import UserTable from "../Table/UserTable";
 import ElderlyDataTable from "../Table/ElderlyDataTable";
 
 
-function CardFull({ data, onEdit, onSetting, showActions=true }) {
+function CardFull({ data, onEdit, onSetting, onDeleteSuccess, showActions=true }) {
 
     console.log("dataCardFull",data)
 
@@ -74,7 +74,7 @@ function CardFull({ data, onEdit, onSetting, showActions=true }) {
     }
     else if(isElderlyData(data)){
         console.log("ElderlyPass")
-        displayContent = <ElderlyDataTable data={data} showActions={null}/>
+        displayContent = <ElderlyDataTable data={data} showActions={showActions} onEdit={onEdit} onSetting={onSetting} onDeleteSuccess={onDeleteSuccess} />
     }
 
 

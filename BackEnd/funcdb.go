@@ -484,6 +484,84 @@ func addEldertoZone(c *fiber.Ctx) error {
 	})
 }
 
+func updateElder(c *fiber.Ctx) error {
+	id := c.Params("id")
+	elderUpdate := new(Elder)
+	if err := c.BodyParser(elderUpdate); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "ข้อมูลไม่ถูกต้อง"})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	updateFields := bson.M{}
+	if elderUpdate.FirstName != "" {
+		updateFields["first_name"] = elderUpdate.FirstName
+	}
+	if elderUpdate.LastName != "" {
+		updateFields["last_name"] = elderUpdate.LastName
+	}
+	if elderUpdate.Sex != "" {
+		updateFields["sex"] = elderUpdate.Sex
+	}
+	if elderUpdate.Age != 0 {
+		updateFields["age"] = elderUpdate.Age
+	}
+	if elderUpdate.Weight != 0 {
+		updateFields["weight"] = elderUpdate.Weight
+	}
+	if elderUpdate.Height != 0 {
+		updateFields["height"] = elderUpdate.Height
+	}
+	if elderUpdate.CongenitalDisease != "" {
+		updateFields["congenital_disease"] = elderUpdate.CongenitalDisease
+	}
+	if elderUpdate.PersonalMedicine != "" {
+		updateFields["personal_medicine"] = elderUpdate.PersonalMedicine
+	}
+	if elderUpdate.EmergencyContacts != "" {
+		updateFields["emergency_contacts"] = elderUpdate.EmergencyContacts
+	}
+	if elderUpdate.Address != "" {
+		updateFields["address"] = elderUpdate.Address
+	}
+
+	if len(updateFields) == 0 {
+		return c.Status(400).JSON(fiber.Map{"error": "กรุณาระบุข้อมูลที่ต้องการแก้ไข"})
+	}
+
+	result, err := getCollection("elders").UpdateOne(ctx, bson.M{"elder_id": id}, bson.M{"$set": updateFields})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "ไม่สามารถอัปเดตข้อมูลได้"})
+	}
+	if result.MatchedCount == 0 {
+		return c.Status(404).JSON(fiber.Map{"error": "ไม่พบผู้สูงอายุรหัส " + id})
+	}
+
+	return c.JSON(fiber.Map{
+		"message":  "อัปเดตข้อมูลสำเร็จ",
+		"elder_id": id,
+	})
+}
+
+func deleteElder(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	result, err := getCollection("elders").DeleteOne(ctx, bson.M{"elder_id": id})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "ไม่สามารถเชื่อมต่อฐานข้อมูลได้"})
+	}
+
+	if result.DeletedCount == 0 {
+		return c.Status(404).JSON(fiber.Map{"error": "ไม่พบผู้สูงอายุรหัส " + id})
+	}
+
+	return c.SendStatus(204)
+}
+
 func getAllDevice(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

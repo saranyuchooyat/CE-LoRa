@@ -71,6 +71,8 @@ func main() {
 
 	// --- Elders ---
 	app.Get("/elders", getAllElderly) //✅
+	app.Put("/elders/:id", updateElder)
+	app.Delete("/elders/:id", deleteElder)
 	// app.Get("/elders/:id", getElderDetail)
 
 	// --- Devices ---
