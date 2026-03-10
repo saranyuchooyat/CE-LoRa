@@ -27,12 +27,12 @@ function AddDeviceForm({ onClose, onSaveSuccess }){
         const token = localStorage.getItem('token');
 
         const dataToSend = {
-            batttery: 100,
-            deviceId: formData.deviceId,
+            battery: 100,
+            device_id: formData.deviceId,
             features: ["GPS", "Heart Rate Monitor"],
-            lastUpdate: "2025-10-19 10:00:00",
+            last_update: "2025-10-19 10:00:00",
             model: formData.model,
-            serialnumber: formData.serialnumber,
+            serial_number: formData.serialnumber,
             status: "unassigned",
             type: formData.type
         };

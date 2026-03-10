@@ -553,6 +553,14 @@ func updateDevice(c *fiber.Ctx) error {
 		updateFields["description"] = deviceUpdate.Description
 	}
 
+	if deviceUpdate.Status != "" {
+		updateFields["status"] = deviceUpdate.Status
+	}
+
+	if deviceUpdate.AssignedTo != "" {
+		updateFields["assigned_to"] = deviceUpdate.AssignedTo
+	}
+
 	if len(updateFields) == 0 {
 		return c.Status(400).JSON(fiber.Map{"error": "กรุณาระบุข้อมูลที่ต้องการแก้ไข"})
 	}

@@ -2,7 +2,7 @@ import DeviceCard from "./DeviceCard";
 import ZoneStaffCard from "./ZoneStaffCard";
 
 
-function CardLayouts({ name, data }) {
+function CardLayouts({ name, data, onSetting }) {
 
     const gridCheck = () =>{
         if(name == 'device'){
@@ -16,7 +16,7 @@ function CardLayouts({ name, data }) {
     const componentCheck = () =>{
 
         if(name == 'device'){
-            return <DeviceCard data={data}/>
+            return <DeviceCard data={data} onSetting={onSetting}/>
         }
         else if(name == 'staff'){
             return <ZoneStaffCard data={data}/>

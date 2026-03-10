@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import ApiDelete from '../API-Delete';
 
 
-function DeviceCard({data}) {
+function DeviceCard({data, onSetting}) {
 
     console.log("device",data)
     const navigate = useNavigate();
@@ -36,6 +36,11 @@ function DeviceCard({data}) {
         }
     };
 
+    const handleSettingClick = (deviceId, event) => {
+        event.stopPropagation();
+        onSetting(deviceId); // 💡 ส่ง ID กลับไปที่ Component แม่
+    };
+
     // Delete Button
     const { mutate: deleteDevice, isPending } = ApiDelete('device'); 
 
@@ -50,12 +55,18 @@ function DeviceCard({data}) {
     return(
         <>
             {data.map((card, index) =>{
+                const status = card.status || 'unassigned';
+                const type = card.type || 'Unknown';
+                const assigned_to = card.assigned_to || 'None';
+                const model = card.model || card.device_name || 'Unknown Model';
+                const battery = card.battery || 0;
+                const last_update = card.last_update || '-';
 
                 return(
-                    <button key={index} className={`flex flex-col items-center  border-l-0 border-y-5 ${CardstatusCheck(card.status)} rounded-[15px] gap-4 p-3 drop-shadow-lg hover:bg-main-card/30 cursor-pointer transition-colors duration-150`} onClick={() => handleRowClick(card.device_id)}>
+                    <button key={index} className={`flex flex-col items-center  border-l-0 border-y-5 ${CardstatusCheck(status)} rounded-[15px] gap-4 p-3 drop-shadow-lg hover:bg-main-card/30 cursor-pointer transition-colors duration-150`} onClick={() => handleRowClick(card.device_id)}>
                         
-                        <div className={`font-semibold rounded-full py-1 px-10 w-fit ${statusCheck(card.status)}`}>
-                            <p>{card.status}</p>
+                        <div className={`font-semibold rounded-full py-1 px-10 w-fit ${statusCheck(status)}`}>
+                            <p>{status}</p>
                         </div>
 
                         <div className="grid grid-cols-2 text-start gap-4 w-full">
@@ -64,7 +75,7 @@ function DeviceCard({data}) {
                                 <img src={J3} alt="J3-ismarch"/>
                                 <div>
                                     <p className='text-gray-400'>ประเภท</p>
-                                    <p>{card.type}</p>
+                                    <p>{type}</p>
                                 </div>
 
                             </div>
@@ -78,24 +89,24 @@ function DeviceCard({data}) {
 
                                 <div className=''>
                                     <p className='text-gray-400'>ผู้ใช้งาน</p>
-                                    <p>{card.assigned_to}</p>
+                                    <p>{assigned_to}</p>
                                 </div>
 
                                 <div className=''>
                                     <p className='text-gray-400'>รุ่นอุปกรณ์</p>
-                                    <p>{card.model}</p>
+                                    <p>{model}</p>
                                 </div>
 
                             </div>
                             
                             <div className=''>
                                 <p className='text-gray-400'>แบตเตอรี่</p>
-                                <p>{card.battery}%</p>
+                                <p>{battery}%</p>
                             </div>
 
                             <div className=''>
                                 <p className='text-gray-400'>อัพเดตล่าสุด</p>
-                                <p>{card.last_update}</p>
+                                <p>{last_update}</p>
                             </div>
 
                         </div>
@@ -103,7 +114,7 @@ function DeviceCard({data}) {
                         <div className='text-start w-full'>
                             <p className='text-gray-400'>เซนเซอร์/ฟีเจอร์</p>
                             <div className='flex gap-2 w-full'>
-                                {card.features.map((data,index)=>{
+                                {(card.features || []).map((data,index)=>{
                                     return(
                                         <div key={index} className='bg-main-green font-xs text-white rounded-lg px-2 w-fit'>{data}</div>
 
@@ -113,11 +124,12 @@ function DeviceCard({data}) {
                         </div>
 
                         <div className='flex w-full gap-4'>
-                            <button className="table-btn hover:bg-main-yellow hover:text-white">Edit</button>
-                            <button className="table-btn hover:bg-green-500 hover:text-white">Setting</button>
+                            <button className="table-btn hover:bg-main-yellow hover:text-white">แก้ไข</button>
+                            <button className="table-btn hover:bg-green-500 hover:text-white"
+                                    onClick={(event) => handleSettingClick(card.device_id, event)}>ตั้งค่า</button>
                             <button className="table-btn hover:bg-main-red hover:text-white"
                                     onClick={(event) => handleDeleteClick(card.device_id, event)}
-                                    disabled={isPending} >{isPending ? 'ลบ...' : 'Delete'}</button>
+                                    disabled={isPending} >{isPending ? 'ลบ...' : 'ลบ'}</button>
                         </div>
 
                     </button>

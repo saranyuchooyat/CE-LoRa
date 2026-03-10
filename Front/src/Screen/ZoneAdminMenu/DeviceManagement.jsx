@@ -8,6 +8,7 @@ import Cardno2 from "../../components/Card/Cardno2";
 import CardLayouts from "../../components/Card/CardLayouts";
 import Modal from "../../components/ModalForm/Modal";
 import AddDeviceForm from "../../components/ModalForm/AddDeviceForm";
+import SetDeviceForm from "../../components/ModalForm/SetDeviceForm";
 
 const initialFilters = {
     search: '', // สำหรับช่องค้นหา ชื่อ, อีเมล, เบอร์โทร
@@ -22,6 +23,17 @@ function DeviceManagement(){
     const [isModalOpen, setIsModalOpen] = useState(false);
     const handleOpenModal = () => setIsModalOpen(true);
     const handleCloseModal = () => setIsModalOpen(false);
+
+    const [isSetModalOpen, setIsSetModalOpen] = useState(false);
+    const [selectedSettingDeviceId, setSelectedSettingDeviceId] = useState(null);
+    const handleOpenSetModal = (deviceId) => {
+        setSelectedSettingDeviceId(deviceId);
+        setIsSetModalOpen(true);
+    };
+    const handleCloseSetModal = () => {
+        setSelectedSettingDeviceId(null);
+        setIsSetModalOpen(false);
+    };
 
     //ดึงข้อมูลหลังบ้าน
     const deviceQueries = useQueries({
@@ -66,30 +78,30 @@ function DeviceManagement(){
     
             // กรองตามช่องค้นหา (Search)
             if (search) {
-            const lowerSearch = search.toLowerCase();
-            data = data.filter((device) => {
-                // 1. การค้นหาด้วย ID (ต้องแปลงเป็น String ก่อน)
-                const deviceIdSearch = device.device_id
-                ? String(device.device_id).includes(lowerSearch)
-                : false;
-    
-                // 2. การค้นหาด้วยชื่อและรหัส (ป้องกันค่าเป็น null/undefined ก่อนเรียก toLowerCase)
-                const modelSearch =
-                device.model && device.model.toLowerCase().includes(lowerSearch);
-                const addressSearch =
-                device.address && device.address.toLowerCase().includes(lowerSearch);
-    
-                // รวมผลลัพธ์การค้นหาทั้งหมด
-                return deviceIdSearch || modelSearch || addressSearch;
-            });
+                const lowerSearch = search.toLowerCase();
+                data = data.filter((device) => {
+                    // 1. การค้นหาด้วย ID (ต้องแปลงเป็น String ก่อน)
+                    const deviceIdSearch = device.device_id
+                    ? String(device.device_id).includes(lowerSearch)
+                    : false;
+        
+                    // 2. การค้นหาด้วยชื่อและรหัส
+                    const modelSearch =
+                    device.model && device.model.toLowerCase().includes(lowerSearch);
+                    const addressSearch =
+                    device.address && device.address.toLowerCase().includes(lowerSearch);
+        
+                    // รวมผลลัพธ์การค้นหาทั้งหมด
+                    return deviceIdSearch || modelSearch || addressSearch;
+                });
             }
     
             if (deviceType && deviceType !== "ทั้งหมด") {
-            data = data.filter((device) => device.type === deviceType);
+                data = data.filter((device) => (device.type || 'Unknown') === deviceType);
             }
     
             if (status && status !== "ทั้งหมด") {
-            data = data.filter((device) => device.status === status);
+                data = data.filter((device) => (device.status || 'unassigned') === status);
             }
     
             return data;
@@ -98,10 +110,9 @@ function DeviceManagement(){
 
     //ระบบกรองสถานะอุปกรณ์
     const deviceStatusCount = (deviceQueryResult.data || []).reduce((acc, device) => {
-    const status = device.status;
-    acc[status] = (acc[status] || 0)+1;
-    console.log("acc",acc)
-    return acc
+        const status = device.status || "unassigned";
+        acc[status] = (acc[status] || 0) + 1;
+        return acc;
     }, {});
 
     const deviceStatusList = Object.entries(deviceStatusCount).map(([status, count]) => {
@@ -109,10 +120,9 @@ function DeviceManagement(){
             name: status, 
             value: count
         }
-        
-    })
+    });
 
-    const totalDevicesObject = {name: "อุปกรณ์ทั้งหมด", value: deviceQueries.length}
+    const totalDevicesObject = {name: "อุปกรณ์ทั้งหมด", value: (deviceQueryResult.data || []).length}
 
     const deviceStatusData = [
         totalDevicesObject,
@@ -157,7 +167,8 @@ function DeviceManagement(){
         
                 <CardLayouts
                 name="device"
-                data={filteredDevices}/>
+                data={filteredDevices}
+                onSetting={handleOpenSetModal}/>
 
             </div>
 
@@ -169,6 +180,20 @@ function DeviceManagement(){
                 <AddDeviceForm
                     onClose={() => {
                         handleCloseModal();
+                        deviceQueries[0].refetch();
+                    }}
+                />
+            </Modal>
+
+            <Modal
+                title="ตั้งค่าอุปกรณ์"
+                isOpen={isSetModalOpen}
+                onClose={handleCloseSetModal}
+            >
+                <SetDeviceForm
+                    deviceId={selectedSettingDeviceId}
+                    onClose={() => {
+                        handleCloseSetModal();
                         deviceQueries[0].refetch();
                     }}
                 />
