@@ -86,36 +86,42 @@ function DeviceManagement(){
     
         const filteredDevices = useMemo(() => {
             const { search, deviceType, status } = filters;
-            let data = deviceQueryResult.data || []; 
-    
-            // กรองตามช่องค้นหา (Search)
+            let data = deviceQueryResult.data || [];
+
+            // 1. กรองด้วยช่องค้นหา (Search)
             if (search) {
                 const lowerSearch = search.toLowerCase();
                 data = data.filter((device) => {
-                    // 1. การค้นหาด้วย ID (ต้องแปลงเป็น String ก่อน)
-                    const deviceIdSearch = device.device_id
-                    ? String(device.device_id).includes(lowerSearch)
-                    : false;
-        
-                    // 2. การค้นหาด้วยชื่อและรหัส
-                    const modelSearch =
-                    device.model && device.model.toLowerCase().includes(lowerSearch);
-                    const addressSearch =
-                    device.address && device.address.toLowerCase().includes(lowerSearch);
-        
-                    // รวมผลลัพธ์การค้นหาทั้งหมด
-                    return deviceIdSearch || modelSearch || addressSearch;
+                    // ค้นหาจาก DeviceID
+                    const deviceIdMatch = device.device_id?.toLowerCase().includes(lowerSearch);
+                    
+                    // ค้นหาจาก Model
+                    const modelMatch = device.model?.toLowerCase().includes(lowerSearch);
+                    
+                    // ค้นหาจาก Device Name
+                    const nameMatch = device.device_name?.toLowerCase().includes(lowerSearch);
+                    
+                    // ค้นหาจาก Serial Number (เพิ่มใหม่ตาม struct)
+                    const snMatch = device.serial_number?.toLowerCase().includes(lowerSearch);
+                    
+                    // ค้นหาจากชื่อผู้ที่ได้รับมอบหมาย (เพิ่มใหม่ตาม struct)
+                    const assignedMatch = device.assigned_to?.toLowerCase().includes(lowerSearch);
+
+                    return deviceIdMatch || modelMatch || nameMatch || snMatch || assignedMatch;
                 });
             }
-    
+
+            // 2. กรองตามประเภท (Type)
+            // เช็คให้ชัวร์ว่าค่าจาก Frontend (deviceType) ตรงกับค่าใน DB (device.type)
             if (deviceType && deviceType !== "ทั้งหมด") {
-                data = data.filter((device) => (device.type || 'Unknown') === deviceType);
+                data = data.filter((device) => device.type === deviceType);
             }
-    
+
+            // 3. กรองตามสถานะ (Status)
             if (status && status !== "ทั้งหมด") {
-                data = data.filter((device) => (device.status || 'unassigned') === status);
+                data = data.filter((device) => device.status === status);
             }
-    
+
             return data;
         }, [deviceQueryResult.data, filters]);
         //ระบบ filter
