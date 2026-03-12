@@ -72,8 +72,8 @@ function ZoneStaffManagement(){
 
     const zoneOptions = useMemo(() => {
     return zoneData.map(zone => ({ 
-        label: zone.zonename, // ใช้ชื่อ 'label' เพื่อให้ง่ายต่อการนำไปใส่ Dropdown
-        value: zone.zoneid    // ใช้ชื่อ 'value' สำหรับค่าที่จะส่งไป API
+        label: zone.zone_name, // ใช้ชื่อ 'label' เพื่อให้ง่ายต่อการนำไปใส่ Dropdown
+        value: zone.zone_id    // ใช้ชื่อ 'value' สำหรับค่าที่จะส่งไป API
     }));
     }, [zoneData]);
 

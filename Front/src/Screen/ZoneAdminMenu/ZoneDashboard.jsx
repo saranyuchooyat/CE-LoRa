@@ -66,13 +66,13 @@ function ZoneDashboard(){
         const lowerSearch = search.toLowerCase();
         data = data.filter((zone) => {
             // 1. การค้นหาด้วย ID (ต้องแปลงเป็น String ก่อน)
-            const zoneIdSearch = zone.zoneid
-            ? String(zone.zoneid).includes(lowerSearch)
+            const zoneIdSearch = zone.zone_id
+            ? String(zone.zone_id).includes(lowerSearch)
             : false;
 
             // 2. การค้นหาด้วยชื่อและรหัส (ป้องกันค่าเป็น null/undefined ก่อนเรียก toLowerCase)
             const nameSearch =
-            zone.zonename && zone.zonename.toLowerCase().includes(lowerSearch);
+            zone.zone_name && zone.zone_name.toLowerCase().includes(lowerSearch);
             const addressSearch =
             zone.address && zone.address.toLowerCase().includes(lowerSearch);
 

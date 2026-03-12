@@ -41,20 +41,21 @@ function AddZoneStaffForm({ onClose, onSaveSuccess, zones }) {
 
         // จัดเตรียม Object สำหรับส่งไป API (รวมชื่อ-นามสกุล และ map ค่าให้ตรงกับ Backend)
         const dataToSend = {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
+            first_name: formData.firstName.trim(),
+            last_name: formData.lastName.trim(),
             username: formData.username,
             password: formData.password,
             email: formData.email,
             phone: formData.phone,
             description: formData.description,
             position: formData.position,
-            role: formData.role,
-            zoneIds: formData.currentZoneId
+            role: "Zone Staff", // Force Role as Zone Staff
+            zone_id: currentZoneId || "" // Send exact zone string ID
         };
         console.log("Data to send:", dataToSend);
         try {
-            await axios.post(`http://localhost:8080/zones/${currentZoneId}/staff`, dataToSend, {
+            // ส่ง request ไปยัง Endpoint สำหรับ User
+            await axios.post(`http://localhost:8080/users`, dataToSend, {
                 headers: {
                     'Authorization': `Bearer ${token}` 
                 }
@@ -117,7 +118,7 @@ function AddZoneStaffForm({ onClose, onSaveSuccess, zones }) {
                         // เช็คความยาว Array ป้องกัน Error reading '0'
                         value={formData.zoneIds && formData.zoneIds.length > 0 ? formData.zoneIds[0] : ""} 
                         onChange={(e) => {
-                            const selectedId = Number(e.target.value); // แปลงเป็นตัวเลข
+                            const selectedId = e.target.value; // Store as string
                             setFormData(prev => ({
                                 ...prev,
                                 zoneIds: [selectedId] // 💡 เก็บค่า ID ลงใน Array

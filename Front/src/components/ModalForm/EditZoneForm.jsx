@@ -15,8 +15,8 @@ function EditZoneForm({ zoneId, zoneData, onClose, onSaveSuccess }) {
     useEffect(() => {
         if (zoneData) {
             setFormData({
-                zonename: zoneData.zonename || '',
-                address: zoneData.address || '',
+                zonename: zoneData.zone_name || zoneData.zonename || '', // fallback
+                address: zoneData.address || zoneData.zone_address || '', // fallback to zone_address 
                 description: zoneData.description || '',
             });
             setIsLoading(false);

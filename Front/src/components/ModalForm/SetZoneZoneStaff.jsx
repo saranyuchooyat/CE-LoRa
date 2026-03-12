@@ -80,7 +80,7 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
             }
 
             const requestBody = {
-                zone_id: finalZoneIds
+                zone_id: finalZoneIds.join(',')
             };
 
             await api.put(`/users/${uId}`, requestBody);

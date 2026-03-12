@@ -56,8 +56,8 @@ function ZoneTable({ data }){
                                 <tr key={index} className={rowBgClass}>
                                     {/* *** KEY FIXES: แก้ไข Key เป็นตัวพิมพ์ใหญ่ตามข้อมูล *** */}
                                     {console.log(card)}
-                                    <td className="table-data whitespace-nowrap">{card.zoneid}</td>
-                                    <td className="table-data whitespace-nowrap">{card.zonename}</td>
+                                    <td className="table-data whitespace-nowrap">{card.zone_id}</td>
+                                    <td className="table-data whitespace-nowrap">{card.zone_name}</td>
                                     <td className="table-data whitespace-wrap w-[200px]">{card.address}</td>
                                     <td className="table-data whitespace-wrap w-[500px]">{card.description}</td>
                                     <td className="table-data whitespace-nowrap">

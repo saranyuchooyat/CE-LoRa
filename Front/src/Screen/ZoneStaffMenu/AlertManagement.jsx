@@ -26,7 +26,7 @@ function AlertManagement() {
     const zoneData = zoneQueries[0].data || [];
 
     // 2. สกัด Zone ID (ใช้ Optional Chaining เพื่อความปลอดภัย)
-    const currentZoneId = zoneData[0]?.zoneid || null;
+    const currentZoneId = zoneData[0]?.zone_id || null;
 
     const AlertQueries = useQueries({
         queries: [
@@ -88,7 +88,7 @@ function AlertManagement() {
             <div className="mx-5">
                 <MenuNameCard2
                     title="จัดการการแจ้งเตือน"
-                    description= {`${zoneData[0]?.zonename} : ${zoneData[0]?.address}`}
+                    description= {`${zoneData[0]?.zone_name} : ${zoneData[0]?.address}`}
                     buttonText={showCriticalOnly ? "แสดงทั้งหมด" : "ดูรายการฉุกเฉินทั้งหมด"}
                     onButtonClick={() => setShowCriticalOnly(v => !v)}
                 />

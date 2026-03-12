@@ -4,8 +4,8 @@ import HighchartsReact from 'highcharts-react-official';
 function TopZonePieChart({piedata}){
 
     const topZoneData = piedata.map(item => ({
-        name: item.zonename, 
-        y: item.activeuser
+        name: item.zone_name, 
+        y: item.active_user
     }));
 
     const pieoptions = {

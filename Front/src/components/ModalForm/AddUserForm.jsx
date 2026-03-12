@@ -53,7 +53,7 @@ function AddUserForm({ onClose, onSaveSuccess }){
             description: formData.description,
             position: formData.position,
             role: formData.role,
-            zone_id: formData.zoneids || []
+            zone_id: (formData.zoneids && formData.zoneids.length > 0) ? formData.zoneids.join(',') : ""
         };
 
         try {
