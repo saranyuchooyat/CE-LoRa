@@ -8,7 +8,7 @@ import Cardno2 from "../../components/Card/Cardno2";
 import CardFilter from "../../components/Card/CardFilter";
 import Cardno5 from "../../components/Card/Cardno5";
 import Modal from "../../components/ModalForm/Modal";
-import EditUserForm from "../../components/ModalForm/EditUserForm";
+import EditZoneStaff from "../../components/ModalForm/EditZoneStaff";
 import AddZoneStaffForm from "../../components/ModalForm/AddZoneStaff";
 import SetZoneZoneStaff from "../../components/ModalForm/SetZoneZoneStaff";
 
@@ -205,12 +205,13 @@ function ZoneStaffManagement(){
             </Modal>
 
             <Modal
-                title="แก้ไขข้อมูลผู้ใช้งาน"
+                title="แก้ไขข้อมูลพนักงานโซน"
                 isOpen={isEditModalOpen}
                 onClose={handleCloseEditModal}
             >
-                <EditUserForm 
+                <EditZoneStaff 
                     userId={selectedUserId} 
+                    zones={zoneOptions}
                     onClose={handleCloseEditModal}
                     onSaveSuccess={() => userQueries[0].refetch()}
                 />
