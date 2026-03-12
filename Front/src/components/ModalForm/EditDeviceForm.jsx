@@ -5,6 +5,8 @@ function EditDeviceForm({ onClose, onSaveSuccess, deviceData }) {
     const [formData, setFormData] = useState({
         deviceId: deviceData?.device_id || '',
         deviceName: deviceData?.device_name || '',
+        type: deviceData?.type || '',
+        model: deviceData?.model || '',
         description: deviceData?.description || ''
     });
 
@@ -15,6 +17,8 @@ function EditDeviceForm({ onClose, onSaveSuccess, deviceData }) {
             setFormData({
                 deviceId: deviceData.device_id || '',
                 deviceName: deviceData.device_name || '',
+                type: deviceData.type || '',
+                model: deviceData.model || '',
                 description: deviceData.description || ''
             });
         }
@@ -34,6 +38,8 @@ function EditDeviceForm({ onClose, onSaveSuccess, deviceData }) {
 
         const payload = {
             device_name: formData.deviceName,
+            type: formData.type,
+            model: formData.model,
             description: formData.description
         };
 
@@ -80,6 +86,35 @@ function EditDeviceForm({ onClose, onSaveSuccess, deviceData }) {
                         onChange={handleChange}
                         className="border rounded w-full p-2 bg-white outline-none focus:border-blue-500"
                         placeholder="กรุณาระบุชื่อเรียกอุปกรณ์"
+                    />
+                </div>
+
+                 {/* ประเภทอุปกรณ์ (Type) */}
+                 <div className="mb-2">
+                    <label className="block text-gray-700 text-sm">ประเภทอุปกรณ์ (Type):</label>
+                    <select
+                        name="type"
+                        value={formData.type}
+                        onChange={handleChange}
+                        className="border rounded w-full p-2 bg-white"
+                        required
+                    >
+                        <option value="เลือก Type">เลือก Type</option>
+                        <option value="Smartwatch">Smartwatch</option>
+                        <option value="Gateway">Gateway</option>
+                    </select>
+                </div>
+
+                {/* โมเดลอุปกรณ์ (Model) */}
+                <div className="mb-2">
+                    <label className="block text-gray-700 text-sm">รุ่นอุปกรณ์ (Model):</label>
+                    <input
+                        type="text"
+                        name="model"
+                        value={formData.model}
+                        onChange={handleChange}
+                        className="border rounded w-full p-2 bg-white outline-none focus:border-blue-500"
+                        placeholder="เช่น W-D3200"
                     />
                 </div>
 

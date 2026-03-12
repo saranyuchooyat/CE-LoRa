@@ -106,20 +106,32 @@ function ZoneStaffManagement(){
         // กรองตามช่องค้นหา (Search)
         if (search) {
             const lowerSearch = search.toLowerCase();
-            data = data.filter(user => (
-            //ตรวจสอบ user.username
-            (user.name && user.name.toLowerCase().includes(lowerSearch)) ||
-            //ตรวจสอบ email
-            (user.email && user.email.toLowerCase().includes(lowerSearch)) ||
-            //ตรวจสอบ phone
-            (user.phone && String(user.phone).includes(lowerSearch))));
+            data = data.filter(user => {
+                const fullName = `${user.first_name || ''} ${user.last_name || ''}`.toLowerCase();
+                return (
+                    fullName.includes(lowerSearch) ||
+                    (user.username && user.username.toLowerCase().includes(lowerSearch)) ||
+                    (user.email && user.email.toLowerCase().includes(lowerSearch)) ||
+                    (user.phone && String(user.phone).includes(lowerSearch))
+                );
+            });
         }
 
         if (zonestaff && zonestaff !== "ทั้งหมด") {
-            data = data.filter((user) => user.zoneids.includes(Number(zonestaff)));
+            // zone_id from API might be comma separated string or array or single string
+            data = data.filter((user) => {
+                if (!user.zone_id) return false;
+                if (Array.isArray(user.zone_id)) return user.zone_id.includes(zonestaff);
+                if (typeof user.zone_id === 'string') {
+                    // split by comma if there are multiple zones
+                    const zones = user.zone_id.split(',').map(z => z.trim());
+                    return zones.includes(zonestaff);
+                }
+                return false;
+            });
         }
         if (status && status !== 'ทั้งหมด') {
-            data = data.filter((user) => user.status === status);
+            data = data.filter((user) => user.account_status === status);
         }
         return data;
     }, [userData, filters]);

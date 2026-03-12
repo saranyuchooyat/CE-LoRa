@@ -234,6 +234,10 @@ func createUser(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "User ID already exists (System Error)"})
 	}
 
+	if user.AccountStatus == "" {
+		user.AccountStatus = "Active"
+	}
+
 	_, err = getCollection("users").InsertOne(ctx, user)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to create user"})
@@ -275,6 +279,9 @@ func updateUser(c *fiber.Ctx) error {
 	}
 	if userUpdate.ZoneID != "" {
 		updateFields["zone_id"] = userUpdate.ZoneID
+	}
+	if userUpdate.AccountStatus != "" {
+		updateFields["account_status"] = userUpdate.AccountStatus
 	}
 	_, err := getCollection("users").UpdateOne(ctx, bson.M{"user_id": id}, bson.M{"$set": updateFields})
 	if err != nil {
@@ -637,6 +644,14 @@ func updateDevice(c *fiber.Ctx) error {
 
 	if deviceUpdate.AssignedTo != "" {
 		updateFields["assigned_to"] = deviceUpdate.AssignedTo
+	}
+
+	if deviceUpdate.Type != "" {
+		updateFields["type"] = deviceUpdate.Type
+	}
+
+	if deviceUpdate.Model != "" {
+		updateFields["model"] = deviceUpdate.Model
 	}
 
 	if len(updateFields) == 0 {

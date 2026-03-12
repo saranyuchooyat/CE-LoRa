@@ -6,6 +6,7 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
     const [userData, setUserData] = useState(null);
     const [selectedZoneId, setSelectedZoneId] = useState("");
     const [selectedZoneIds, setSelectedZoneIds] = useState([]);
+    const [accountStatus, setAccountStatus] = useState("Active");
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -25,6 +26,9 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
 
                 setUserData(userRes.data);
                 
+                // Initialize account status
+                setAccountStatus(userRes.data.account_status || "Active");
+
                 // Initialize selected zones
                 let userZones = [];
                 if (userRes.data.zone_id) {
@@ -80,7 +84,8 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
             }
 
             const requestBody = {
-                zone_id: finalZoneIds.join(',')
+                zone_id: finalZoneIds.join(','),
+                account_status: accountStatus
             };
 
             await api.put(`/users/${uId}`, requestBody);
@@ -150,6 +155,19 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
                         ))}
                     </select>
                 )}
+            </div>
+
+            <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2">สถานะบัญชีผู้ใช้งาน:</label>
+                <select
+                    value={accountStatus}
+                    onChange={(e) => setAccountStatus(e.target.value)}
+                    className="border text-sm rounded w-full p-2.5 bg-white"
+                    required
+                >
+                    <option value="Active">Active (เปิดใช้งาน)</option>
+                    <option value="Inactive">Inactive (ระงับบัญชี)</option>
+                </select>
             </div>
 
             <div className="flex justify-end gap-3 mt-6 border-t pt-4">
