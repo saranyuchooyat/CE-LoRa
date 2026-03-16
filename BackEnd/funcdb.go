@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/smtp"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -322,19 +323,55 @@ func getMyZone(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	var currentUser User
+	var currentUser bson.M
 	err := getCollection("users").FindOne(ctx, bson.M{"user_id": userID}).Decode(&currentUser)
 	if err != nil {
 		return c.Status(404).JSON(fiber.Map{"error": "User not found"})
 	}
-	if currentUser.ZoneID == "" {
-		return c.JSON([]Zone{})
+
+	// 1. แกะรหัสโซนออกมา
+	var zoneIDs []string
+	if rawZone, ok := currentUser["zone_id"]; ok {
+		switch v := rawZone.(type) {
+		case string:
+			if v != "" {
+				// ✅ อัปเกรด: ถ้า Database เก็บมาเป็น "Z001,Z002" ให้หั่นแบ่งด้วยลูกน้ำ
+				parts := strings.Split(v, ",")
+				for _, p := range parts {
+					zoneIDs = append(zoneIDs, strings.TrimSpace(p))
+				}
+			}
+		case bson.A: // กรณีเป็น Array ใน MongoDB
+			for _, val := range v {
+				if strVal, ok := val.(string); ok {
+					zoneIDs = append(zoneIDs, strVal)
+				}
+			}
+		}
 	}
-	var myZones []Zone = []Zone{}
-	cursor, err := getCollection("zones").Find(ctx, bson.M{"zone_id": currentUser.ZoneID})
+
+	// 🔍 2. ปริ้นท์เช็คใน Terminal (สำคัญมาก! เอาไว้ดูว่ามันดึงโซนอะไรมาได้บ้าง)
+	fmt.Println("=====================================")
+	fmt.Printf("🧐 Debug User: %s\n", userID)
+	fmt.Printf("🧐 Zone IDs extracted: %v\n", zoneIDs)
+	fmt.Println("=====================================")
+
+	if len(zoneIDs) == 0 {
+		return c.JSON([]fiber.Map{}) // คืนค่า Array ว่างถ้าไม่มีโซน
+	}
+
+	// 3. ไปดึงข้อมูลโซนจาก Collection zones
+	var myZones []bson.M // ใช้ bson.M เพื่อความเหนียวแน่น ไม่ต้องกลัว Struct พัง
+	cursor, err := getCollection("zones").Find(ctx, bson.M{"zone_id": bson.M{"$in": zoneIDs}})
 	if err == nil {
+		defer cursor.Close(ctx)
 		cursor.All(ctx, &myZones)
 	}
+
+	if myZones == nil {
+		myZones = []bson.M{}
+	}
+
 	return c.JSON(myZones)
 }
 

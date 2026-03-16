@@ -91,7 +91,7 @@ function ZoneDashboardDetail (){
 
     const filteredZoneStaffData = zoneStaffData.filter(user => {
         if (userRole === "Zone Admin") {
-            return user.position === "Zone Staff";
+            return user.role === "Zone Staff";
         }
         return true;
     });
@@ -209,6 +209,7 @@ function ZoneDashboardDetail (){
             >
                 <AddElderlyform
                     zoneid={zoneid}
+                    onClose={handleCloseModal}
                     onSaveSuccess={() => {
                         handleCloseModal();
                         zoneDashboardQueries[0].refetch(); 

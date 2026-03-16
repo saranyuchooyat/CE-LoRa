@@ -28,25 +28,38 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
 
     const zoneData = userQueries[0].data || [];
 
-    // ✅ แก้ไข 1: ปรับฟังก์ชันดึงชื่อโซนให้รองรับ zone_id และ zone_name แบบใหม่
+    // ✅ แก้ไข 1: ฟังก์ชันเก็ทชื่อโซนเวอร์ชันอัปเกรด (รับมือได้ทั้ง String และ Array)
     const getZoneName = (userZoneId, zoneData) => {
         if (!userZoneId) return "N/A"; 
 
-        // กรณีที่ Backend ส่ง zone_id เป็น Array (เช่น [ "Z001", "Z002" ])
+        let zoneArray = [];
+
+        // 1. เช็คว่าถ้ามาเป็น Array อยู่แล้ว (เช่น ["Z001", "Z002"])
         if (Array.isArray(userZoneId)) {
-            const matchedZones = zoneData.filter(zone => userZoneId.includes(zone.zone_id));
-            if(matchedZones.length > 0){
-                return matchedZones.map(zone => zone.zone_name).join(', ');
-            }
+            zoneArray = userZoneId;
+        } 
+        // 2. เช็คว่าถ้ามาเป็น String แต่มีลูกน้ำคั่น (เช่น "Z001,Z002")
+        else if (typeof userZoneId === 'string' && userZoneId.includes(',')) {
+            zoneArray = userZoneId.split(',').map(z => z.trim());
+        } 
+        // 3. ถ้าเป็น String เดี่ยวๆ (เช่น "Z001")
+        else if (typeof userZoneId === 'string') {
+            zoneArray = [userZoneId];
+        } else {
             return "N/A";
         }
 
-        // กรณีที่ Backend ส่ง zone_id มาเป็น String เดี่ยวๆ (เช่น "Z001")
-        const matchedZone = zoneData.find(zone => zone.zone_id === userZoneId);
-        return matchedZone ? matchedZone.zone_name : "N/A";
+        // เอา Array ของ ID ไปเทียบหาชื่อโซน
+        const matchedZones = zoneData.filter(zone => zoneArray.includes(zone.zone_id));
+        
+        if(matchedZones.length > 0){
+            // เอาชื่อโซนมาต่อกันด้วยลูกน้ำพร้อมเว้นวรรคให้สวยงาม
+            return matchedZones.map(zone => zone.zone_name).join(', ');
+        } 
+        return "N/A";
     };
 
-    // ✅ แก้ไข 2: ปรับ Status ให้รองรับตัวพิมพ์เล็ก-ใหญ่ และ active/inactive
+    // ปรับ Status ให้รองรับตัวพิมพ์เล็ก-ใหญ่ และ active/inactive
     const statusCheck = (status) => {
         if (!status) return 'text-gray-700 bg-gray-200';
         
@@ -121,14 +134,15 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
                                 // ใช้ card.user_id เป็น Key เพื่อความเสถียร
                                 <tr key={card.user_id || index} className={rowBgClass}>
                                     
-                                    {/* ✅ แก้ไข 3: เปลี่ยนชื่อ Key เป็นแบบมี Underscore ให้ตรงกับ Backend */}
                                     <td className="table-data whitespace-nowrap">
                                         {card.first_name ? `${card.first_name} ${card.last_name || ''}`.trim() : (card.username || card.name || "ไม่ระบุชื่อ")}
                                     </td>
                                     <td className="table-data whitespace-nowrap">{card.role || card.position}</td>
                                     
-                                    {/* ส่ง zone_id ไปหาชื่อโซน */}
-                                    <td className="table-data whitespace-wrap w-[200px]">{getZoneName(card.zone_id, zoneData)}</td>
+                                    {/* ✅ เผื่อฟิลด์ชื่อ zone_id, zoneids เอาไว้กันเหนียว */}
+                                    <td className="table-data whitespace-wrap w-[200px]">
+                                        {getZoneName(card.zone_id || card.zoneids || card.zoneIds, zoneData)}
+                                    </td>
                                     
                                     <td className="table-data whitespace-nowrap">{card.phone || "-"}</td>
                                     <td className="table-data whitespace-nowrap">
@@ -137,7 +151,6 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
                                     
                                     {showActions && (
                                     <td className="p-3 text-sm text-left whitespace-nowrap w-fit">
-                                        {/* ✅ แก้ไข 4: เปลี่ยน card.userId เป็น card.user_id ในปุ่มกด */}
                                         <button className="table-btn hover:bg-main-yellow hover:text-white"
                                                 onClick={(event) => handleEditClick(card.user_id, event)}>
                                             แก้ไข</button>

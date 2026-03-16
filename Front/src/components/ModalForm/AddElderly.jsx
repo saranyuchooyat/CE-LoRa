@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
-import api from "../API";
+import api from "../API"; // 💡 ใช้ api ตัวนี้ตัวเดียวพอครับ ไม่ต้อง import axios แล้ว
 
 function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
 
@@ -21,17 +20,15 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
     const [devices, setDevices] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // 1. ดึงข้อมูลอุปกรณ์ที่ยังว่างอยู่
     useEffect(() => {
         const fetchAvailableDevices = async () => {
             try {
-                const token = localStorage.getItem('token');
-                if (!token) return;
-
-                const response = await axios.get('http://localhost:8080/devices', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                // ใช้ api.get แทน axios ได้เลย มันจะแนบ base URL และ Token ให้เอง (ถ้าตั้งค่า API ไว้แล้ว)
+                const response = await api.get('/devices'); 
                 
-                const allDevices = response.data;
+                const allDevices = response.data || [];
+                // กรองเอาเฉพาะอุปกรณ์ที่ยังไม่มีเจ้าของ
                 const availableOnly = allDevices.filter(dev => 
                     !dev.assigned_to || dev.assigned_to === ''
                 );
@@ -48,7 +45,10 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: name === 'age' || name === 'weight' || name === 'height' ? Number(value) : value
+            // ป้องกันกรณีลบตัวเลขจนหมดแล้วกลายเป็น 0
+            [name]: (name === 'age' || name === 'weight' || name === 'height') 
+                    ? (value === '' ? '' : Number(value)) 
+                    : value
         }));
     };
 
@@ -56,12 +56,10 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
         e.preventDefault();
         setIsSubmitting(true);
 
-        const token = localStorage.getItem('token');
-
         const dataToSend = {
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            sex: formData.gender,
+            first_name: formData.firstName.trim(),
+            last_name: formData.lastName.trim(),
+            sex: formData.gender, // ⚠️ ระวัง: เช็คฝั่ง Go ว่าใช้ฟิลด์ sex หรือ gender
             age: Number(formData.age),
             weight: Number(formData.weight),
             height: Number(formData.height),
@@ -74,31 +72,30 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
         };
 
         try {
-            // 1. เพิ่มผู้สูงอายุ (หัวใจหลักต้องสำเร็จ)
-            await axios.post('http://localhost:8080/zones/elderlyRegister', dataToSend, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            // 1. เพิ่มผู้สูงอายุ (ใช้ api.post)
+            // ⚠️ เช็ค URL ให้ดีว่าใน Go ใช้ /zones/elderlyRegister หรือ /elders
+            await api.post('/zones/elderlyRegister', dataToSend);
 
-            // 💡 2. เงื่อนไขการผูกอุปกรณ์: ต้องมี ID และ ID ต้องไม่ใช่ค่าว่าง
+            // 2. ถ้ามีการผูกอุปกรณ์ ให้ยิงไปอัปเดตสถานะอุปกรณ์ด้วย
             if (dataToSend.device_id && dataToSend.device_id.trim() !== "") {
                 try {
                     await api.put(`/devices/${dataToSend.device_id}`, {
-                        status: "offline",
+                        status: "active", // ปกติพอผูกแล้ว สถานะน่าจะเป็น active หรือ in-use นะครับ (ลองเช็คกับเพื่อนดู)
                         assigned_to: `${formData.firstName} ${formData.lastName}`
                     });
-                    console.log("Device linked!");
+                    console.log("Device linked successfully!");
                 } catch (devErr) {
                     console.warn("Elderly added, but device link failed:", devErr);
                 }
             }
 
-            // 3. แจ้งเตือนสำเร็จและปิด Modal
             alert("เพิ่มข้อมูลผู้สูงอายุสำเร็จเรียบร้อยแล้ว");
-            onSaveSuccess();
-            onClose();
+            
+            if (onSaveSuccess) onSaveSuccess();
+            if (onClose) onClose();
 
         } catch (error) {
-            console.error("Primary Error:", error);
+            console.error("Primary Error:", error.response?.data || error.message);
             alert("ไม่สามารถเพิ่มข้อมูลได้ กรุณาตรวจสอบการเชื่อมต่อหรือข้อมูลอีกครั้ง");
         } finally {
             setIsSubmitting(false);
@@ -132,7 +129,7 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
                         className="border rounded w-full p-2 bg-white"
                         required
                     >
-                        <option value="เลือกเพศ">เลือกเพศ</option>
+                        <option value="เลือกเพศ" disabled>เลือกเพศ</option>
                         <option value="ชาย">ชาย</option>
                         <option value="หญิง">หญิง</option>
                         <option value="อื่นๆ">อื่นๆ</option>
@@ -150,18 +147,18 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
                 </div>
 
                 <div className="mb-2 col-span-2">
-                    <label className="block text-gray-700 text-sm">เลือกอุปกรณ์:</label>
+                    <label className="block text-gray-700 text-sm">เลือกอุปกรณ์ (ถ้ามี):</label>
                     <select
                         name="device"
                         value={formData.device}
                         onChange={handleChange}
                         className="border rounded w-full p-2 bg-white"
                     >
-                        <option value="เลือกอุปกรณ์">เลือกอุปกรณ์</option>
+                        <option value="เลือกอุปกรณ์">-- ไม่ระบุอุปกรณ์ --</option>
                             {devices.length > 0 ? (
                                 devices.map(device => (
-                                    <option key={device.id} value={device.device_id}>
-                                        {device.device_id} - {device.model}
+                                    <option key={device.device_id || device.id} value={device.device_id}>
+                                        {device.device_id} - {device.device_name || 'Smart Watch'}
                                     </option>
                                 ))
                             ) : (
@@ -213,5 +210,3 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
     );
 }
 export default AddElderlyform;
-
-   
