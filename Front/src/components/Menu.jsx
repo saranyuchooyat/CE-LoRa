@@ -41,20 +41,17 @@ function Menu() {
             "System Overview Dashboard": "/system-overview-dashboard",
             "Zone Management": "/zone-management",
             "User Management": "/user-management",
-            "Emergency Respond Dashboard": "/emergency-respond"
         },
         "Zone Admin": {
             "Zone Dashboard": "/zone-dashboard",
             "Device Management": "/device-management",
             "Zone Staff Management": "/zone-staff-management",
-            "Emergency Respond Dashboard": "/emergency-respond"
         },
         "Zone Staff": {
             "Eldery Monitoring": "/eldery-monitoring",
             "Alert Management": "/alert-management",
             "Reports": "/reports",
             "Zone Map Overview": "/zone-map-overview",
-            "Emergency Respond Dashboard": "/emergency-respond"
         },
         "Elderly Caregiver": {}
     };
