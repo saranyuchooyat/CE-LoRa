@@ -80,7 +80,7 @@ func main() {
 	app.Post("/devices", createDevice)       //✅
 	app.Put("/devices/:id", updateDevice)    //✅
 	app.Delete("/devices/:id", deleteDevice) //✅
-	app.Get("/device_data/:device_id", getDeviceDataByDeviceID)
+	app.Get("/device_data/:device_id", getDeviceDataByDeviceName)
 
 	// --- System Dashboard ---
 	app.Get("/dashboard/usage-trend", getUserTrend)    //mock
