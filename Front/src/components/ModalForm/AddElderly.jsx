@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import api from "../API"; // 💡 ใช้ api ตัวนี้ตัวเดียวพอครับ ไม่ต้อง import axios แล้ว
+import api from "../API"; 
 
 function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
 
@@ -12,6 +12,7 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
         height: '',
         congenitalDisease: '',
         personalMedicine: '',
+        emergencyContactName: '', // ✅ 1. เพิ่ม State เก็บชื่อผู้ติดต่อ
         emergencyContacts: '',
         address: '',
         device: 'เลือกอุปกรณ์'
@@ -20,15 +21,12 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
     const [devices, setDevices] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // 1. ดึงข้อมูลอุปกรณ์ที่ยังว่างอยู่
     useEffect(() => {
         const fetchAvailableDevices = async () => {
             try {
-                // ใช้ api.get แทน axios ได้เลย มันจะแนบ base URL และ Token ให้เอง (ถ้าตั้งค่า API ไว้แล้ว)
                 const response = await api.get('/devices'); 
                 
                 const allDevices = response.data || [];
-                // กรองเอาเฉพาะอุปกรณ์ที่ยังไม่มีเจ้าของ
                 const availableOnly = allDevices.filter(dev => 
                     !dev.assigned_to || dev.assigned_to === ''
                 );
@@ -45,7 +43,6 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
-            // ป้องกันกรณีลบตัวเลขจนหมดแล้วกลายเป็น 0
             [name]: (name === 'age' || name === 'weight' || name === 'height') 
                     ? (value === '' ? '' : Number(value)) 
                     : value
@@ -59,12 +56,13 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
         const dataToSend = {
             first_name: formData.firstName.trim(),
             last_name: formData.lastName.trim(),
-            sex: formData.gender, // ⚠️ ระวัง: เช็คฝั่ง Go ว่าใช้ฟิลด์ sex หรือ gender
+            sex: formData.gender, 
             age: Number(formData.age),
             weight: Number(formData.weight),
             height: Number(formData.height),
             congenital_disease: formData.congenitalDisease,
             personal_medicine: formData.personalMedicine,
+            emergency_contact_name: formData.emergencyContactName, // ✅ 2. เพิ่มฟิลด์สำหรับส่งไปหลังบ้าน
             emergency_contacts: formData.emergencyContacts,
             address: formData.address,
             device_id: (formData.device === 'เลือกอุปกรณ์' || !formData.device) ? "" : formData.device,
@@ -72,15 +70,12 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
         };
 
         try {
-            // 1. เพิ่มผู้สูงอายุ (ใช้ api.post)
-            // ⚠️ เช็ค URL ให้ดีว่าใน Go ใช้ /zones/elderlyRegister หรือ /elders
             await api.post('/zones/elderlyRegister', dataToSend);
 
-            // 2. ถ้ามีการผูกอุปกรณ์ ให้ยิงไปอัปเดตสถานะอุปกรณ์ด้วย
             if (dataToSend.device_id && dataToSend.device_id.trim() !== "") {
                 try {
                     await api.put(`/devices/${dataToSend.device_id}`, {
-                        status: "active", // ปกติพอผูกแล้ว สถานะน่าจะเป็น active หรือ in-use นะครับ (ลองเช็คกับเพื่อนดู)
+                        status: "active", 
                         assigned_to: `${formData.firstName} ${formData.lastName}`
                     });
                     console.log("Device linked successfully!");
@@ -178,9 +173,16 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
                 <textarea name="personalMedicine" type="text" value={formData.personalMedicine} onChange={handleChange} className="border rounded w-full h-14 p-2 bg-white resize-none" placeholder="ระบุประเภทของยาที่ต้องรับประทาน"/>
             </div>
             
-            <div className="mb-2">
-                <label className="block text-gray-700 text-sm">เบอร์โทรติดต่อฉุกเฉิน</label>
-                <input name="emergencyContacts" type="text" value={formData.emergencyContacts} onChange={handleChange} className="border rounded w-full p-2 bg-white outline-none focus:border-blue-500" placeholder="เบอร์โทรฉุกเฉิน (มีหลายเบอร์ให้ใช้ลูกน้ำขั้น)"/>
+            {/* ✅ 3. ปรับตรงนี้ให้แบ่ง 2 คอลัมน์ (ชื่อผู้ติดต่อ และ เบอร์โทร) */}
+            <div className="grid grid-cols-2 gap-x-4">
+                <div className="mb-2">
+                    <label className="block text-gray-700 text-sm">ชื่อผู้ติดต่อฉุกเฉิน</label>
+                    <input name="emergencyContactName" type="text" value={formData.emergencyContactName} onChange={handleChange} className="border rounded w-full p-2 bg-white outline-none focus:border-blue-500" placeholder="ชื่อ-นามสกุล ผู้ติดต่อ"/>
+                </div>
+                <div className="mb-2">
+                    <label className="block text-gray-700 text-sm">เบอร์โทรติดต่อฉุกเฉิน</label>
+                    <input name="emergencyContacts" type="text" value={formData.emergencyContacts} onChange={handleChange} className="border rounded w-full p-2 bg-white outline-none focus:border-blue-500" placeholder="เบอร์โทรศัพท์"/>
+                </div>
             </div>
 
             <div className="mb-2">

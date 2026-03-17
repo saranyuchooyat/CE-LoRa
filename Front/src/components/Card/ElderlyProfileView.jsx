@@ -60,8 +60,23 @@ function ElderlyProfileView({ elderData, onBack }) {
                     <div className="grid grid-cols-2 gap-y-4 gap-x-8">
                         <div><p className="text-gray-500 text-sm">โรคประจำตัว</p><p className="font-semibold bg-gray-50 p-2 rounded">{elderData.congenital_disease || "-"}</p></div>
                         <div><p className="text-gray-500 text-sm">ยาประจำตัว</p><p className="font-semibold bg-gray-50 p-2 rounded">{elderData.personal_medicine || "-"}</p></div>
-                        <div><p className="text-gray-500 text-sm">เบอร์โทรติดต่อฉุกเฉิน</p><p className="font-semibold text-red-500 bg-red-50 p-2 rounded">{elderData.emergency_contacts || "-"}</p></div>
-                        <div><p className="text-gray-500 text-sm">ที่อยู่</p><p className="font-semibold bg-gray-50 p-2 rounded">{elderData.address || "-"}</p></div>
+                        
+                        {/* ✅ เพิ่มชื่อผู้ติดต่อฉุกเฉินตรงนี้ */}
+                        <div>
+                            <p className="text-gray-500 text-sm">ชื่อผู้ติดต่อฉุกเฉิน</p>
+                            <p className="font-semibold text-red-700 bg-red-50 p-2 rounded">{elderData.emergency_contact_name || "-"}</p>
+                        </div>
+                        
+                        <div>
+                            <p className="text-gray-500 text-sm">เบอร์โทรติดต่อฉุกเฉิน</p>
+                            <p className="font-semibold text-red-500 bg-red-50 p-2 rounded">{elderData.emergency_contacts || "-"}</p>
+                        </div>
+                        
+                        {/* ✅ ปรับที่อยู่ให้ขยายเต็ม 2 คอลัมน์ (col-span-2) */}
+                        <div className="col-span-2">
+                            <p className="text-gray-500 text-sm">ที่อยู่</p>
+                            <p className="font-semibold bg-gray-50 p-2 rounded">{elderData.address || "-"}</p>
+                        </div>
                     </div>
                 </div>
             </div>

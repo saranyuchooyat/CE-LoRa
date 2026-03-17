@@ -33,22 +33,23 @@ type Zone struct {
 }
 
 type Elder struct {
-	ID                primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
-	ElderID           string             `bson:"elder_id" json:"elder_id"`
-	ZoneID            string             `bson:"zone_id" json:"zone_id"`
-	DeviceID          string             `bson:"device_id" json:"device_id"`
-	CaregiverUserIDs  []string           `bson:"caregiver_user_id" json:"caregiver_user_id"` // Array
-	FirstName         string             `bson:"first_name" json:"first_name"`
-	LastName          string             `bson:"last_name" json:"last_name"`
-	Sex               string             `bson:"sex" json:"sex"`
-	Age               int                `bson:"age" json:"age"`
-	Weight            float64            `bson:"weight" json:"weight"`
-	Height            float64            `bson:"height" json:"height"`
-	CongenitalDisease string             `bson:"congenital_disease" json:"congenital_disease"`
-	PersonalMedicine  string             `bson:"personal_medicine" json:"personal_medicine"`
-	EmergencyContacts string             `bson:"emergency_contacts" json:"emergency_contacts"`
-	HealthStatus      string             `bson:"health_status" json:"health_status"`
-	Address           string             `bson:"address" json:"address"`
+	ID                   primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
+	ElderID              string             `bson:"elder_id" json:"elder_id"`
+	ZoneID               string             `bson:"zone_id" json:"zone_id"`
+	DeviceID             string             `bson:"device_id" json:"device_id"`
+	CaregiverUserIDs     []string           `bson:"caregiver_user_id" json:"caregiver_user_id"` // Array
+	FirstName            string             `bson:"first_name" json:"first_name"`
+	LastName             string             `bson:"last_name" json:"last_name"`
+	Sex                  string             `bson:"sex" json:"sex"`
+	Age                  int                `bson:"age" json:"age"`
+	Weight               float64            `bson:"weight" json:"weight"`
+	Height               float64            `bson:"height" json:"height"`
+	CongenitalDisease    string             `bson:"congenital_disease" json:"congenital_disease"`
+	PersonalMedicine     string             `bson:"personal_medicine" json:"personal_medicine"`
+	EmergencyContactName string             `json:"emergency_contact_name" bson:"emergency_contact_name"`
+	EmergencyContacts    string             `bson:"emergency_contacts" json:"emergency_contacts"`
+	HealthStatus         string             `bson:"health_status" json:"health_status"`
+	Address              string             `bson:"address" json:"address"`
 }
 type Device struct {
 	ID           primitive.ObjectID `bson:"_id,omitempty" json:"_id"`

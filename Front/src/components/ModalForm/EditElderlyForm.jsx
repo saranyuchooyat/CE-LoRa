@@ -13,6 +13,7 @@ function EditElderlyForm({ elderData, onClose, onSaveSuccess }) {
         height: elderData?.height || 0,
         congenitalDisease: elderData?.congenital_disease || '',
         personalMedicine: elderData?.personal_medicine || '',
+        emergencyContactName: elderData?.emergency_contact_name || '', // ✅ 1. เพิ่ม State ดึงค่าเก่ามาโชว์
         emergencyContacts: elderData?.emergency_contacts || '',
         address: elderData?.address || ''
     });
@@ -31,6 +32,7 @@ function EditElderlyForm({ elderData, onClose, onSaveSuccess }) {
                 height: elderData.height || 0,
                 congenitalDisease: elderData.congenital_disease || '',
                 personalMedicine: elderData.personal_medicine || '',
+                emergencyContactName: elderData.emergency_contact_name || '', // ✅ ดึงค่าตอนที่ Props เปลี่ยน
                 emergencyContacts: elderData.emergency_contacts || '',
                 address: elderData.address || ''
             });
@@ -58,6 +60,7 @@ function EditElderlyForm({ elderData, onClose, onSaveSuccess }) {
             height: formData.height,
             congenital_disease: formData.congenitalDisease,
             personal_medicine: formData.personalMedicine,
+            emergency_contact_name: formData.emergencyContactName, // ✅ 2. เตรียมแพ็คส่งกลับไปอัปเดต
             emergency_contacts: formData.emergencyContacts,
             address: formData.address
         };
@@ -140,9 +143,16 @@ function EditElderlyForm({ elderData, onClose, onSaveSuccess }) {
                 <textarea name="personalMedicine" type="text" value={formData.personalMedicine} onChange={handleChange} className="border rounded w-full h-14 p-2 bg-white resize-none" placeholder="ระบุประเภทของยาที่ต้องรับประทาน"/>
             </div>
             
-            <div className="mb-2">
-                <label className="block text-gray-700 text-sm">เบอร์โทรติดต่อฉุกเฉิน</label>
-                <input name="emergencyContacts" type="text" value={formData.emergencyContacts} onChange={handleChange} className="border rounded w-full p-2 bg-white outline-none focus:border-blue-500" placeholder="เบอร์โทรฉุกเฉิน (มีหลายเบอร์ให้ใช้ลูกน้ำขั้น)"/>
+            {/* ✅ 3. ปรับตรงนี้ให้แบ่ง 2 คอลัมน์เหมือนกับหน้า Add */}
+            <div className="grid grid-cols-2 gap-x-4">
+                <div className="mb-2">
+                    <label className="block text-gray-700 text-sm">ชื่อผู้ติดต่อฉุกเฉิน</label>
+                    <input name="emergencyContactName" type="text" value={formData.emergencyContactName} onChange={handleChange} className="border rounded w-full p-2 bg-white outline-none focus:border-blue-500" placeholder="ชื่อ-นามสกุล ผู้ติดต่อ"/>
+                </div>
+                <div className="mb-2">
+                    <label className="block text-gray-700 text-sm">เบอร์โทรติดต่อฉุกเฉิน</label>
+                    <input name="emergencyContacts" type="text" value={formData.emergencyContacts} onChange={handleChange} className="border rounded w-full p-2 bg-white outline-none focus:border-blue-500" placeholder="เบอร์โทรฉุกเฉิน (มีหลายเบอร์ให้ใช้ลูกน้ำขั้น)"/>
+                </div>
             </div>
 
             <div className="mb-2">
