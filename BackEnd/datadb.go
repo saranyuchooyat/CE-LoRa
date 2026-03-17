@@ -8,19 +8,21 @@ import (
 )
 
 type User struct {
-	ID            primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
-	UserID        string             `bson:"user_id" json:"user_id"`
-	ZoneID        string             `bson:"zone_id" json:"zone_id"`
-	Role          string             `bson:"role" json:"role"`
-	Username      string             `bson:"username" json:"username"`
-	Password      string             `bson:"password" json:"password"`
-	FirstName     string             `bson:"first_name" json:"first_name"`
-	LastName      string             `bson:"last_name" json:"last_name"`
-	Age           int                `bson:"age" json:"age"`
-	Phone         string             `bson:"phone" json:"phone"`
-	Email         string             `bson:"email" json:"email"`
-	LastLogin     time.Time          `bson:"last_login" json:"last_login"`
-	AccountStatus string             `bson:"account_status" json:"account_status"`
+	ID             primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
+	UserID         string             `bson:"user_id" json:"user_id"`
+	ZoneID         string             `bson:"zone_id" json:"zone_id"`
+	Role           string             `bson:"role" json:"role"`
+	Username       string             `bson:"username" json:"username"`
+	Password       string             `bson:"password" json:"password"`
+	FirstName      string             `bson:"first_name" json:"first_name"`
+	LastName       string             `bson:"last_name" json:"last_name"`
+	Age            int                `bson:"age" json:"age"`
+	Phone          string             `bson:"phone" json:"phone"`
+	Email          string             `bson:"email" json:"email"`
+	LastLogin      time.Time          `bson:"last_login" json:"last_login"`
+	AccountStatus  string             `bson:"account_status" json:"account_status"`
+	IsCaregiver    bool               `json:"is_caregiver" bson:"is_caregiver"`
+	AssignedElders []string           `json:"assigned_elders" bson:"assigned_elders"`
 }
 type Zone struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty" json:"_id"`

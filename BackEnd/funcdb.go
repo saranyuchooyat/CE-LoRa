@@ -284,6 +284,20 @@ func updateUser(c *fiber.Ctx) error {
 	if userUpdate.AccountStatus != "" {
 		updateFields["account_status"] = userUpdate.AccountStatus
 	}
+
+	// ✅ เพิ่ม 2 ฟิลด์ใหม่ตรงนี้เลยครับ
+	// 1. รับค่า is_caregiver (เป็น boolean จับยัดได้เลย)
+	updateFields["is_caregiver"] = userUpdate.IsCaregiver
+
+	// 2. รับค่ารายชื่อผู้สูงอายุ (เป็น Array)
+	if userUpdate.AssignedElders != nil {
+		updateFields["assigned_elders"] = userUpdate.AssignedElders
+	} else {
+		// ดักไว้เผื่อหน้าบ้านไม่ได้ส่งมา หรือเขายกเลิกการเป็น Caregiver
+		// จะได้เคลียร์ค่าใน Database ให้เป็น Array ว่างๆ ครับ
+		updateFields["assigned_elders"] = []string{}
+	}
+
 	_, err := getCollection("users").UpdateOne(ctx, bson.M{"user_id": id}, bson.M{"$set": updateFields})
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Update failed"})
