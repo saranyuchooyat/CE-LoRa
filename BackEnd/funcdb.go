@@ -285,24 +285,59 @@ func updateUser(c *fiber.Ctx) error {
 		updateFields["account_status"] = userUpdate.AccountStatus
 	}
 
-	// ✅ เพิ่ม 2 ฟิลด์ใหม่ตรงนี้เลยครับ
-	// 1. รับค่า is_caregiver (เป็น boolean จับยัดได้เลย)
-	updateFields["is_caregiver"] = userUpdate.IsCaregiver
-
-	// 2. รับค่ารายชื่อผู้สูงอายุ (เป็น Array)
+	// ✅ กรองขยะ (ค่าว่าง) ออกจาก Array ของ AssignedElders ก่อน
+	var validElderIds []string
 	if userUpdate.AssignedElders != nil {
-		updateFields["assigned_elders"] = userUpdate.AssignedElders
+		for _, eID := range userUpdate.AssignedElders {
+			if eID != "" {
+				validElderIds = append(validElderIds, eID)
+			}
+		}
 	} else {
-		// ดักไว้เผื่อหน้าบ้านไม่ได้ส่งมา หรือเขายกเลิกการเป็น Caregiver
-		// จะได้เคลียร์ค่าใน Database ให้เป็น Array ว่างๆ ครับ
-		updateFields["assigned_elders"] = []string{}
+		validElderIds = []string{}
 	}
 
+	// ✅ ยัด 2 ฟิลด์ใหม่ลงไป (ข้อมูลคลีนๆ ไม่มีช่องว่างหลงเหลือ)
+	updateFields["is_caregiver"] = userUpdate.IsCaregiver
+	updateFields["assigned_elders"] = validElderIds
+
+	// =========================================================
+	// 🎯 1. อัปเดตข้อมูลฝั่ง User
+	// =========================================================
 	_, err := getCollection("users").UpdateOne(ctx, bson.M{"user_id": id}, bson.M{"$set": updateFields})
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Update failed"})
 	}
-	return c.JSON(fiber.Map{"message": "User updated", "id": id})
+
+	// =========================================================
+	// 🎯 2. ซิงค์ข้อมูลไปยังฝั่ง Elders
+	// =========================================================
+
+	// 2.1 ล้างไพ่: ดึง user_id ของสตาฟคนนี้ออกจากผู้สูงอายุทุกคนก่อน
+	// (ใช้ $pull เผื่อกรณีที่แอดมินปลดสตาฟออกจากการดูแลคนไข้บางคน)
+	_, err = getCollection("elders").UpdateMany(
+		ctx,
+		bson.M{"caregiver_user_id": id},
+		bson.M{"$pull": bson.M{"caregiver_user_id": id}},
+	)
+	if err != nil {
+		fmt.Println("Error pulling caregiver from elders:", err)
+	}
+
+	// 2.2 จ่ายไพ่ใหม่: ถ้าเป็น Caregiver ให้เอา user_id ไปใส่ให้ผู้สูงอายุที่ถูกเลือก
+	if userUpdate.IsCaregiver && len(validElderIds) > 0 {
+		// ใช้ $addToSet ยัด user_id เข้าไป (ป้องกันการใส่ค่าซ้ำ)
+		_, err = getCollection("elders").UpdateMany(
+			ctx,
+			bson.M{"elder_id": bson.M{"$in": validElderIds}},
+			bson.M{"$addToSet": bson.M{"caregiver_user_id": id}},
+		)
+		if err != nil {
+			fmt.Println("Error pushing caregiver to elders:", err)
+		}
+	}
+
+	return c.JSON(fiber.Map{"message": "User updated and synced with elders successfully", "id": id})
 }
 
 func deleteUser(c *fiber.Ctx) error {

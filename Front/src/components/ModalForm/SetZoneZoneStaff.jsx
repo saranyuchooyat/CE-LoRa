@@ -11,10 +11,13 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // ✅ State สำหรับระบบ Caregiver
-    const [isCaregiver, setIsCaregiver] = useState('no'); // ค่าเริ่มต้นคือไม่ใช่
-    const [availableElders, setAvailableElders] = useState([]); // รายชื่อผู้สูงอายุทั้งหมดในโซนที่เลือก
-    const [selectedElders, setSelectedElders] = useState([]); // คนที่ถูกเลือกให้ดูแล
-    const [searchElder, setSearchElder] = useState(""); // คำค้นหา
+    const [isCaregiver, setIsCaregiver] = useState('no');
+    const [availableElders, setAvailableElders] = useState([]); 
+    
+    // 🎯 แก้ให้ selectedElders เก็บแค่ "รหัส (String)" เช่น ["E001", "E002"]
+    const [selectedElders, setSelectedElders] = useState([]); 
+    
+    const [searchElder, setSearchElder] = useState("");
 
     useEffect(() => {
         const fetchData = async () => {
@@ -29,13 +32,9 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
                     value: zone.zone_id
                 }));
                 setZones(zoneOptions);
-
                 setUserData(userRes.data);
-                
-                // Initialize account status
                 setAccountStatus(userRes.data.account_status || "Active");
 
-                // Initialize selected zones
                 let userZones = [];
                 if (userRes.data.zone_id) {
                     if (Array.isArray(userRes.data.zone_id)) {
@@ -55,10 +54,12 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
                     }
                 }
 
-                // ✅ โหลดค่า Caregiver เดิมจาก DB (ถ้ามี)
+                // ✅ โหลดค่า Caregiver
                 if (userRes.data.is_caregiver) {
                     setIsCaregiver('yes');
                 }
+                
+                // 🎯 ดึง Array ของรหัส ["E001", "E002"] มาใส่ได้เลยโดยตรง
                 if (userRes.data.assigned_elders && Array.isArray(userRes.data.assigned_elders)) {
                     setSelectedElders(userRes.data.assigned_elders); 
                 }
@@ -72,10 +73,8 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
         fetchData();
     }, [userId]);
 
-    // ✅ ดึงรายชื่อผู้สูงอายุ เมื่อมีการเปลี่ยนโซน (สำหรับ Zone Staff ที่ดูแลโซนเดียว)
     useEffect(() => {
         const fetchElders = async () => {
-            // ถ้า role ไม่ใช่แอดมินหลายโซน และมีการเลือกโซนแล้ว ให้ไปดึงรายชื่อมา
             if (!['Zone Admin', 'System Admin'].includes(userData?.role) && selectedZoneId) {
                 try {
                     const res = await api.get(`/zones/${selectedZoneId}/dashboard`);
@@ -100,8 +99,8 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
 
         try {
             const uId = userId;
-            
             let finalZoneIds = [];
+            
             if (['Zone Admin', 'System Admin'].includes(userData?.role)) {
                 finalZoneIds = selectedZoneIds;
                 if (finalZoneIds.length === 0) {
@@ -121,13 +120,12 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
             const requestBody = {
                 zone_id: finalZoneIds.join(','),
                 account_status: accountStatus,
-                // ✅ แนบข้อมูล Caregiver ไปให้ Backend ด้วย
                 is_caregiver: isCaregiver === 'yes',
-                assigned_elders: isCaregiver === 'yes' ? selectedElders.map(e => e.elder_id) : []
+                // 🎯 ส่งก้อน String Array ไปได้เลย
+                assigned_elders: isCaregiver === 'yes' ? selectedElders : []
             };
 
             await api.put(`/users/${uId}`, requestBody);
-            
             onSaveSuccess();
             onClose();
         } catch (error) {
@@ -140,31 +138,26 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
 
     const handleCheckboxChange = (zoneId) => {
         setSelectedZoneIds(prev => 
-            prev.includes(zoneId) 
-                ? prev.filter(id => id !== zoneId) 
-                : [...prev, zoneId]
+            prev.includes(zoneId) ? prev.filter(id => id !== zoneId) : [...prev, zoneId]
         );
     };
 
-    // ✅ ฟังก์ชันเพิ่ม/ลบ ผู้สูงอายุ
-    const handleAddElder = (elder) => {
-        if (!selectedElders.find(e => e.elder_id === elder.elder_id)) {
-            setSelectedElders([...selectedElders, elder]);
+    // 🎯 แก้ฟังก์ชันเพิ่ม/ลบ ให้ทำงานกับ String ID
+    const handleAddElder = (elderId) => {
+        if (!selectedElders.includes(elderId)) {
+            setSelectedElders([...selectedElders, elderId]);
         }
     };
     const handleRemoveElder = (elderId) => {
-        setSelectedElders(selectedElders.filter(e => e.elder_id !== elderId));
+        setSelectedElders(selectedElders.filter(id => id !== elderId));
     };
 
-    // ✅ ฟิลเตอร์รายชื่อตามช่องค้นหา
     const filteredElders = availableElders.filter(elder => 
         (elder.first_name + " " + elder.last_name).toLowerCase().includes(searchElder.toLowerCase()) ||
         elder.elder_id.toLowerCase().includes(searchElder.toLowerCase())
     );
 
-
     if (isLoading) return <div className="p-4 text-center">กำลังโหลดข้อมูล...</div>;
-
     const isMultiZoneRole = ['Zone Admin', 'System Admin'].includes(userData?.role);
 
     return (
@@ -177,7 +170,6 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
 
             <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2">เขตพื้นที่ดูแล:</label>
-                
                 {isMultiZoneRole ? (
                     <div className="border rounded w-full p-3 bg-white max-h-48 overflow-y-auto">
                         {zones.map((zone) => (
@@ -200,7 +192,7 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
                         value={selectedZoneId}
                         onChange={(e) => {
                             setSelectedZoneId(e.target.value);
-                            setSelectedElders([]); // รีเซ็ตคนที่เลือกไว้ถ้าสลับโซน
+                            setSelectedElders([]); 
                         }}
                         className="border rounded w-full p-2 bg-white"
                         required
@@ -215,7 +207,6 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
                 )}
             </div>
 
-            {/* ✅ ซ่อน UI นี้ถ้าเป็นแอดมิน (เพราะแอดมินคงไม่ได้ลงไปดูแลรายคน) หรือจะเปิดไว้ก็ได้ */}
             {!isMultiZoneRole && (
                 <div className="mb-4 border-t pt-4">
                     <label className="block text-gray-800 text-sm font-bold mb-3">
@@ -246,31 +237,35 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
                         </label>
                     </div>
 
-                    {/* ✅ ส่วนของ UI ค้นหาและเลือกผู้สูงอายุ */}
                     {isCaregiver === 'yes' && (
                         <div className="bg-gray-50 border rounded-lg p-3 animate-fade-in">
                             <label className="block text-gray-700 text-xs font-bold mb-2">
                                 👥 ระบุผู้สูงอายุที่ต้องดูแล <span className="font-normal text-gray-500">(เลือกได้หลายคน)</span>
                             </label>
 
-                            {/* ป้าย Tag แสดงคนที่เลือกแล้ว */}
+                            {/* 🎯 แสดงป้าย Tag โดยดึงชื่อจาก availableElders */}
                             <div className="flex flex-wrap gap-2 mb-3 min-h-[32px]">
                                 {selectedElders.length === 0 && <span className="text-xs text-gray-400 italic mt-1">ยังไม่ได้เลือกผู้สูงอายุ...</span>}
-                                {selectedElders.map(elder => (
-                                    <div key={elder.elder_id} className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs flex items-center shadow-sm border border-green-200">
-                                        <span className="font-bold mr-1">{elder.elder_id}</span> - {elder.first_name}
-                                        <button 
-                                            type="button" 
-                                            onClick={() => handleRemoveElder(elder.elder_id)} 
-                                            className="ml-2 text-red-400 hover:text-red-600 font-bold focus:outline-none"
-                                        >
-                                            ✕
-                                        </button>
-                                    </div>
-                                ))}
+                                {selectedElders.map(elderId => {
+                                    // หาข้อมูลชื่อจากตารางหลัก
+                                    const elderInfo = availableElders.find(e => e.elder_id === elderId);
+                                    const elderName = elderInfo ? `- ${elderInfo.first_name}` : '';
+                                    
+                                    return (
+                                        <div key={elderId} className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs flex items-center shadow-sm border border-green-200">
+                                            <span className="font-bold mr-1">{elderId}</span> {elderName}
+                                            <button 
+                                                type="button" 
+                                                onClick={() => handleRemoveElder(elderId)} 
+                                                className="ml-2 text-red-400 hover:text-red-600 font-bold focus:outline-none"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    )
+                                })}
                             </div>
 
-                            {/* กล่องค้นหา */}
                             <input 
                                 type="text" 
                                 placeholder="🔍 ค้นหาชื่อ หรือ รหัส (E00...)" 
@@ -279,7 +274,6 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
                                 className="border rounded w-full p-2 mb-2 bg-white text-sm focus:outline-none focus:border-green-500" 
                             />
 
-                            {/* ลิสต์แบบเลื่อนได้ (มี Scrollbar) */}
                             <div className="max-h-32 overflow-y-auto border rounded bg-white">
                                 {availableElders.length === 0 ? (
                                     <div className="text-center text-gray-500 text-xs py-4">
@@ -289,7 +283,8 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
                                     <div className="text-center text-gray-500 text-xs py-4">ไม่พบชื่อที่ค้นหา</div>
                                 ) : (
                                     filteredElders.map(elder => {
-                                        const isSelected = selectedElders.some(e => e.elder_id === elder.elder_id);
+                                        // 🎯 เช็คว่าเลือกไปหรือยังจาก Array String
+                                        const isSelected = selectedElders.includes(elder.elder_id);
                                         return (
                                             <div key={elder.elder_id} className={`flex justify-between items-center p-2 border-b last:border-0 transition-colors ${isSelected ? 'bg-gray-50 opacity-60' : 'hover:bg-green-50'}`}>
                                                 <div className="text-xs text-gray-700">
@@ -298,7 +293,7 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
                                                 <button 
                                                     type="button" 
                                                     disabled={isSelected}
-                                                    onClick={() => handleAddElder(elder)}
+                                                    onClick={() => handleAddElder(elder.elder_id)}
                                                     className={`text-[10px] px-2 py-1 rounded font-bold transition-all ${isSelected ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-blue-100 text-blue-600 hover:bg-blue-500 hover:text-white shadow-sm'}`}
                                                 >
                                                     {isSelected ? 'เลือกแล้ว' : '+ เพิ่ม'}
