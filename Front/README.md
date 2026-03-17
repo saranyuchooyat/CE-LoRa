@@ -16,3 +16,5 @@ If you are developing a production application, we recommend using TypeScript wi
 npm install
 npm audit fix (ถ้ามี)
 npm run dev
+
+npm install jspdf html2canvas

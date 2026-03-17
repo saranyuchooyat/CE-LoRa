@@ -52,18 +52,16 @@ type Elder struct {
 	Address              string             `bson:"address" json:"address"`
 }
 type Device struct {
-	ID           primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
-	DeviceID     string             `bson:"device_id" json:"device_id"`
-	DeviceName   string             `bson:"device_name" json:"device_name"`
-	Description  string             `bson:"description" json:"description"`
-	Battery      int                `bson:"battery" json:"battery"`
-	Features     []string           `bson:"features" json:"features"`
-	LastUpdate   string             `bson:"last_update" json:"last_update"`
-	Model        string             `bson:"model" json:"model"`
-	SerialNumber string             `bson:"serial_number" json:"serial_number"`
-	Status       string             `bson:"status" json:"status"`
-	Type         string             `bson:"type" json:"type"`
-	AssignedTo   string             `bson:"assigned_to" json:"assigned_to"`
+	ID         primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
+	DeviceID   string             `bson:"device_id" json:"device_id"`
+	DeviceName string             `bson:"device_name" json:"device_name"`
+	Battery    int                `bson:"battery" json:"battery"`
+	Features   []string           `bson:"features" json:"features"`
+	LastUpdate string             `bson:"last_update" json:"last_update"`
+	Model      string             `bson:"model" json:"model"`
+	Status     string             `bson:"status" json:"status"`
+	Type       string             `bson:"type" json:"type"`
+	AssignedTo string             `bson:"assigned_to" json:"assigned_to"`
 }
 
 type DeviceData struct {

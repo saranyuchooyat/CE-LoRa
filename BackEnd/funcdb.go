@@ -597,9 +597,54 @@ func deleteElder(c *fiber.Ctx) error {
 func getAllDevice(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	var devices []Device = []Device{}
-	cursor, _ := getCollection("devices").Find(ctx, bson.M{})
-	cursor.All(ctx, &devices)
+
+	// 1. ดึงรายชื่ออุปกรณ์ทั้งหมดจากตาราง devices
+	cursor, err := getCollection("devices").Find(ctx, bson.M{})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "ดึงข้อมูลอุปกรณ์ไม่สำเร็จ"})
+	}
+
+	var devices []bson.M
+	if err = cursor.All(ctx, &devices); err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "ถอดรหัสข้อมูลไม่สำเร็จ"})
+	}
+
+	// 2. วนลูปเพื่อเอา "สถานะล่าสุด" มาแปะใส่แต่ละ Card
+	for i, device := range devices {
+		targetName := device["device_name"]
+
+		var latestData bson.M
+		filter := bson.M{"device.device_name": targetName}
+		opts := options.FindOne().SetSort(bson.D{{Key: "timestamp", Value: -1}})
+
+		// แอบไปดูในสมุดบันทึก (device_data) ว่ามีข้อมูลล่าสุดไหม
+		err := MI.DB.Collection("device_data").FindOne(ctx, filter, opts).Decode(&latestData)
+
+		if err == nil {
+			if swData, ok := latestData["smartwatch_data"].(bson.M); ok {
+				devices[i]["battery"] = swData["device_battery"]
+			}
+
+			lastUpdateStr, _ := latestData["timestamp"].(string)
+
+			lastUpdateTime, _ := time.Parse(time.RFC3339, lastUpdateStr)
+
+			// คำนวณส่วนต่างเวลาปัจจุบัน กับ เวลาล่าสุด
+			duration := time.Since(lastUpdateTime)
+			fmt.Println(duration.Minutes(), lastUpdateTime)
+			if duration.Minutes() > 5 {
+				devices[i]["status"] = "offline"
+			} else {
+				devices[i]["status"] = "online"
+			}
+
+			devices[i]["last_update"] = lastUpdateStr
+		} else {
+			devices[i]["status"] = "offline"
+			devices[i]["battery"] = 0
+		}
+	}
+
 	return c.JSON(devices)
 }
 
@@ -657,10 +702,6 @@ func updateDevice(c *fiber.Ctx) error {
 
 	if deviceUpdate.DeviceName != "" {
 		updateFields["device_name"] = deviceUpdate.DeviceName
-	}
-
-	if deviceUpdate.Description != "" {
-		updateFields["description"] = deviceUpdate.Description
 	}
 
 	if deviceUpdate.Status != "" {
@@ -722,13 +763,40 @@ func deleteDevice(c *fiber.Ctx) error {
 	return c.SendStatus(204)
 }
 
-func getDeviceDataByDeviceID(c *fiber.Ctx) error {
-	id := c.Params("device_id")
+func getDeviceDataByDeviceName(c *fiber.Ctx) error {
+	deviceID := c.Params("device_id")
+
+	var deviceProfile bson.M
+	err := MI.DB.Collection("devices").FindOne(c.Context(), bson.M{"device_id": deviceID}).Decode(&deviceProfile)
+	if err != nil {
+		return c.Status(404).JSON(fiber.Map{"message": "ไม่พบเครื่องนี้ในระบบ"})
+	}
+
+	targetName := deviceProfile["device_name"]
+
+	// 2. หาข้อมูลล่าสุดชุดเดียวจาก device_data โดยเทียบกับ device_name
+	var latestData bson.M
+	filter := bson.M{
+		"device.device_name": targetName,
+	}
+	// Sort ตาม timestamp จากใหม่ไปเก่า (-1) และเอาแค่อันเดียว
+	opts := options.FindOne().SetSort(bson.D{{Key: "timestamp", Value: -1}})
+
+	err = MI.DB.Collection("device_data").FindOne(c.Context(), filter, opts).Decode(&latestData)
+	// กรณีหาชื่อเจอแต่ใน device_data ยังไม่มีข้อมูล
+	if err != nil {
+		return c.JSON(fiber.Map{
+			"info": deviceProfile,
+			"data": nil,
+		})
+	}
+
+	// 3. ส่งข้อมูลรวมร่างกลับไป
 	return c.JSON(fiber.Map{
-		"device_id": id,
-		"status":    "online",
-		"data":      []string{"data1", "data2"},
+		"info": deviceProfile, // ข้อมูลจากตาราง devices
+		"data": latestData,    // ข้อมูลล่าสุดจากตาราง device_data
 	})
+
 }
 
 func getZoneDashboard(c *fiber.Ctx) error {
