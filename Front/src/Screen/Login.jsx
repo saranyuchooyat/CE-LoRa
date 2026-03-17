@@ -37,7 +37,11 @@ function LoginPage() {
         navigate('/zone-dashboard', { state: { user: userData.username, role: userRole, token: token } });
       } 
       else if (userRole === "Zone Staff") {
-        navigate('/eldery-monitoring', { state: { user: userData.username, role: userRole, token: token } });
+        if (userData.is_caregiver) {
+          navigate('/caregiver', { state: { user: userData.username, role: "Elderly Caregiver", token: token } });
+        } else {
+          navigate('/eldery-monitoring', { state: { user: userData.username, role: userRole, token: token } });
+        }
       } else {
         setError("User role not recognized!");
       }

@@ -39,12 +39,16 @@ function ElderlyProfileView({ elderData, onBack }) {
   return (
     <div className="p-6 max-w-5xl mx-auto animate-fade-in">
       <div className="flex justify-between items-center mb-6">
-        <button
-          onClick={onBack}
-          className="flex items-center text-gray-600 hover:text-main-green font-bold bg-white px-4 py-2 rounded-lg shadow-sm border transition-all"
-        >
-          ← ย้อนกลับ
-        </button>
+        <div>
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="flex items-center text-gray-600 hover:text-main-green font-bold bg-white px-4 py-2 rounded-lg shadow-sm border transition-all"
+            >
+              ← ย้อนกลับ
+            </button>
+          )}
+        </div>
 
         {/* ✨ ปุ่ม Export PDF ✨ */}
         <button

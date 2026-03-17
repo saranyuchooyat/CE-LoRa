@@ -137,7 +137,12 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
                                     <td className="table-data whitespace-nowrap">
                                         {card.first_name ? `${card.first_name} ${card.last_name || ''}`.trim() : (card.username || card.name || "ไม่ระบุชื่อ")}
                                     </td>
-                                    <td className="table-data whitespace-nowrap">{card.role || card.position}</td>
+                                    <td className="table-data whitespace-nowrap">
+                                        {card.role || card.position}
+                                        {card.is_caregiver && (
+                                            <span className="ml-1 text-green-600 font-medium text-sm">(Caregiver)</span>
+                                        )}
+                                    </td>
                                     
                                     {/* ✅ เผื่อฟิลด์ชื่อ zone_id, zoneids เอาไว้กันเหนียว */}
                                     <td className="table-data whitespace-wrap w-[200px]">

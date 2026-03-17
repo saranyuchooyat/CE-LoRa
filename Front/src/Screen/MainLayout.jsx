@@ -14,6 +14,7 @@ import LoginPage from './Login';
 import DeviceDetail from './DeviceDetail';
 import ElderlyMonitoring from './ZoneStaffMenu/ElderlyMonitoring';
 import AlertManagement from './ZoneStaffMenu/AlertManagement';
+import CareGiver from './ZoneStaffMenu/CareGiver';
 
 function MainLayout() {
   return (
@@ -39,6 +40,7 @@ function MainLayout() {
           {/* ... ส่วนที่เหลือ ... */}
 
           {/* Zone Staff Menu */}
+          <Route path="/caregiver" element={<CareGiver/>}/>
           <Route path="/eldery-monitoring" element={<ElderlyMonitoring/>}/>
           <Route path="/alert-management" element={<AlertManagement/>}/>
 

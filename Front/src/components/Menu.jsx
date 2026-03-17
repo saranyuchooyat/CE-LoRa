@@ -53,7 +53,10 @@ function Menu() {
             "Reports": "/reports",
             "Zone Map Overview": "/zone-map-overview",
         },
-        "Elderly Caregiver": {}
+        "Elderly Caregiver": {
+            "My Elders Dashboard": "/caregiver",
+            "Alert Management": "/alert-management"
+        }
     };
 
     useEffect(() => {
