@@ -4,7 +4,7 @@ import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import ApiDelete from "../API-Delete";
 
-function ElderlyDataTable({ data, onEdit, onSetting, onDeleteSuccess, showActions = true }) {
+function ElderlyDataTable({ data, onEdit, onSetting, onDeleteSuccess, onRowClick, showActions = true }) {
 
     console.log("table data", data);
     
@@ -67,7 +67,14 @@ function ElderlyDataTable({ data, onEdit, onSetting, onDeleteSuccess, showAction
                             const rowBgClass = isOddRow ? 'bg-gray-100' : 'bg-gray-50';
                             const statusClass = statusCheck(card.health_status);                             
                             return(
-                                <tr key={index} className={rowBgClass}>
+                                // ✅ แก้ไขตรงบรรทัด tr นี้ครับ ให้กดได้และมีเอฟเฟกต์
+                                <tr 
+                                    key={index} 
+                                    className={`${rowBgClass} cursor-pointer hover:bg-green-100 transition-colors duration-200`}
+                                    onClick={() => {
+                                        if (onRowClick) onRowClick(card);
+                                    }}
+                                >
                                     <td className="table-data whitespace-nowrap">{card.elder_id}</td>
                                     <td className="table-data whitespace-nowrap">{card.first_name} {card.last_name}</td>
                                     <td className="table-data whitespace-nowrap">{card.age}</td>

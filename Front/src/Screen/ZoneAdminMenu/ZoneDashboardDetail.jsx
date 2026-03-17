@@ -11,8 +11,7 @@ import CardFull from '../../components/Card/Cardno5';
 import Modal from '../../components/ModalForm/Modal';
 import AddElderlyform from '../../components/ModalForm/AddElderly';
 import EditElderlyForm from '../../components/ModalForm/EditElderlyForm';
-
-
+import ElderlyProfileView from '../../components/Card/ElderlyProfileView';
 
 function ZoneDashboardDetail (){
 
@@ -37,7 +36,9 @@ function ZoneDashboardDetail (){
         setSelectedElderly(null);
         setIsEditElderlyModalOpen(false);
     };
-    
+
+    // ✅ 2. สร้าง State สำหรับเก็บข้อมูลคนที่ถูกคลิก
+    const [viewingProfile, setViewingProfile] = useState(null);
 
 
     //ดึงข้อมูลหลังบ้าน
@@ -110,20 +111,15 @@ function ZoneDashboardDetail (){
         return <div className="mx-5 mt-10 text-center text-xl text-red-600">Zone ID "{zoneid}" not found.</div>;
     }
 
-
-
     const { alerts, deviceStatus, elders, zone } = zoneDashboard;
 
     const allAlertDetail = alerts;
     // console.log("alert",allAlertDetail)
 
-
     const allDeviceStatus = deviceStatus;
-
 
     const allEldery = elders
     console.log("Elder",allEldery)
-
 
     const zoneDetail = zone;
 
@@ -163,8 +159,15 @@ function ZoneDashboardDetail (){
         }
     ];
 
-    // console.log("Health Averages:", healthAverages);
-
+    // ✅ 3. ดักสลับหน้าจอ ถ้ามีการกดเลือกผู้สูงอายุ ให้โชว์หน้าโปรไฟล์แทน!
+    if (viewingProfile) {
+        return (
+            <ElderlyProfileView 
+                elderData={viewingProfile} 
+                onBack={() => setViewingProfile(null)} // พอกดกลับ ก็เคลียร์ค่าให้เป็น null เพื่อโชว์ Dashboard เหมือนเดิม
+            />
+        );
+    }
 
     return(
         <>
@@ -193,6 +196,7 @@ function ZoneDashboardDetail (){
                     showActions={userRole === "Zone Admin" || true} 
                     onEdit={handleOpenEditElderlyModal}
                     onDeleteSuccess={() => zoneDashboardQueries[0].refetch()}
+                    onRowClick={setViewingProfile} // ✅ 4. ส่งคำสั่งให้ตารางรับรู้ว่าถ้ากดแถว ให้เอาข้อมูลมาใส่ใน viewingProfile
                 />
                 
                 <Cardno5 data={allAlertDetail}/>

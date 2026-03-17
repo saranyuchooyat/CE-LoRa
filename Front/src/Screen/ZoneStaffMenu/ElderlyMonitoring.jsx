@@ -159,18 +159,6 @@ function ElderlyMonitoring() {
             <CardFull
                 data={filteredElderly}
             />
-
-            {/* ส่วน Debug ข้อมูล (ซ่อนได้เมื่อใช้งานจริง)*/}
-            <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono bg-gray-100 p-4 rounded">
-                <div>
-                    <h3 className="font-bold mb-2">Elders Data (Raw)</h3>
-                    <pre className="overflow-auto max-h-40">{JSON.stringify(eldersData, null, 2)}</pre>
-                </div>
-                <div>
-                    <h3 className="font-bold mb-2">Dashboard Data (Raw)</h3>
-                    <pre className="overflow-auto max-h-40">{JSON.stringify(zoneDashboardData, null, 2)}</pre>
-                </div>
-            </div> 
         </div>
     );
 }

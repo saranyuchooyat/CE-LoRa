@@ -4,8 +4,8 @@ import ZoneAdminTable from "../Table/ZoneAdminTable";
 import UserTable from "../Table/UserTable";
 import ElderlyDataTable from "../Table/ElderlyDataTable";
 
-
-function CardFull({ data, onEdit, onSetting, onDeleteSuccess, showActions=true }) {
+// ✅ 1. เพิ่ม onRowClick มารับค่าตรงนี้ (นอกนั้นโค้ดเดิมจารย์ทั้งหมดครับ ไม่แตะเลย)
+function CardFull({ data, onEdit, onSetting, onDeleteSuccess, onRowClick, showActions=true }) {
 
     console.log("dataCardFull",data)
 
@@ -45,7 +45,6 @@ function CardFull({ data, onEdit, onSetting, onDeleteSuccess, showActions=true }
         return 'name' in arr[0] && 'position' in arr[0];
     }
 
-
     const isElderlyData = (arr) => {
         if (!Array.isArray(arr) || arr.length === 0) {
             return false;
@@ -74,10 +73,9 @@ function CardFull({ data, onEdit, onSetting, onDeleteSuccess, showActions=true }
     }
     else if(isElderlyData(data)){
         console.log("ElderlyPass")
-        displayContent = <ElderlyDataTable data={data} showActions={showActions} onEdit={onEdit} onSetting={onSetting} onDeleteSuccess={onDeleteSuccess} />
+        // ✅ 2. ส่งต่อท่อ onRowClick ให้ตาราง ElderlyDataTable
+        displayContent = <ElderlyDataTable data={data} showActions={showActions} onEdit={onEdit} onSetting={onSetting} onDeleteSuccess={onDeleteSuccess} onRowClick={onRowClick} />
     }
-
-
 
     return(
         <>
