@@ -2,9 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import axios from "axios";
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
 
 function ElderlyProfileView({ elderData, onBack }) {
   const [liveVitals, setLiveVitals] = useState(null);
+  const [historyData, setHistoryData] = useState([]); // ✅ State เก็บความจุข้อมูลสำหรับกราฟ 20 วิ
   const reportRef = useRef(null);
 
   const fetchLiveVitals = async () => {
@@ -16,7 +19,38 @@ function ElderlyProfileView({ elderData, onBack }) {
         { headers: { Authorization: `Bearer ${token}` } },
       );
       // โครงสร้างข้อมูลที่ Go ส่งมาคือ { info: ..., data: { smartwatch_data: ... } }
-      setLiveVitals(res.data.data?.smartwatch_data);
+      const vitals = res.data.data?.smartwatch_data;
+      setLiveVitals(vitals);
+
+      // ✅ เก็บค่าเข้า Graph เฉพาะเมื่อข้อมูลมีการเปลี่ยนแปลงจริงๆ (อัพเดตตามข้อมูล ไม่ใช่จับเวลา)
+      if (vitals) {
+        setHistoryData(prev => {
+          const lastPoint = prev[prev.length - 1];
+          if (lastPoint && 
+              lastPoint.hr === vitals.heart_rate && 
+              lastPoint.spo2 === vitals.spo2 &&
+              lastPoint.temp === vitals.body_temperature &&
+              lastPoint.sys === vitals.blood_pressure_systolic &&
+              lastPoint.dia === vitals.blood_pressure_diastolic) {
+             return prev; // ค่าไม่เปลี่ยน ไม่ต้องวาดจุดใหม่
+          }
+
+          const now = new Date();
+          const timeStr = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+          
+          const newPoint = { 
+            time: timeStr, 
+            hr: vitals.heart_rate || null, 
+            spo2: vitals.spo2 || null,
+            temp: vitals.body_temperature || null,
+            sys: vitals.blood_pressure_systolic || null,
+            dia: vitals.blood_pressure_diastolic || null
+          };
+          
+          const newData = [...prev, newPoint];
+          return newData.length > 20 ? newData.slice(newData.length - 20) : newData; // เก็บกราฟย้อนหลัง 20 จุดข้อมูล
+        });
+      }
     } catch (err) {
       console.error("Error fetching live vitals:", err);
     }
@@ -34,6 +68,37 @@ function ElderlyProfileView({ elderData, onBack }) {
   const handleExportPDF = async () => {
     window.print();
   };
+
+  const chartOptions = {
+    chart: { type: 'spline', height: 400, animation: Highcharts.svg },
+    title: { text: null },
+    xAxis: { 
+      categories: historyData.map(d => d.time),
+    },
+    yAxis: [{
+      title: { text: 'หัวใจ (BPM), ออกซิเจน (%), ความดัน (mmHg)', style: { color: '#4B5563' } },
+      min: 40, max: 200,
+      labels: { style: { color: '#4B5563', fontWeight: 'bold' } }
+    }, {
+      title: { text: 'อุณหภูมิ (°C)', style: { color: '#F97316' } },
+      min: 30, max: 45,
+      opposite: true,
+      labels: { style: { color: '#F97316', fontWeight: 'bold' } }
+    }],
+    series: [
+      { name: 'อัตราการเต้นหัวใจ', data: historyData.map(d => d.hr), yAxis: 0, color: '#EF4444', tooltip: { valueSuffix: ' bpm' } },
+      { name: 'ออกซิเจนในเลือด', data: historyData.map(d => d.spo2), yAxis: 0, color: '#3B82F6', tooltip: { valueSuffix: ' %' } },
+      { name: 'ความดันโลหิต (ตัวบน)', data: historyData.map(d => d.sys), yAxis: 0, color: '#8B5CF6', tooltip: { valueSuffix: ' mmHg' } },
+      { name: 'ความดันโลหิต (ตัวล่าง)', data: historyData.map(d => d.dia), yAxis: 0, color: '#A78BFA', tooltip: { valueSuffix: ' mmHg' }, dashStyle: 'ShortDash' },
+      { name: 'อุณหภูมิร่างกาย', data: historyData.map(d => d.temp), yAxis: 1, color: '#F97316', tooltip: { valueSuffix: ' °C' } },
+    ],
+    credits: { enabled: false },
+    legend: { layout: 'horizontal', align: 'center', verticalAlign: 'bottom' },
+    plotOptions: {
+      spline: { marker: { radius: 4, enabled: true } }
+    }
+  };
+
   if (!elderData) return null;
 
   return (
@@ -55,7 +120,7 @@ function ElderlyProfileView({ elderData, onBack }) {
           onClick={handleExportPDF}
           className="flex items-center gap-2 bg-main-green text-white px-6 py-2 rounded-lg font-bold shadow-md hover:bg-green-600 transition-all"
         >
-          📥 Export เป็น PDF
+          {/* 📥 Export เป็น PDF */} Export เป็น PDF 
         </button>
       </div>
       {/* ปุ่มกดย้อนกลับ */}
@@ -90,7 +155,8 @@ function ElderlyProfileView({ elderData, onBack }) {
             <div
               className={`px-4 py-2 rounded-full font-bold ${liveVitals.is_wearing ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}
             >
-              {liveVitals.is_wearing ? "⌚ สวมใส่อยู่" : "⭕ ไม่ได้สวมใส่"}
+              {/* {liveVitals.is_wearing ? "⌚ สวมใส่อยู่" : "⭕ ไม่ได้สวมใส่"} */}
+              {liveVitals.is_wearing ? "สวมใส่อยู่" : "ไม่ได้สวมใส่"}
             </div>
           )}
         </div>
@@ -156,7 +222,8 @@ function ElderlyProfileView({ elderData, onBack }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 flex justify-between items-center">
               <span className="text-gray-600 font-bold">
-                🔋 แบตเตอรี่นาฬิกา
+                {/* 🔋 แบตเตอรี่นาฬิกา */}
+                แบตเตอรี่นาฬิกา
               </span>
               <div className="flex items-center gap-3 w-1/2">
                 <div className="flex-1 bg-gray-200 h-2 rounded-full overflow-hidden">
@@ -172,12 +239,27 @@ function ElderlyProfileView({ elderData, onBack }) {
             </div>
             <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 flex justify-between items-center">
               <span className="text-gray-600 font-bold">
-                👣 จำนวนก้าววันนี้
+                {/* 👣 จำนวนก้าววันนี้ */}
+                จำนวนก้าววันนี้
               </span>
               <span className="font-bold text-lg text-main-green">
                 {liveVitals?.steps?.toLocaleString() || 0} ก้าว
               </span>
             </div>
+          </div>
+
+          {/* ✅ ส่วนการแสดงผลกราฟแนวโน้มสุขภาพ */}
+          <div className="mt-4 bg-white border border-gray-200 rounded-xl p-4 shadow-sm animate-fade-in">
+             <div className="flex justify-between items-center mb-2">
+                 <h3 className="text-lg font-bold text-gray-700">กราฟแนวโน้มสุขภาพทั้ง 4 ค่า (คลิกที่ป้ายชื่อด้านล่างเพื่อ ปิด/เปิด กราฟ)</h3>
+             </div>
+             {historyData.length > 0 ? (
+               <HighchartsReact highcharts={Highcharts} options={chartOptions} />
+             ) : (
+               <div className="h-[400px] flex items-center justify-center text-gray-400 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                 <p className="animate-pulse">กำลังรอรับสัญญาณข้อมูลจาก Smartwatch...</p>
+               </div>
+             )}
           </div>
         </div>
 
