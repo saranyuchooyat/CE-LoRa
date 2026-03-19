@@ -19,6 +19,9 @@ function ElderlyRow({ card, index, onRowClick, handleEditClick, handleSettingCli
     });
 
     const liveVitals = deviceResponse?.data?.smartwatch_data || card.vitals;
+    console.log("liveVitals", liveVitals);
+
+    const lastUpdatedTime = deviceResponse?.data?.updated_at || card.last_updated || "-";
     
     return(
         <tr 
@@ -42,8 +45,8 @@ function ElderlyRow({ card, index, onRowClick, handleEditClick, handleSettingCli
             <td className="table-data whitespace-nowrap">
                 <span className={`table-status ${statusClass}`}>{card.health_status}</span>
             </td>
-            <td className="table-data whitespace-nowrap">{card.battery || "-"}</td>
-            <td className="table-data whitespace-nowrap">{card.last_updated || "-"}</td>
+            <td className="table-data whitespace-nowrap">{liveVitals?.device_battery ?? card.vitals?.device_battery ?? "-"}</td>
+            <td className="table-data whitespace-nowrap">{lastUpdatedTime}</td>
 
             {showActions && (
             <td className="p-3 text-sm text-left whitespace-nowrap w-fit">

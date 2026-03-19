@@ -49,14 +49,16 @@ function DeviceDetail() {
           <span
             className={`px-4 py-1 rounded-full text-sm font-medium ${sw?.is_wearing === "Worn" ? "bg-blue-100 text-blue-700" : "bg-gray-200 text-gray-600"}`}
           >
-            {sw?.is_wearing === "Worn" ? "⌚ สวมใส่อยู่" : "⭕ ไม่ได้สวมใส่"}
+            {/* {sw?.is_wearing === "Worn" ? "⌚ สวมใส่อยู่" : "⭕ ไม่ได้สวมใส่"} */}
+            {sw?.is_wearing === "Worn" ? "สวมใส่อยู่" : "ไม่ได้สวมใส่"}
           </span>
         </div>
       </div>
 
       {!data ? (
         <div className="bg-amber-50 p-6 rounded-2xl text-amber-700">
-          ⚠️ ยังไม่มีสัญญาณข้อมูล
+          {/* ⚠️ ยังไม่มีสัญญาณข้อมูล */}
+          ยังไม่มีสัญญาณข้อมูล
         </div>
       ) : (
         <div className="space-y-6">
@@ -99,17 +101,20 @@ function DeviceDetail() {
                 {/* 1. เช็คเคส SOS ก่อน (สำคัญสุด) */}
                 {sw?.is_sos_called === 1 ? (
                   <div className="flex items-center gap-2 text-red-600 animate-pulse">
-                    <span className="text-3xl font-black">🆘 SOS!</span>
+                    {/* <span className="text-3xl font-black">🆘 SOS!</span> */}
+                    <span className="text-3xl font-black">SOS!</span>
                   </div>
                 ) : /* 2. เช็คเคสล้ม */
                 sw?.is_fallen ? (
                   <div className="flex items-center gap-2 text-red-600 animate-bounce">
-                    <span className="text-3xl font-black">🚨 ล้ม!</span>
+                    {/* <span className="text-3xl font-black">🚨 ล้ม!</span> */}
+                    <span className="text-3xl font-black">ล้ม!</span>  
                   </div>
                 ) : (
                   /* 3. ถ้าไม่เข้าทั้งสองอย่าง คือปกติ */
                   <div className="flex items-center gap-2 text-emerald-500">
-                    <span className="text-2xl font-bold">✅ ปกติ</span>
+                    {/* <span className="text-2xl font-bold">✅ ปกติ</span> */}
+                    <span className="text-2xl font-bold">ปกติ</span>
                   </div>
                 )}
               </div>
