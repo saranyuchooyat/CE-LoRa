@@ -1008,7 +1008,15 @@ func getZoneStaff(c *fiber.Ctx) error {
 	defer cancel()
 
 	var users []User = []User{}
-	cursor, err := getCollection("users").Find(ctx, bson.M{"zone_id": zoneID})
+	
+	filter := bson.M{
+		"zone_id": primitive.Regex{
+			Pattern: "(^|\\s*,\\s*)" + zoneID + "(\\s*,\\s*|$)",
+			Options: "i",
+		},
+	}
+	
+	cursor, err := getCollection("users").Find(ctx, filter)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch staff"})
 	}
