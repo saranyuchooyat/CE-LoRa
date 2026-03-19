@@ -1,22 +1,35 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
+import api from "../API";
 
 function AddDeviceForm({ onClose, onSaveSuccess }) {
   const [formData, setFormData] = useState({
     deviceName: "",
     deviceModel: "เลือก Model",
-    type: "เลือก Type",
+    type: "Smartwatch",
     features: "เลือก Feature",
   });
-
+  const [nextId, setNextId] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const MODEL_DEFAULTS = {
     J3: ["GPS", "Heart Rate", "Fall Detection", "SpO2", "SOS Button"],
     X7: ["GPS", "Heart Rate", "Temperature", "SpO2"],
     ED20W: ["Heart Rate", "SOS Button"],
-    Dragino: [],
   };
+  useEffect(() => {
+    const fetchNextId = async () => {
+      try {
+        const res = await api.get("/devices");
+        const count = res.data.length;
+        const nextIdStr = `D${String(count + 1).padStart(3, "0")}`;
+        setNextId(nextIdStr);
+      } catch (err) {
+        console.error("Failed to fetch device count", err);
+      }
+    };
+    fetchNextId();
+  }, []);
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -53,16 +66,17 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // 1. ดึง Token จาก localStorage (เปลี่ยนชื่อ Key ตามที่คุณตั้งไว้ตอน Login)
     const token = localStorage.getItem("token");
 
     const dataToSend = {
+      device_id: nextId,
       device_Name: formData.deviceName,
       features: formData.features,
       model: formData.model,
       last_update: new Date().toISOString(),
       status: "unassigned",
       type: formData.type,
+      assigned_to: "",
     };
 
     try {
@@ -94,6 +108,17 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
   return (
     <form onSubmit={handleSubmit}>
       <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+        <div className="mb-2">
+          <label className="block text-gray-700 text-sm font-bold text-blue-600">
+            ID ที่จะถูกสร้าง:
+          </label>
+          <input
+            type="text"
+            value={nextId}
+            readOnly
+            className="border rounded w-full p-2 bg-blue-50 font"
+          />
+        </div>
         {/*Device ID*/}
         <div className="mb-2">
           <label className="block text-gray-700 text-sm">Device Name:</label>
@@ -117,9 +142,8 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
             className="border rounded w-full p-2 bg-white"
             required
           >
-            <option value="เลือก Type">เลือก Type</option>
+            <option value="เลือก Type">เลือก ประเภท</option>
             <option value="Smartwatch">Smartwatch</option>
-            <option value="Gateway">Gateway</option>
           </select>
         </div>
 
@@ -133,11 +157,10 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
             className="border rounded w-full p-2 bg-white"
             required
           >
-            <option value="เลือก Type">เลือก Model</option>
+            <option value="เลือก Model">เลือก Model</option>
             <option value="J3">J3</option>
             <option value="X7">X7</option>
             <option value="ED20W">ED20W</option>
-            <option value="Dragino">Dragino</option>
           </select>
         </div>
         {/* Dropdown Feature*/}
@@ -162,6 +185,8 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
                 type="checkbox"
                 value={item.value}
                 checked={formData.features.includes(item.value)}
+                readOnly
+                disabled
                 onChange={handleCheckboxChange}
                 className="w-4 h-4 text-blue-600"
               />

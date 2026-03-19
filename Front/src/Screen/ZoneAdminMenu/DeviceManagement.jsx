@@ -141,10 +141,11 @@ function DeviceManagement() {
   const deviceStatusCount = (deviceQueryResult.data || []).reduce(
     (acc, device) => {
       const status = device.status || "unassigned";
+      console.log(device.status);
       acc[status] = (acc[status] || 0) + 1;
       return acc;
     },
-    {},
+    { online: 0, offline: 0, unassigned: 0 },
   );
 
   const deviceStatusList = Object.entries(deviceStatusCount).map(

@@ -661,6 +661,15 @@ func getAllDevice(c *fiber.Ctx) error {
 
 	// 2. วนลูปเพื่อเอา "สถานะล่าสุด" มาแปะใส่แต่ละ Card
 	for i, device := range devices {
+		currentStatus, _ := device["status"].(string)
+		assignedTo, _ := device["assigned_to"].(string)
+
+		// ถ้ายังไม่ได้มอบหมาย (unassigned) ให้ข้ามการคำนวณ Online/Offline
+		if currentStatus == "unassigned" || assignedTo == "" || assignedTo == "None" {
+			devices[i]["status"] = "unassigned"
+			devices[i]["battery"] = 0
+			continue
+		}
 		targetName := device["device_name"]
 
 		var latestData bson.M
@@ -681,7 +690,6 @@ func getAllDevice(c *fiber.Ctx) error {
 
 			// คำนวณส่วนต่างเวลาปัจจุบัน กับ เวลาล่าสุด
 			duration := time.Since(lastUpdateTime)
-			fmt.Println(duration.Minutes(), lastUpdateTime)
 			if duration.Minutes() > 5 {
 				devices[i]["status"] = "offline"
 			} else {
@@ -721,6 +729,7 @@ func createDevice(c *fiber.Ctx) error {
 		} else {
 			device.DeviceID = fmt.Sprintf("D%03d", rand.Intn(999))
 		}
+
 	} else {
 		device.DeviceID = "D001"
 	}
@@ -735,6 +744,25 @@ func createDevice(c *fiber.Ctx) error {
 	}
 
 	return c.Status(201).JSON(device)
+}
+func getDeviceOwnerbyID(c *fiber.Ctx) error {
+	deviceID := c.Params("id")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var elder bson.M
+
+	// 2. ไปที่ collection "elders" เพื่อหาคนที่มี device_id ตรงกับเครื่องนี้
+	err := getCollection("elders").FindOne(ctx, bson.M{"device_id": deviceID}).Decode(&elder)
+
+	if err != nil {
+		return c.Status(404).JSON(fiber.Map{
+			"message": "อุปกรณ์นี้ยังไม่มีผู้ครอบครอง",
+		})
+	}
+
+	return c.JSON(elder)
 }
 
 func updateDevice(c *fiber.Ctx) error {
@@ -753,19 +781,15 @@ func updateDevice(c *fiber.Ctx) error {
 	if deviceUpdate.DeviceName != "" {
 		updateFields["device_name"] = deviceUpdate.DeviceName
 	}
-
 	if deviceUpdate.Status != "" {
 		updateFields["status"] = deviceUpdate.Status
 	}
-
 	if deviceUpdate.AssignedTo != "" {
 		updateFields["assigned_to"] = deviceUpdate.AssignedTo
 	}
-
 	if deviceUpdate.Type != "" {
 		updateFields["type"] = deviceUpdate.Type
 	}
-
 	if deviceUpdate.Model != "" {
 		updateFields["model"] = deviceUpdate.Model
 	}
@@ -780,16 +804,38 @@ func updateDevice(c *fiber.Ctx) error {
 		bson.M{"$set": updateFields},
 	)
 
-	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "ไม่สามารถอัปเดตข้อมูลได้"})
+	if err != nil || result.MatchedCount == 0 {
+		return c.Status(500).JSON(fiber.Map{"error": "ไม่พบอุปกรณ์หรืออัปเดตไม่ได้"})
 	}
 
-	if result.MatchedCount == 0 {
-		return c.Status(404).JSON(fiber.Map{"error": "ไม่พบอุปกรณ์รหัส " + id})
+	if deviceUpdate.AssignedTo != "" {
+		// ขั้นตอนที่ A: ล้าง device_id ออกจาก Elder คนเก่าที่เคยถือเครื่องนี้
+		// (คนไหนเคยมี device_id นี้ ให้กลายเป็นค่าว่าง)
+		getCollection("elders").UpdateMany(ctx,
+			bson.M{"device_id": id},
+			bson.M{"$set": bson.M{"device_id": ""}},
+		)
+
+		// ขั้นตอนที่ B: อัปเดต device_id ให้คนใหม่
+		fullName := deviceUpdate.AssignedTo
+		nameParts := strings.Split(fullName, " ")
+
+		if len(nameParts) >= 2 {
+			firstName := nameParts[0]
+			lastName := nameParts[1]
+
+			_, err = getCollection("elders").UpdateOne(ctx,
+				bson.M{"first_name": firstName, "last_name": lastName},
+				bson.M{"$set": bson.M{"device_id": id}},
+			)
+			if err != nil {
+				fmt.Println("Warning: Failed to link elder:", err)
+			}
+		}
 	}
 
 	return c.JSON(fiber.Map{
-		"message":   "อัปเดตอุปกรณ์สำเร็จ",
+		"message":   "อัปเดตอุปกรณ์และผู้สูงอายุสำเร็จ",
 		"device_id": id,
 	})
 }

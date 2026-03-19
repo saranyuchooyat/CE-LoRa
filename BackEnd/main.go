@@ -76,6 +76,7 @@ func main() {
 	// app.Get("/elders/:id", getElderDetail)
 
 	// --- Devices ---
+	app.Get("/devices/:id/owner", getDeviceOwnerbyID)
 	app.Get("/devices", getAllDevice)        //✅
 	app.Post("/devices", createDevice)       //✅
 	app.Put("/devices/:id", updateDevice)    //✅
