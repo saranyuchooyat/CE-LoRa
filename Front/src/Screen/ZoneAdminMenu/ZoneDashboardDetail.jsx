@@ -238,6 +238,7 @@ function ZoneDashboardDetail() {
           showActions={false}
           onEdit={(user) => console.log("Edit User:", user)}
         />
+        <Cardno5 data={allAlertDetail} />
 
         <MenuNameCard2
           title={allEldery.length}
@@ -253,8 +254,7 @@ function ZoneDashboardDetail() {
           onRowClick={setViewingProfile} // ✅ 4. ส่งคำสั่งให้ตารางรับรู้ว่าถ้ากดแถว ให้เอาข้อมูลมาใส่ใน viewingProfile
         />
 
-        <Cardno5 data={allAlertDetail} />
-        <Cardno8 healthdata={mockGraphData} devicedata={allDeviceStatus} />
+        
 
         {/* <Cardno9 data=""/> */}
       </div>

@@ -60,30 +60,34 @@ function Menu() {
     };
 
     useEffect(() => {
-        // ตรวจสอบเมื่อ Role และ Path มีการเปลี่ยนแปลง
         if (currentRole && roleRoutes[currentRole]) {
             const currentPath = location.pathname;
             const buttons = roleRoutes[currentRole];
             
-            console.log("path",currentPath)
-            // วนลูปในเมนูสำหรับ Role ปัจจุบัน
+            // วนลูปเช็คความตรงกันแบบ 100%
             for (const buttonTitle in buttons) {
-                // ถ้า Path ของปุ่มตรงกับ Path ปัจจุบัน
                 if (buttons[buttonTitle] === currentPath) {
                     setActiveButton(buttonTitle);
-                    return; // พบแล้ว ออกจากฟังก์ชัน
-                }
-                else if(currentPath.startsWith("/zone-details/")){
-                    setActiveButton(buttonTitle);
-                    return console.log(true)
+                    return; 
                 }
             }
             
-            // กรณีไม่พบปุ่มที่ตรงกับ Path (เช่น อยู่ที่หน้า Home หรือ 404)
-            // คุณสามารถตั้งค่า activeButton(null) หรือตั้งค่าปุ่มเริ่มต้นที่นี่
+            // จัดการกรณี Sub-path ของหน้าลูก
+            if (currentPath.startsWith("/zone-details/")) {
+                if (buttons["Zone Management"]) {
+                    setActiveButton("Zone Management");
+                    return;
+                } else if (buttons["Zone Dashboard"]) {
+                    setActiveButton("Zone Dashboard");
+                    return;
+                }
+            }
+            
+            // ไม่พบหน้านี้ในเมนู
             setActiveButton(null); 
         }
-    }, [location.pathname, currentRole, roleRoutes]); 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [location.pathname, currentRole]); 
 
     // const handleButtonClick = (buttonTitle) => {
     //     setActiveButton(buttonTitle);

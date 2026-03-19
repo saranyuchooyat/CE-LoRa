@@ -1,8 +1,66 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { useQueries } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import api from "../../components/API";
 import ApiDelete from "../API-Delete";
+
+function ElderlyRow({ card, index, onRowClick, handleEditClick, handleSettingClick, handleDeleteClick, isPending, showActions, statusCheck }) {
+    const isOddRow = (index % 2 === 0);
+    const rowBgClass = isOddRow ? 'bg-gray-100' : 'bg-gray-50';
+    const statusClass = statusCheck(card.health_status);                             
+    
+    // ดึงข้อมูล Realtime 
+    const { data: deviceResponse } = useQuery({
+        queryKey: ['deviceData', card.device_id],
+        queryFn: () => api.get(`/device_data/${card.device_id}`).then(res => res.data),
+        enabled: !!card.device_id,
+        refetchInterval: 10000 // Refresh ทุกๆ 10 วิ
+    });
+
+    const liveVitals = deviceResponse?.data?.smartwatch_data || card.vitals;
+    
+    return(
+        <tr 
+            className={`${rowBgClass} cursor-pointer hover:bg-green-100 transition-colors duration-200`}
+            onClick={() => {
+                if (onRowClick) onRowClick(card);
+            }}
+        >
+            <td className="table-data whitespace-nowrap text-center text-gray-600 font-medium">{index + 1}</td>
+            <td className="table-data whitespace-nowrap">{card.elder_id}</td>
+            <td className="table-data whitespace-nowrap">{card.first_name} {card.last_name}</td>
+            <td className="table-data whitespace-nowrap">{card.age}</td>
+            <td className="table-data whitespace-nowrap">
+                <div className="flex flex-col items-start gap-1">
+                    <span>อัตราการเต้นหัวใจ: <b>{liveVitals?.heart_rate ?? "-"}</b></span>
+                    <span>ความดันโลหิต: <b>{liveVitals?.blood_pressure_systolic ? `${liveVitals.blood_pressure_systolic}/${liveVitals.blood_pressure_diastolic}` : (card.vitals?.blood_pressure ?? "-")}</b></span>
+                    <span>SpO₂: <b>{liveVitals?.spo2 ?? "-"}</b></span>
+                    <span>อุณหภูมิ: <b>{liveVitals?.body_temperature ?? card.vitals?.temperature ?? "-"}</b></span>
+                </div>
+            </td>
+            <td className="table-data whitespace-nowrap">
+                <span className={`table-status ${statusClass}`}>{card.health_status}</span>
+            </td>
+            <td className="table-data whitespace-nowrap">{card.battery || "-"}</td>
+            <td className="table-data whitespace-nowrap">{card.last_updated || "-"}</td>
+
+            {showActions && (
+            <td className="p-3 text-sm text-left whitespace-nowrap w-fit">
+                <button className="table-btn hover:bg-main-yellow hover:text-white"
+                        onClick={(event) => handleEditClick(card, event)}>
+                    แก้ไข</button>
+                <button className="table-btn hover:bg-green-500 hover:text-white"
+                        onClick={(event) => handleSettingClick(card.elder_id, event)}>
+                    ตั้งค่า</button>
+                <button className="table-btn hover:bg-main-red hover:text-white"
+                        onClick={(event) => handleDeleteClick(card.elder_id, event)}
+                        disabled={isPending} >
+                    {isPending ? 'ลบ...' : 'ลบ'}</button>
+            </td>
+            )}
+        </tr>
+    );
+}
 
 function ElderlyDataTable({ data, onEdit, onSetting, onDeleteSuccess, onRowClick, showActions = true }) {
 
@@ -63,55 +121,20 @@ function ElderlyDataTable({ data, onEdit, onSetting, onDeleteSuccess, onRowClick
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100"> 
-                        {data.map((card, index) => {
-                            const isOddRow = (index % 2 === 0);
-                            const rowBgClass = isOddRow ? 'bg-gray-100' : 'bg-gray-50';
-                            const statusClass = statusCheck(card.health_status);                             
-                            return(
-                                // ✅ แก้ไขตรงบรรทัด tr นี้ครับ ให้กดได้และมีเอฟเฟกต์
-                                <tr 
-                                    key={index} 
-                                    className={`${rowBgClass} cursor-pointer hover:bg-green-100 transition-colors duration-200`}
-                                    onClick={() => {
-                                        if (onRowClick) onRowClick(card);
-                                    }}
-                                >
-                                    <td className="table-data whitespace-nowrap text-center text-gray-600 font-medium">{index + 1}</td>
-                                    <td className="table-data whitespace-nowrap">{card.elder_id}</td>
-                                    <td className="table-data whitespace-nowrap">{card.first_name} {card.last_name}</td>
-                                    <td className="table-data whitespace-nowrap">{card.age}</td>
-                                    <td className="table-data whitespace-nowrap">
-                                        <div className="flex flex-col items-start gap-1">
-                                            <span>อัตราการเต้นหัวใจ: <b>{card.vitals?.heart_rate ?? "-"}</b></span>
-                                            <span>ความดันโลหิต: <b>{card.vitals?.blood_pressure ?? "-"}</b></span>
-                                            <span>SpO₂: <b>{card.vitals?.spo2 ?? "-"}</b></span>
-                                            <span>อุณหภูมิ: <b>{card.vitals?.temperature ?? "-"}</b></span>
-                                        </div>
-                                    </td>
-                                    <td className="table-data whitespace-nowrap">
-                                        <span className={`table-status ${statusClass}`}>{card.health_status}</span>
-                                    </td>
-                                    <td className="table-data whitespace-nowrap">{card.battery || "-"}</td>
-                                    <td className="table-data whitespace-nowrap">{card.last_updated || "-"}</td>
-
-                                    
-                                    {/* Un-commented และแก้ไขส่วนของปุ่ม Menu */}
-                                    {showActions && (
-                                    <td className="p-3 text-sm text-left whitespace-nowrap w-fit">
-                                        <button className="table-btn hover:bg-main-yellow hover:text-white"
-                                                onClick={(event) => handleEditClick(card, event)}>
-                                            แก้ไข</button>
-                                        <button className="table-btn hover:bg-green-500 hover:text-white"
-                                                onClick={(event) => handleSettingClick(card.elder_id, event)}>
-                                            ตั้งค่า</button>
-                                        <button className="table-btn hover:bg-main-red hover:text-white"
-                                                onClick={(event) => handleDeleteClick(card.elder_id, event)}
-                                                disabled={isPending} >
-                                            {isPending ? 'ลบ...' : 'ลบ'}</button>
-                                    </td>
-                                    )}</tr>
-                            );
-                        })}
+                        {data.map((card, index) => (
+                            <ElderlyRow 
+                                key={card.elder_id || index}
+                                card={card}
+                                index={index}
+                                onRowClick={onRowClick}
+                                handleEditClick={handleEditClick}
+                                handleSettingClick={handleSettingClick}
+                                handleDeleteClick={handleDeleteClick}
+                                isPending={isPending}
+                                showActions={showActions}
+                                statusCheck={statusCheck}
+                            />
+                        ))}
                     </tbody>
                 </table>
             </div>
