@@ -35,6 +35,7 @@ function ZoneAdminTable({ data }){
                     <thead className="bg-gray-50 border-b-2 border-gray-400">
                         <tr>
                             {/* ... Table Headers ... */}
+                            <th className="table-header w-16 text-center">No.</th>
                             <th className="table-header">Zone ID</th>
                             <th className="table-header">Zone Name</th>
                             <th className="table-header">Address</th>
@@ -56,6 +57,7 @@ function ZoneAdminTable({ data }){
                                 <tr key={index} className={rowBgClass}>
                                     {/* *** KEY FIXES: แก้ไข Key เป็นตัวพิมพ์ใหญ่ตามข้อมูล *** */}
                                     {console.log(card)}
+                                    <td className="table-data whitespace-nowrap text-center text-gray-600 font-medium">{index + 1}</td>
                                     <td className="table-data whitespace-nowrap">{card.zone_id}</td>
                                     <td className="table-data whitespace-nowrap">{card.zone_name}</td>
                                     <td className="table-data whitespace-wrap w-[200px]">{card.address}</td>

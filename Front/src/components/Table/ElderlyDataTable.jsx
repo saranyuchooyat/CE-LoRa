@@ -51,6 +51,7 @@ function ElderlyDataTable({ data, onEdit, onSetting, onDeleteSuccess, onRowClick
                 <table className="w-full">
                     <thead className="bg-gray-50 border-b-2 border-gray-400">
                         <tr>
+                            <th className="table-header w-16 text-center">ลำดับ</th>
                             <th className="table-header">รหัส</th>
                             <th className="table-header">ชื่อ</th>
                             <th className="table-header">อายุ</th>
@@ -75,6 +76,7 @@ function ElderlyDataTable({ data, onEdit, onSetting, onDeleteSuccess, onRowClick
                                         if (onRowClick) onRowClick(card);
                                     }}
                                 >
+                                    <td className="table-data whitespace-nowrap text-center text-gray-600 font-medium">{index + 1}</td>
                                     <td className="table-data whitespace-nowrap">{card.elder_id}</td>
                                     <td className="table-data whitespace-nowrap">{card.first_name} {card.last_name}</td>
                                     <td className="table-data whitespace-nowrap">{card.age}</td>

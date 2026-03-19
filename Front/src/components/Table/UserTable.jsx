@@ -117,6 +117,7 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
                 <table className="w-full">
                     <thead className="bg-gray-50 border-b-2 border-gray-400">
                         <tr>
+                            <th className="table-header w-16 text-center">ลำดับ</th>
                             <th className="table-header">ชื่อ</th>
                             <th className="table-header">ตำแหน่ง</th>
                             <th className="table-header">พื้นที่ดูแล</th>
@@ -134,6 +135,7 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
                                 // ใช้ card.user_id เป็น Key เพื่อความเสถียร
                                 <tr key={card.user_id || index} className={rowBgClass}>
                                     
+                                    <td className="table-data whitespace-nowrap text-center text-gray-600 font-medium">{index + 1}</td>
                                     <td className="table-data whitespace-nowrap">
                                         {card.first_name ? `${card.first_name} ${card.last_name || ''}`.trim() : (card.username || card.name || "ไม่ระบุชื่อ")}
                                     </td>

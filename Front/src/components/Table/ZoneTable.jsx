@@ -60,6 +60,7 @@ function ZoneTable({ data, onEdit, showActions=true }) {
                 <table className="w-full">
                     <thead className="bg-gray-50 border-b-2 border-gray-400">
                         <tr>
+                            <th className="table-header w-16 text-center">ลำดับ</th>
                             <th className="table-header">รหัส Zone</th>
                             <th className="table-header">ชื่อ Zone</th>
                             <th className="table-header">ที่อยู่</th>
@@ -83,6 +84,7 @@ function ZoneTable({ data, onEdit, showActions=true }) {
                                     // ✅ แก้ไข: ใช้ card.zone_id
                                     onClick={() => handleRowClick(card.zone_id)}
                                 >
+                                    <td className="table-data whitespace-nowrap text-center text-gray-600 font-medium">{index + 1}</td>
                                     {/* ✅ เปลี่ยนทุกช่องให้ใช้ Key ที่มี Underscore (_) ตาม Backend */}
                                     <td className="table-data whitespace-nowrap">{card.zone_id}</td>
                                     <td className="table-data whitespace-nowrap">{card.zone_name}</td>
