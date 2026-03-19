@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../API";
+import { showPopup } from '../Popup';
 
 function SetDeviceForm({ deviceId, onClose }) {
   const [zones, setZones] = useState([]);
@@ -91,7 +92,7 @@ function SetDeviceForm({ deviceId, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedElder) {
-      alert("กรุณาเลือกผู้สูงอายุ");
+      showPopup("แจ้งเตือน", "กรุณาเลือกผู้สูงอายุ", "error");
       return;
     }
 
@@ -114,10 +115,12 @@ function SetDeviceForm({ deviceId, onClose }) {
         },
       });
 
-      if (onClose) onClose();
+      showPopup("สำเร็จ", "บันทึกสำเร็จ", "success").then(() => {
+          if (onClose) onClose();
+      });
     } catch (error) {
       console.error("Failed to set device:", error);
-      alert("ไม่สามารถบันทึกการตั้งค่าได้");
+      showPopup("ข้อผิดพลาด", "ไม่สามารถบันทึกการตั้งค่าได้", "error");
     } finally {
       setIsSubmitting(false);
     }

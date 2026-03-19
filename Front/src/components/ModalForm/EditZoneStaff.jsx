@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../API";
+import { showPopup } from '../Popup';
 
 function EditZoneStaff({ userId, onClose, onSaveSuccess, zones }) {
     const [formData, setFormData] = useState({
@@ -85,11 +86,12 @@ function EditZoneStaff({ userId, onClose, onSaveSuccess, zones }) {
             await api.put(`/users/${userId}`, dataToSend, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
+            showPopup("สำเร็จ", "บันทึกการแก้ไขสำเร็จ", "success");
             onSaveSuccess(); 
             onClose(); 
         } catch (error) {
             console.error("Update failed:", error.response?.data || error.message);
-            alert("บันทึกการแก้ไขไม่สำเร็จ");
+            showPopup("ข้อผิดพลาด", "บันทึกการแก้ไขไม่สำเร็จ", "error");
         } finally {
             setIsSubmitting(false);
         }

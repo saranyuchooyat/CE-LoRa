@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { showPopup } from '../Popup';
 
 function AddZoneStaffForm({ onClose, onSaveSuccess, zones }) {
     // 1. กำหนดโครงสร้าง State ให้ครบตามฟิลด์ที่ต้องการ
@@ -54,13 +55,14 @@ function AddZoneStaffForm({ onClose, onSaveSuccess, zones }) {
         };
         console.log("Data to send:", dataToSend);
         try {
-            // ส่ง request ไปยัง Endpoint สำหรับ User
-            await axios.post(`http://localhost:8080/users`, dataToSend, {
+            // ส่ง request ไปยัง Endpoint สำหรับ        try {
+            await axios.post("http://localhost:8080/users", dataToSend, {
                 headers: {
                     'Authorization': `Bearer ${token}` 
                 }
             }); 
             
+            showPopup("สำเร็จ", "เพิ่มหมวดหมู่หรือโซนเรียบร้อยแล้ว", "success");
             // หากสำเร็จ: แจ้งให้ Component แม่รีเฟรชข้อมูล (refetch) และปิด Modal
             if (typeof onSaveSuccess === 'function') {
                 onSaveSuccess(); 
@@ -75,7 +77,7 @@ function AddZoneStaffForm({ onClose, onSaveSuccess, zones }) {
                 console.error("Server Error Detail:", error.response.data);
             }
             console.error("Error adding user:", error);
-            alert(error.response?.data?.message || "เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+            showPopup("ข้อผิดพลาด", error.response?.data?.message || "เกิดข้อผิดพลาดในการบันทึกข้อมูล", "error");
         } finally {
             setIsSubmitting(false);
         }

@@ -2,6 +2,7 @@ import { useLocation } from "react-router-dom";
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../API';
 import ApiDelete from '../API-Delete';
+import { showConfirm, showPopup } from '../Popup';
 
 function ZoneTable({ data, onEdit, showActions=true }) {
 
@@ -38,9 +39,12 @@ function ZoneTable({ data, onEdit, showActions=true }) {
     // ✅ แก้ไข: ใช้ zone_id สำหรับการลบ
     const handleDeleteClick = (zoneId, event) => {
         event.stopPropagation(); 
-        if (window.confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบ Zone ID: ${zoneId}?`)) {
-            deleteZone(zoneId); 
-        }
+        showConfirm("ยืนยันลบข้อมูล", `คุณแน่ใจหรือไม่ว่าต้องการลบ Zone ID: ${zoneId}?`).then(isConfirmed => {
+            if (isConfirmed) {
+                deleteZone(zoneId); 
+                showPopup("สำเร็จ", "ลบข้อมูลโซนเรียบร้อยแล้ว", "success");
+            }
+        });
     };
 
     const handleEditClick = (zone, event) => {

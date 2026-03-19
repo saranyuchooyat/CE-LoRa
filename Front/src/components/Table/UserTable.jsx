@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import ApiDelete from "../API-Delete";
+import { showConfirm, showPopup } from "../../components/Popup";
 
 function UserTable({ data, onEdit, onSetting, showActions = true }) {
 
@@ -80,9 +81,12 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
 
     const handleDeleteClick = (userId, event) => {
         event.stopPropagation(); 
-        if (window.confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบ User ID: ${userId}?`)) {
-            deleteUser(userId); 
-        }
+        showConfirm("ยืนยันลบข้อมูล", `คุณแน่ใจหรือไม่ว่าต้องการลบ User ID: ${userId}?`).then(isConfirmed => {
+            if (isConfirmed) {
+                deleteUser(userId); 
+                showPopup("สำเร็จ", "ลบข้อมูลผู้ใช้งานเรียบร้อยแล้ว", "success");
+            }
+        });
     };
 
     const handleEditClick = (userId, event) => {

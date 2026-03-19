@@ -1,6 +1,7 @@
 import J3 from "../../assets/picture/J3-Smartwatch.png";
 import { Link, useNavigate } from "react-router-dom";
 import ApiDelete from "../API-Delete";
+import { showConfirm, showPopup } from '../Popup';
 
 function DeviceCard({ data, onSetting, onEdit }) {
   console.log("device", data);
@@ -51,9 +52,12 @@ function DeviceCard({ data, onSetting, onEdit }) {
 
   const handleDeleteClick = (deviceId, event) => {
     event.stopPropagation();
-    if (window.confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบ Device ID: ${deviceId}?`)) {
-      deleteDevice(deviceId);
-    }
+    showConfirm("ยืนยันลบข้อมูล", `คุณแน่ใจหรือไม่ว่าต้องการลบ Device ID: ${deviceId}?`).then(isConfirmed => {
+        if (isConfirmed) {
+            deleteDevice(deviceId);
+            showPopup("สำเร็จ", "ลบข้อมูลอุปกรณ์เรียบร้อยแล้ว", "success");
+        }
+    });
   };
   // Delete Button
 

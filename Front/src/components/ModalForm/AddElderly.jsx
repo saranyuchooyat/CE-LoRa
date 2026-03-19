@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../API"; 
+import { showPopup } from '../Popup';
 
 function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
 
@@ -84,14 +85,14 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
                 }
             }
 
-            alert("เพิ่มข้อมูลผู้สูงอายุสำเร็จเรียบร้อยแล้ว");
+            showPopup("สำเร็จ", "เพิ่มข้อมูลผู้สูงอายุสำเร็จเรียบร้อยแล้ว", "success");
             
             if (onSaveSuccess) onSaveSuccess();
             if (onClose) onClose();
 
         } catch (error) {
             console.error("Primary Error:", error.response?.data || error.message);
-            alert("ไม่สามารถเพิ่มข้อมูลได้ กรุณาตรวจสอบการเชื่อมต่อหรือข้อมูลอีกครั้ง");
+            showPopup("ข้อผิดพลาด", "ไม่สามารถเพิ่มข้อมูลได้ กรุณาตรวจสอบการเชื่อมต่อหรือข้อมูลอีกครั้ง", "error");
         } finally {
             setIsSubmitting(false);
         }

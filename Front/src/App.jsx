@@ -2,12 +2,14 @@ import { Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import LoginPage from "./Screen/Login.jsx";
 import MainLayout from "./Screen/MainLayout.jsx";
+import { GlobalPopup } from "./components/Popup.jsx";
 
 const queryClient = new QueryClient();
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <GlobalPopup />
       <Routes>
         {/* Route สำหรับหน้า Login ที่เป็นหน้าแรก */}
         <Route path="/" element={<LoginPage />} />

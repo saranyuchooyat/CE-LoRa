@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import api from "../../components/API";
 import ApiDelete from "../API-Delete";
+import { showConfirm, showPopup } from "../../components/Popup";
 
 function ElderlyRow({ card, index, onRowClick, handleEditClick, handleSettingClick, handleDeleteClick, isPending, showActions, statusCheck }) {
     const isOddRow = (index % 2 === 0);
@@ -84,10 +85,13 @@ function ElderlyDataTable({ data, onEdit, onSetting, onDeleteSuccess, onRowClick
 
     const handleDeleteClick = (elderId, event) => {
         event.stopPropagation(); 
-        if (window.confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลผู้สูงอายุรหัส: ${elderId}?`)) {
-            // Because ApiDelete takes an ID directly and prefixes the base table name internally, we just pass ID.
-            deleteElder(elderId); 
-        }
+        showConfirm("ยืนยันลบข้อมูล", `คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลผู้สูงอายุรหัส: ${elderId}?`).then((isConfirmed) => {
+            if (isConfirmed) {
+                // Because ApiDelete takes an ID directly and prefixes the base table name internally, we just pass ID.
+                deleteElder(elderId); 
+                showPopup("สำเร็จ", "ลบข้อมูลเรียบร้อยแล้ว", "success");
+            }
+        });
     };
     // Delete Button
 

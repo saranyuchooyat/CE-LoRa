@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../API";
+import { showPopup } from '../Popup';
 
 function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
     const [zones, setZones] = useState([]);
@@ -104,13 +105,13 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
             if (['Zone Admin', 'System Admin'].includes(userData?.role)) {
                 finalZoneIds = selectedZoneIds;
                 if (finalZoneIds.length === 0) {
-                    alert("กรุณาเลือกอย่างน้อย 1 โซน");
+                    showPopup("แจ้งเตือน", "กรุณาเลือกอย่างน้อย 1 โซน", "error");
                     setIsSubmitting(false);
                     return;
                 }
             } else {
                 if (!selectedZoneId) {
-                    alert("กรุณาเลือกโซน");
+                    showPopup("แจ้งเตือน", "กรุณาเลือกโซน", "error");
                     setIsSubmitting(false);
                     return;
                 }
@@ -126,11 +127,12 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
             };
 
             await api.put(`/users/${uId}`, requestBody);
+            showPopup("สำเร็จ", "บันทึกการแก้ไขสำเร็จ", "success");
             onSaveSuccess();
             onClose();
         } catch (error) {
-            console.error("Update failed:", error.response?.data || error.message);
-            alert("บันทึกการแก้ไขไม่สำเร็จ");
+            console.error("Submit Error:", error.response?.data || error.message);
+            showPopup("ข้อผิดพลาด", "บันทึกการแก้ไขไม่สำเร็จ", "error");
         } finally {
             setIsSubmitting(false);
         }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../API";
+import { showPopup } from '../Popup';
 
 function EditDeviceForm({ onClose, onSaveSuccess, deviceData }) {
   const [formData, setFormData] = useState({
@@ -50,11 +51,12 @@ function EditDeviceForm({ onClose, onSaveSuccess, deviceData }) {
         },
       });
 
+      showPopup("สำเร็จ", "บันทึกการแก้ไขสำเร็จ", "success");
       if (onSaveSuccess) onSaveSuccess();
       if (onClose) onClose();
     } catch (error) {
       console.error("Failed to update device:", error);
-      alert("ไม่สามารถบันทึกการแก้ไขได้");
+      showPopup("ข้อผิดพลาด", "ไม่สามารถบันทึกการแก้ไขได้", "error");
     } finally {
       setIsSubmitting(false);
     }

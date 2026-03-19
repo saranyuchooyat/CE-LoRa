@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { showPopup } from '../Popup';
 
 function AddUserForm({ onClose, onSaveSuccess }){
     // 1. กำหนดโครงสร้าง State ให้ครบตามฟิลด์ที่ต้องการ
@@ -64,6 +65,7 @@ function AddUserForm({ onClose, onSaveSuccess }){
                 }
             }); 
             
+            showPopup("สำเร็จ", "เพิ่มข้อมูลผู้ใช้เรียบร้อยแล้ว", "success");
             // หากสำเร็จ: แจ้งให้ Component แม่รีเฟรชข้อมูล (refetch) และปิด Modal
             if (typeof onSaveSuccess === 'function') {
                 onSaveSuccess(); 
@@ -78,7 +80,7 @@ function AddUserForm({ onClose, onSaveSuccess }){
                 console.error("Server Error Detail:", error.response.data);
             }
             console.error("Error adding user:", error);
-            alert(error.response?.data?.message || "เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+            showPopup("ข้อผิดพลาด", error.response?.data?.message || "เกิดข้อผิดพลาดในการบันทึกข้อมูล", "error");
         } finally {
             setIsSubmitting(false);
         }
