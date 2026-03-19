@@ -117,8 +117,8 @@ function UserManagement(){
     // ระบบ filter
 
     // ระบบกรองจำวน Role
-        const roleCountsObject = (userData).reduce((acc, user) => {
-        const role = user.role;
+    const roleCountsObject = userData.reduce((acc, user) => {
+        const role = user.role || "ไม่ระบุบทบาท";
         acc[role] = (acc[role] || 0) + 1;
         return acc;
     }, {});
@@ -128,14 +128,17 @@ function UserManagement(){
             name: roleName,
             value: count
         };
-    })
+    });
 
-    const totalStaffObjects= {name:"จำนวนทั้งหมด", value:userQueries.length}
+    const totalStaffObjects = {
+        name: "จำนวนทั้งหมด", 
+        value: userData.length
+    };
 
-    const staffData=[
+    const staffData = [
         totalStaffObjects,
         ...staffDataList
-    ]
+    ];
     // ระบบกรองจำวน Role
     
     if (isSystemLoading) {
