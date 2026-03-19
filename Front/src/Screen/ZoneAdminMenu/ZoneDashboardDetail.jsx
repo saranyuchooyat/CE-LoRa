@@ -4,9 +4,7 @@ import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
 import MenuNameCard2 from "../../components/MainCardOption/MenuNameCard2";
-import Cardno8 from "../../components/Card/Cardno8";
-import Cardno9 from "../../components/Card/Cardno9";
-import Cardno5 from "../../components/Card/Cardno5";
+import Cardno2 from "../../components/Card/Cardno2";
 import CardFull from "../../components/Card/Cardno5";
 import Modal from "../../components/ModalForm/Modal";
 import AddElderlyform from "../../components/ModalForm/AddElderly";
@@ -130,89 +128,19 @@ function ZoneDashboardDetail() {
   const allAlertDetail = alerts;
   // console.log("alert",allAlertDetail)
 
-  const allDeviceStatus = deviceStatus;
+  // จัดรูปแบบข้อมูลให้ตรงกับที่ Cardno2 ต้องการ
+  const allDeviceStatus = [
+    { name: "เชื่อมต่อ Smartwatch ทั้งหมด", value: deviceStatus?.total || 0 },
+    { name: "Online", value: deviceStatus?.online || 0 },
+    { name: "Offline", value: deviceStatus?.offline || 0 }
+  ];
 
   const allEldery = elders;
   console.log("Elder", allEldery);
 
   const zoneDetail = zone;
 
-  const calculateAverages = (eldersList) => {
-    if (!eldersList || eldersList.length === 0)
-      return { avgSpO2: 0, avgHR: 0, avgTemp: 0 };
-
-    const totals = eldersList.reduce(
-      (acc, elder) => {
-        return {
-          spo2: acc.spo2 + (elder.vitals?.spo2 || 0),
-          hr: acc.hr + (elder.vitals?.heart_rate || 0),
-          temp: acc.temp + (elder.vitals?.temperature || 0),
-        };
-      },
-      { spo2: 0, hr: 0, temp: 0 },
-    );
-
-    return {
-      avgSpO2: (totals.spo2 / eldersList.length).toFixed(1),
-      avgHR: (totals.hr / eldersList.length).toFixed(1),
-      avgTemp: (totals.temp / eldersList.length).toFixed(1),
-    };
-  };
-
-  const healthAverages = calculateAverages(allEldery);
-
-  const mockGraphData = [
-    {
-      date: "2026-02-03",
-      activeUsers: 98,
-      avgHR: 80,
-      avgSpO2: 96,
-      avgTemp: 36.5,
-    },
-    {
-      date: "2026-02-04",
-      activeUsers: 105,
-      avgHR: 85,
-      avgSpO2: 97,
-      avgTemp: 36.7,
-    },
-    {
-      date: "2026-02-05",
-      activeUsers: 95,
-      avgHR: 82,
-      avgSpO2: 96,
-      avgTemp: 36.4,
-    },
-    {
-      date: "2026-02-06",
-      activeUsers: 110,
-      avgHR: 88,
-      avgSpO2: 95,
-      avgTemp: 36.6,
-    },
-    {
-      date: "2026-02-07",
-      activeUsers: 120,
-      avgHR: 90,
-      avgSpO2: 96,
-      avgTemp: 36.8,
-    },
-    {
-      date: "2026-02-08",
-      activeUsers: 115,
-      avgHR: 95,
-      avgSpO2: 94,
-      avgTemp: 36.3,
-    },
-    {
-      date: "2026-02-09",
-      activeUsers: 125,
-      avgHR: parseFloat(healthAverages.avgHR),
-      avgSpO2: parseFloat(healthAverages.avgSpO2),
-      avgTemp: parseFloat(healthAverages.avgTemp),
-    },
-  ];
-
+  
   // ✅ 3. ดักสลับหน้าจอ ถ้ามีการกดเลือกผู้สูงอายุ ให้โชว์หน้าโปรไฟล์แทน!
   if (viewingProfile) {
     return (
@@ -238,7 +166,8 @@ function ZoneDashboardDetail() {
           showActions={false}
           onEdit={(user) => console.log("Edit User:", user)}
         />
-        <Cardno5 data={allAlertDetail} />
+        <CardFull data={allAlertDetail} />
+        <Cardno2 data={allDeviceStatus} />
 
         <MenuNameCard2
           title={allEldery.length}
@@ -253,10 +182,6 @@ function ZoneDashboardDetail() {
           onDeleteSuccess={() => zoneDashboardQueries[0].refetch()}
           onRowClick={setViewingProfile} // ✅ 4. ส่งคำสั่งให้ตารางรับรู้ว่าถ้ากดแถว ให้เอาข้อมูลมาใส่ใน viewingProfile
         />
-
-        
-
-        {/* <Cardno9 data=""/> */}
       </div>
 
       <Modal
