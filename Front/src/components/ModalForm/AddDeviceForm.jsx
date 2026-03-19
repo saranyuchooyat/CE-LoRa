@@ -6,7 +6,6 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
   const [formData, setFormData] = useState({
     deviceName: "",
     deviceModel: "เลือก Model",
-    type: "Smartwatch",
     features: "เลือก Feature",
   });
   const [nextId, setNextId] = useState("");
@@ -132,21 +131,6 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
           />
         </div>
 
-        {/* Dropdown Type */}
-        <div className="mb-2">
-          <label className="block text-gray-700 text-sm">Type:</label>
-          <select
-            name="type"
-            value={formData.type}
-            onChange={handleChange}
-            className="border rounded w-full p-2 bg-white"
-            required
-          >
-            <option value="เลือก Type">เลือก ประเภท</option>
-            <option value="Smartwatch">Smartwatch</option>
-          </select>
-        </div>
-
         {/* deviceName */}
         <div className="mb-2">
           <label className="block text-gray-700 text-sm">Model:</label>
@@ -157,7 +141,7 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
             className="border rounded w-full p-2 bg-white"
             required
           >
-            <option value="เลือก Model">เลือก Model</option>
+            <option value="">-- เลือก Model --</option>
             <option value="J3">J3</option>
             <option value="X7">X7</option>
             <option value="ED20W">ED20W</option>
@@ -179,14 +163,13 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
           ].map((item) => (
             <label
               key={item.value}
-              className="flex items-center space-x-2 cursor-pointer"
+              className="flex items-center space-x-2 cursor-default pointer-events-none"
             >
               <input
                 type="checkbox"
                 value={item.value}
                 checked={formData.features.includes(item.value)}
                 readOnly
-                disabled
                 onChange={handleCheckboxChange}
                 className="w-4 h-4 text-blue-600"
               />

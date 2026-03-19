@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../API";
-import { showPopup } from '../Popup';
+import { showPopup } from "../Popup";
 
 function SetDeviceForm({ deviceId, onClose }) {
   const [zones, setZones] = useState([]);
@@ -11,7 +11,8 @@ function SetDeviceForm({ deviceId, onClose }) {
   const [busyElders, setBusyElders] = useState([]);
   // --- 1. เพิ่ม State ตัวนี้ไว้พัก ID คนเจ้าของเดิม ---
   const [initialElderId, setInitialElderId] = useState(null);
-
+  const [initialElderName, setInitialElderName] = useState("");
+  const [isLoadingElders, setIsLoadingElders] = useState(false);
   // --- 2. ดึงข้อมูลเจ้าของเครื่อง (ยิงเข้าหา Elder โดยตรงตามที่พี่บอก) ---
   useEffect(() => {
     const fetchCurrentOwner = async () => {
@@ -25,6 +26,7 @@ function SetDeviceForm({ deviceId, onClose }) {
           setSelectedZone(owner.zone_id);
           // พัก ID ผู้สูงอายุไว้ก่อน เพราะ Dropdown รายชื่อคนยังโหลดไม่เสร็จ
           setInitialElderId(owner.elder_id);
+          setInitialElderName(`${owner.first_name} ${owner.last_name}`);
         }
       } catch (err) {
         console.log("ยังไม่มีใครใช้เครื่องนี้");
@@ -79,15 +81,25 @@ function SetDeviceForm({ deviceId, onClose }) {
       return;
     }
     const fetchElders = async () => {
+      setIsLoadingElders(true);
       try {
         const res = await api.get(`/zones/${selectedZone}/elder`);
         setElders(res.data);
       } catch (err) {
         console.error("Failed to fetch elders", err);
+      } finally {
+        setIsLoadingElders(false);
       }
     };
     fetchElders();
   }, [selectedZone]);
+
+  //เมื่อข้อมูลคนในโซนโหลดมาแล้ว ให้เซ็ตคนปัจจุบันอัตโนมัติ
+  useEffect(() => {
+    if (elders.length > 0 && initialElderId) {
+      setSelectedElder(initialElderId);
+    }
+  }, [elders, initialElderId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -116,7 +128,7 @@ function SetDeviceForm({ deviceId, onClose }) {
       });
 
       showPopup("สำเร็จ", "บันทึกสำเร็จ", "success").then(() => {
-          if (onClose) onClose();
+        if (onClose) onClose();
       });
     } catch (error) {
       console.error("Failed to set device:", error);
@@ -175,23 +187,25 @@ function SetDeviceForm({ deviceId, onClose }) {
             required
           >
             <option value="">-- กรุณาเลือกผู้สูงอายุ --</option>
-            {elders.map((e, idx) => {
+            {elders.map((e) => {
               const fullName = `${e.first_name} ${e.last_name}`;
-              const isBusy = busyElders.includes(fullName);
+              const isBusy =
+                busyElders.includes(fullName) && fullName !== initialElderName;
 
               return (
                 <option
-                  key={idx}
+                  key={e.elder_id}
                   value={e.elder_id}
                   disabled={isBusy}
                   className={isBusy ? "text-gray-400" : "text-black"}
                 >
                   {fullName} {isBusy ? "(ผูกแล้ว)" : ""}
+                  {fullName === initialElderName ? " (เจ้าของปัจจุบัน)" : ""}
                 </option>
               );
             })}
           </select>
-          {selectedZone && elders.length === 0 && (
+          {selectedZone && !isLoadingElders && elders.length === 0 && (
             <p className="text-sm text-red-500">ไม่มีผู้สูงอายุในโซนนี้</p>
           )}
         </div>
