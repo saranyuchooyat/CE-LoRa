@@ -62,8 +62,8 @@ type Device struct {
 	LastUpdate string             `bson:"last_update" json:"last_update"`
 	Model      string             `bson:"model" json:"model"`
 	Status     string             `bson:"status" json:"status"`
-	Type       string             `bson:"type" json:"type"`
-	AssignedTo string             `bson:"assigned_to" json:"assigned_to"`
+
+	AssignedTo string `bson:"assigned_to" json:"assigned_to"`
 }
 
 type DeviceData struct {

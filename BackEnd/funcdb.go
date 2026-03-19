@@ -787,9 +787,7 @@ func updateDevice(c *fiber.Ctx) error {
 	if deviceUpdate.AssignedTo != "" {
 		updateFields["assigned_to"] = deviceUpdate.AssignedTo
 	}
-	if deviceUpdate.Type != "" {
-		updateFields["type"] = deviceUpdate.Type
-	}
+
 	if deviceUpdate.Model != "" {
 		updateFields["model"] = deviceUpdate.Model
 	}
@@ -1008,14 +1006,14 @@ func getZoneStaff(c *fiber.Ctx) error {
 	defer cancel()
 
 	var users []User = []User{}
-	
+
 	filter := bson.M{
 		"zone_id": primitive.Regex{
 			Pattern: "(^|\\s*,\\s*)" + zoneID + "(\\s*,\\s*|$)",
 			Options: "i",
 		},
 	}
-	
+
 	cursor, err := getCollection("users").Find(ctx, filter)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch staff"})

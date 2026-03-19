@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../API";
-import { showPopup } from '../Popup';
+import { showPopup } from "../Popup";
 
 function EditDeviceForm({ onClose, onSaveSuccess, deviceData }) {
   const [formData, setFormData] = useState({
@@ -93,23 +93,6 @@ function EditDeviceForm({ onClose, onSaveSuccess, deviceData }) {
           />
         </div>
 
-        {/* ประเภทอุปกรณ์ (Type) */}
-        <div className="mb-2">
-          <label className="block text-gray-700 text-sm">
-            ประเภทอุปกรณ์ (Type):
-          </label>
-          <select
-            name="type"
-            value={formData.type}
-            onChange={handleChange}
-            className="border rounded w-full p-2 bg-white"
-            required
-          >
-            <option value="เลือก Type">เลือก ประเภท</option>
-            <option value="Smartwatch">Smartwatch</option>
-          </select>
-        </div>
-
         {/* โมเดลอุปกรณ์ (Model) */}
         <div className="mb-2">
           <label className="block text-gray-700 text-sm">
@@ -122,7 +105,6 @@ function EditDeviceForm({ onClose, onSaveSuccess, deviceData }) {
             className="border rounded w-full p-2 bg-white outline-none focus:border-blue-500"
             placeholder="เช่น W-D3200"
           >
-            <option value="เลือก Model">เลือก Model</option>
             <option value="J3">J3</option>
             <option value="X7">X7</option>
             <option value="ED20W">ED20W</option>
