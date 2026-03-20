@@ -129,6 +129,7 @@ function ZoneDashboardDetail() {
       <ZoneSummaryReportView 
         zoneId={zoneid} 
         zoneName={zoneDetail?.name}
+        eldersData={allEldery}
         onBack={() => setShowSummaryReport(false)} 
       />
     );
