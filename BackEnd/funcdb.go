@@ -695,6 +695,10 @@ func getAllDevice(c *fiber.Ctx) error {
 
 			if duration.Minutes() > 5 {
 				newStatus = "offline"
+				elderID := getElderIDByName(assignedTo)
+				if elderID != "" {
+					CreateAlertWithCheck(elderID, "🔌 นาฬิกาขาดการติดต่อ!", "นาฬิกาของ "+assignedTo+" ออฟไลน์ (เกิน 5 นาที)", "medium", "OFFLINE")
+				}
 			} else {
 				newStatus = "online"
 			}
@@ -1188,7 +1192,7 @@ func StartAlertMonitor() {
 					checkDeviceAndCreateAlert(device)
 				}
 			}
-			time.Sleep(30 * time.Second)
+			time.Sleep(1 * time.Second)
 		}
 	}()
 }
@@ -1225,21 +1229,18 @@ func checkDeviceAndCreateAlert(device bson.M) {
 
 	if err == nil {
 		if swData, ok := latestData["smartwatch_data"].(bson.M); ok {
-			fmt.Println(elderID, swData)
+
 			// --- 🚨 1. เช็คการล้ม (Boolean) ---
 			if fall, ok := swData["is_fallen"].(bool); ok && fall {
-
 				CreateAlertWithCheck(elderID, "🔴 ตรวจพบการล้ม!", "คุณ "+assignedName+" อาจเกิดอุบัติเหตุล้มลง", "high", "FALL")
 			}
-
 			// --- 💓 2. เช็คอัตราการเต้นหัวใจ ---
-			var hr float64
+			var hr int
 			if val, ok := swData["heart_rate"]; ok {
 				switch v := val.(type) {
-				case float64:
-					hr = v
 				case int32:
-					hr = float64(v)
+
+					hr = int(v)
 				}
 			}
 			if hr > 0 {
@@ -1412,4 +1413,30 @@ func GetZoneSummaryReport(c *fiber.Ctx) error {
 			"normal":   normalCount,
 		},
 	})
+}
+
+func getElderIDByName(name string) string {
+	if name == "" || name == "None" {
+		return ""
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var elder bson.M
+	filter := bson.M{
+		"$expr": bson.M{
+			"$eq": bson.A{
+				bson.M{"$concat": bson.A{"$first_name", " ", "$last_name"}},
+				name,
+			},
+		},
+	}
+
+	err := MI.DB.Collection("elders").FindOne(ctx, filter).Decode(&elder)
+	if err != nil {
+		return ""
+	}
+
+	id, _ := elder["elder_id"].(string)
+	return id
 }
