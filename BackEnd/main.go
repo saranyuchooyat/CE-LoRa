@@ -96,6 +96,10 @@ func main() {
 	app.Delete("/alerts/:id", DeleteAlert)
 	app.Get("/alerts/unread-count", GetUnreadCount)
 
+	// --Zone summary report--
+
+	app.Get("/zones/:id/summary", GetZoneSummaryReport)
+
 	// Start Server
 	log.Fatal(app.Listen(":8080"))
 }

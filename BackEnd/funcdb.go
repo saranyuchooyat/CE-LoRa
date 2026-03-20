@@ -1283,3 +1283,133 @@ func CreateAlertWithCheck(elderID, title, desc, severity, alertType string) {
 		CreateAlert(elderID, title, desc, severity, alertType)
 	}
 }
+
+// GetZoneSummaryReport API สรุปข้อมูลสำหรับทำหน้า Report Dashboard
+func GetZoneSummaryReport(c *fiber.Ctx) error {
+	zoneID := c.Params("id")
+	timeFilter := c.Query("filter", "all")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// ==========================================
+	// 1. ดึงข้อมูล Elders และเตรียม Device IDs, Elder IDs
+	// ==========================================
+	var elders []bson.M
+	cursor, err := getCollection("elders").Find(ctx, bson.M{"zone_id": zoneID})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "ไม่สามารถดึงข้อมูลผู้สูงอายุได้"})
+	}
+	cursor.All(ctx, &elders)
+
+	var elderIDs []string
+	var deviceIDs []string
+	for _, e := range elders {
+		if eID, ok := e["elder_id"].(string); ok {
+			elderIDs = append(elderIDs, eID)
+		}
+		if dID, ok := e["device_id"].(string); ok && dID != "" {
+			deviceIDs = append(deviceIDs, dID)
+		}
+	}
+
+	// ==========================================
+	// 2. นับจำนวน Staff ในโซนนี้
+	// ==========================================
+	staffCount, _ := getCollection("users").CountDocuments(ctx, bson.M{
+		"zone_id": bson.M{"$regex": zoneID},
+		"role":    "Zone Staff",
+	})
+
+	// ==========================================
+	// 3. เช็คสถานะ Devices (Online / Offline)
+	// ==========================================
+	onlineCount, _ := getCollection("devices").CountDocuments(ctx, bson.M{
+		"device_id": bson.M{"$in": deviceIDs},
+		"status":    "online",
+	})
+
+	offlineCount, _ := getCollection("devices").CountDocuments(ctx, bson.M{
+		"device_id": bson.M{"$in": deviceIDs},
+		"status":    "offline",
+	})
+
+	// ==========================================
+	// 4. สรุป Alerts (เปลี่ยนเป็น Critical, Warning, Normal)
+	// ==========================================
+	alertMatch := bson.M{"elder_id": bson.M{"$in": elderIDs}}
+
+	if timeFilter != "all" {
+		now := time.Now()
+		var pastTime time.Time
+
+		switch timeFilter {
+		case "1m":
+			pastTime = now.AddDate(0, -1, 0)
+		case "3m":
+			pastTime = now.AddDate(0, -3, 0)
+		case "6m":
+			pastTime = now.AddDate(0, -6, 0)
+		}
+
+		if !pastTime.IsZero() {
+			alertMatch["created_at"] = bson.M{"$gte": pastTime.Format(time.RFC3339)}
+		}
+	}
+
+	// ✅ เปลี่ยนชื่อตัวแปรให้ตรงกับสถานะใหม่
+	criticalCount, warningCount, normalCount := 0, 0, 0
+
+	if len(elderIDs) > 0 {
+		pipeline := mongo.Pipeline{
+			{{Key: "$match", Value: alertMatch}},
+			{{Key: "$group", Value: bson.D{
+				{Key: "_id", Value: "$severity"},
+				{Key: "count", Value: bson.D{{Key: "$sum", Value: 1}}},
+			}}},
+		}
+
+		alertCursor, _ := getCollection("alerts").Aggregate(ctx, pipeline)
+		var alertResults []bson.M
+		alertCursor.All(ctx, &alertResults)
+
+		for _, res := range alertResults {
+			sev, _ := res["_id"].(string)
+
+			// เซฟตี้ไว้เผื่อ MongoDB คืนค่า count มาเป็น int32 หรือ int64
+			var count int
+			if v, ok := res["count"].(int32); ok {
+				count = int(v)
+			} else if v, ok := res["count"].(int64); ok {
+				count = int(v)
+			}
+
+			// ✅ เทียบกับสถานะใหม่
+			switch sev {
+			case "critical":
+				criticalCount = count
+			case "warning":
+				warningCount = count
+			case "normal":
+				normalCount = count
+			}
+		}
+	}
+
+	// ==========================================
+	// 🎯 ส่งข้อมูลกลับไปให้หน้าบ้าน
+	// ==========================================
+	return c.JSON(fiber.Map{
+		"total_elders": len(elderIDs),
+		"total_staff":  staffCount,
+		"device_status": fiber.Map{
+			"online":  onlineCount,
+			"offline": offlineCount,
+		},
+		"alerts_summary": fiber.Map{
+			"critical": criticalCount,
+			"warning":  warningCount,
+			"normal":   normalCount,
+		},
+	})
+}

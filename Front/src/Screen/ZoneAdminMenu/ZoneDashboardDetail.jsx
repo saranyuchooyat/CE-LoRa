@@ -10,6 +10,7 @@ import Modal from "../../components/ModalForm/Modal";
 import AddElderlyform from "../../components/ModalForm/AddElderly";
 import EditElderlyForm from "../../components/ModalForm/EditElderlyForm";
 import ElderlyProfileView from "../../components/Card/ElderlyProfileView";
+import ZoneSummaryReportView from "../../components/Card/ZoneSummaryReportView"; 
 
 function ZoneDashboardDetail() {
   const { zoneid } = useParams();
@@ -34,8 +35,10 @@ function ZoneDashboardDetail() {
     setIsEditElderlyModalOpen(false);
   };
 
-  // ✅ 2. สร้าง State สำหรับเก็บข้อมูลคนที่ถูกคลิก
   const [viewingProfile, setViewingProfile] = useState(null);
+  
+  // ✅ 2. สร้าง State ควบคุมการสลับไปหน้า Report
+  const [showSummaryReport, setShowSummaryReport] = useState(false);
 
   //ดึงข้อมูลหลังบ้าน
   const zoneDashboardQueries = useQueries({
@@ -63,7 +66,6 @@ function ZoneDashboardDetail() {
   const zoneDashboard = zoneDashboardQueries[0].data || [];
   const zoneStaffData = zoneDashboardQueries[1].data || [];
 
-  // ตั้งค่า user role
   const [userRole, setUserRole] = useState(null);
   useEffect(() => {
     let role = null;
@@ -97,38 +99,21 @@ function ZoneDashboardDetail() {
     return true;
   });
 
-  console.log("ZoneData", zoneDashboard);
-
   if (isDashboardLoading || !zoneid) {
-    return (
-      <div className="mx-5 mt-10 text-center text-xl">
-        Loading Zone Dashboard...
-      </div>
-    );
+    return <div className="mx-5 mt-10 text-center text-xl">Loading Zone Dashboard...</div>;
   }
 
   if (isDashboardError) {
-    return (
-      <div className="mx-5 mt-10 text-center text-xl text-red-600">
-        Error fetching data: {error.message}
-      </div>
-    );
+    return <div className="mx-5 mt-10 text-center text-xl text-red-600">Error fetching data</div>;
   }
 
   if (!zoneDashboard || Object.keys(zoneDashboard).length === 0) {
-    return (
-      <div className="mx-5 mt-10 text-center text-xl text-red-600">
-        Zone ID "{zoneid}" not found.
-      </div>
-    );
+    return <div className="mx-5 mt-10 text-center text-xl text-red-600">Zone ID "{zoneid}" not found.</div>;
   }
 
   const { alerts, deviceStatus, elders, zone } = zoneDashboard;
 
   const allAlertDetail = alerts;
-  // console.log("alert",allAlertDetail)
-
-  // จัดรูปแบบข้อมูลให้ตรงกับที่ Cardno2 ต้องการ
   const allDeviceStatus = [
     { name: "เชื่อมต่อ Smartwatch ทั้งหมด", value: deviceStatus?.total || 0 },
     { name: "Online", value: deviceStatus?.online || 0 },
@@ -136,17 +121,24 @@ function ZoneDashboardDetail() {
   ];
 
   const allEldery = elders;
-  console.log("Elder", allEldery);
-
   const zoneDetail = zone;
 
-  
-  // ✅ 3. ดักสลับหน้าจอ ถ้ามีการกดเลือกผู้สูงอายุ ให้โชว์หน้าโปรไฟล์แทน!
+  // ✅ 3. สลับหน้าจอมาที่ Report ถ้า State เป็น true
+  if (showSummaryReport) {
+    return (
+      <ZoneSummaryReportView 
+        zoneId={zoneid} 
+        zoneName={zoneDetail?.name}
+        onBack={() => setShowSummaryReport(false)} 
+      />
+    );
+  }
+
   if (viewingProfile) {
     return (
       <ElderlyProfileView
         elderData={viewingProfile}
-        onBack={() => setViewingProfile(null)} // พอกดกลับ ก็เคลียร์ค่าให้เป็น null เพื่อโชว์ Dashboard เหมือนเดิม
+        onBack={() => setViewingProfile(null)} 
       />
     );
   }
@@ -154,6 +146,16 @@ function ZoneDashboardDetail() {
   return (
     <>
       <div className="mx-5">
+        {/* ✅ 4. เพิ่มปุ่ม Report ไว้มุมขวาบน */}
+        <div className="flex justify-end mb-3 mt-2">
+            <button 
+              onClick={() => setShowSummaryReport(true)}
+              className="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-2"
+            >
+              Zone Summary Report
+            </button>
+        </div>
+
         <MenuNameCard
           title={zoneDetail?.name || "Zone Detail"}
           description={"Zone Admin Dashboard"}
@@ -180,44 +182,18 @@ function ZoneDashboardDetail() {
           showActions={userRole === "Zone Admin" || true}
           onEdit={handleOpenEditElderlyModal}
           onDeleteSuccess={() => zoneDashboardQueries[0].refetch()}
-          onRowClick={setViewingProfile} // ✅ 4. ส่งคำสั่งให้ตารางรับรู้ว่าถ้ากดแถว ให้เอาข้อมูลมาใส่ใน viewingProfile
+          onRowClick={setViewingProfile} 
         />
       </div>
 
-      <Modal
-        title="เพิ่มข้อมูลผู้สูงอายุ"
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-      >
-        <AddElderlyform
-          zoneid={zoneid}
-          onClose={handleCloseModal}
-          onSaveSuccess={() => {
-            handleCloseModal();
-            zoneDashboardQueries[0].refetch();
-          }}
-        />
+      <Modal title="เพิ่มข้อมูลผู้สูงอายุ" isOpen={isModalOpen} onClose={handleCloseModal}>
+        <AddElderlyform zoneid={zoneid} onClose={handleCloseModal} onSaveSuccess={() => { handleCloseModal(); zoneDashboardQueries[0].refetch(); }} />
       </Modal>
 
-      <Modal
-        title="เพิ่มผู้ดูแลโซน"
-        isOpen={isModalOpenStaff}
-        onClose={handleCloseModalStaff}
-      ></Modal>
+      <Modal title="เพิ่มผู้ดูแลโซน" isOpen={isModalOpenStaff} onClose={handleCloseModalStaff}></Modal>
 
-      <Modal
-        title="แก้ไขข้อมูลผู้สูงอายุ"
-        isOpen={isEditElderlyModalOpen}
-        onClose={handleCloseEditElderlyModal}
-      >
-        <EditElderlyForm
-          elderData={selectedElderly}
-          onClose={handleCloseEditElderlyModal}
-          onSaveSuccess={() => {
-            handleCloseEditElderlyModal();
-            zoneDashboardQueries[0].refetch();
-          }}
-        />
+      <Modal title="แก้ไขข้อมูลผู้สูงอายุ" isOpen={isEditElderlyModalOpen} onClose={handleCloseEditElderlyModal}>
+        <EditElderlyForm elderData={selectedElderly} onClose={handleCloseEditElderlyModal} onSaveSuccess={() => { handleCloseEditElderlyModal(); zoneDashboardQueries[0].refetch(); }} />
       </Modal>
     </>
   );
