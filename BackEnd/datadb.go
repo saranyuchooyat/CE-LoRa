@@ -103,11 +103,15 @@ type Server struct {
 }
 
 type Alert struct {
-	ID          int    `json:"id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	CreatedAt   string `json:"created_at"`
-	Severity    string `json:"severity"`
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
+	AlertID     string             `json:"alert_id" bson:"alert_id"`
+	ElderID     string             `json:"elder_id" bson:"elder_id"`
+	Title       string             `json:"title" bson:"title"`             // เช่น "ตรวจพบการล้ม"
+	Description string             `json:"description" bson:"description"` // เช่น "คุณสมชาย ล้มที่โซน A"
+	Severity    string             `json:"severity" bson:"severity"`       // "high", "medium", "low"
+	Type        string             `json:"type" bson:"type"`               // "FALL", "HR", "BATT"
+	Status      string             `json:"status" bson:"status"`           // "unread", "read"
+	CreatedAt   string             `json:"created_at" bson:"created_at"`
 }
 
 type UsageTrend struct {
@@ -149,27 +153,6 @@ var servers = []Server{
 		MemoryTotal: "16GB",
 		DiskUsed:    "234GB",
 		DiskTotal:   "1TB",
-	},
-}
-
-var alerts = []Alert{
-	{
-		ID:          1,
-		Title:       "Analytics Server High Memory Usage",
-		Description: "Memory usage reached 94% - immediate attention required",
-		CreatedAt:   "2025-08-19T10:25:00Z",
-	},
-	{
-		ID:          2,
-		Title:       "3 อุปกรณ์ใน Zone ลาดกระบัง ไม่ส่งสัญญาณ",
-		Description: "Device offline เกิน 30 นาที - ตรวจสอบการเชื่อมต่อ",
-		CreatedAt:   "2025-08-19T10:10:00Z",
-	},
-	{
-		ID:          3,
-		Title:       "Database Backup Completed",
-		Description: "Nightly backup finished successfully",
-		CreatedAt:   "2025-08-19T00:30:00Z",
 	},
 }
 

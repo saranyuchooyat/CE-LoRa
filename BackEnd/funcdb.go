@@ -670,6 +670,7 @@ func getAllDevice(c *fiber.Ctx) error {
 			devices[i]["battery"] = 0
 			continue
 		}
+
 		targetName := device["device_name"]
 
 		var latestData bson.M
@@ -680,26 +681,45 @@ func getAllDevice(c *fiber.Ctx) error {
 		err := MI.DB.Collection("device_data").FindOne(ctx, filter, opts).Decode(&latestData)
 
 		if err == nil {
+			// 1. ดึงแบตเตอรี่
 			if swData, ok := latestData["smartwatch_data"].(bson.M); ok {
 				devices[i]["battery"] = swData["device_battery"]
 			}
 
+			// 2. คำนวณสถานะ Online/Offline
 			lastUpdateStr, _ := latestData["timestamp"].(string)
-
 			lastUpdateTime, _ := time.Parse(time.RFC3339, lastUpdateStr)
 
-			// คำนวณส่วนต่างเวลาปัจจุบัน กับ เวลาล่าสุด
+			var newStatus string
 			duration := time.Since(lastUpdateTime)
+
 			if duration.Minutes() > 5 {
-				devices[i]["status"] = "offline"
+				newStatus = "offline"
 			} else {
-				devices[i]["status"] = "online"
+				newStatus = "online"
 			}
 
+			// 3. ยัดค่าใส่ตัวแปรที่จะส่งไปหน้าบ้าน
+			devices[i]["status"] = newStatus
 			devices[i]["last_update"] = lastUpdateStr
+
+			if currentStatus != newStatus {
+				MI.DB.Collection("devices").UpdateOne(ctx,
+					bson.M{"device_name": targetName},
+					bson.M{"$set": bson.M{"status": newStatus}},
+				)
+			}
 		} else {
+
 			devices[i]["status"] = "offline"
 			devices[i]["battery"] = 0
+
+			if currentStatus != "offline" {
+				MI.DB.Collection("devices").UpdateOne(ctx,
+					bson.M{"device_name": targetName},
+					bson.M{"$set": bson.M{"status": "offline"}},
+				)
+			}
 		}
 	}
 
@@ -916,39 +936,39 @@ func getZoneDashboard(c *fiber.Ctx) error {
 	deviceStatus := map[string]int{"online": 0, "offline": 0, "total": 0}
 	var alertsInZone []Alert = []Alert{}
 
-	for _, e := range zoneElders {
-		if e.DeviceID != "" {
-			deviceStatus["total"]++
+	// for _, e := range zoneElders {
+	// 	if e.DeviceID != "" {
+	// 		deviceStatus["total"]++
 
-			status := "online"
-			if rand.Intn(10) < 2 {
-				status = "offline"
-			}
+	// 		status := "online"
+	// 		if rand.Intn(10) < 2 {
+	// 			status = "offline"
+	// 		}
 
-			if status == "online" {
-				deviceStatus["online"]++
-			} else {
-				deviceStatus["offline"]++
-				alertsInZone = append(alertsInZone, Alert{
-					ID:          rand.Intn(10000),
-					Title:       "Device Offline",
-					Description: fmt.Sprintf("อุปกรณ์ของ %s %s ขาดการเชื่อมต่อ", e.FirstName, e.LastName),
-					CreatedAt:   time.Now().Format(time.RFC3339),
-					Severity:    "High", // เพิ่มความรุนแรง (ถ้ามี field นี้)
-				})
-			}
-		}
+	// 		if status == "online" {
+	// 			deviceStatus["online"]++
+	// 		} else {
+	// 			deviceStatus["offline"]++
+	// 			alertsInZone = append(alertsInZone, Alert{
+	// 				ID:          rand.Intn(10000),
+	// 				Title:       "Device Offline",
+	// 				Description: fmt.Sprintf("อุปกรณ์ของ %s %s ขาดการเชื่อมต่อ", e.FirstName, e.LastName),
+	// 				CreatedAt:   time.Now().Format(time.RFC3339),
+	// 				Severity:    "High", // เพิ่มความรุนแรง (ถ้ามี field นี้)
+	// 			})
+	// 		}
+	// 	}
 
-		if e.HealthStatus == "Critical" {
-			alertsInZone = append(alertsInZone, Alert{
-				ID:          rand.Intn(10000),
-				Title:       "Critical Health",
-				Description: fmt.Sprintf("ผู้สูงอายุ %s %s อยู่ในภาวะวิกฤต", e.FirstName, e.LastName),
-				CreatedAt:   time.Now().Format(time.RFC3339),
-				Severity:    "Critical",
-			})
-		}
-	}
+	// 	if e.HealthStatus == "Critical" {
+	// 		alertsInZone = append(alertsInZone, Alert{
+	// 			ID:          rand.Intn(10000),
+	// 			Title:       "Critical Health",
+	// 			Description: fmt.Sprintf("ผู้สูงอายุ %s %s อยู่ในภาวะวิกฤต", e.FirstName, e.LastName),
+	// 			CreatedAt:   time.Now().Format(time.RFC3339),
+	// 			Severity:    "Critical",
+	// 		})
+	// 	}
+	// }
 
 	return c.JSON(fiber.Map{
 		"zone": fiber.Map{
@@ -1025,4 +1045,241 @@ func getZoneStaff(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(users)
+}
+
+func CreateAlert(elderID string, title string, desc string, severity string, alertType string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// ดึง Alert ตัวล่าสุด 1 ตัว เพื่อดู ID ล่าสุด
+	opts := options.FindOne().SetSort(bson.D{{Key: "created_at", Value: -1}})
+	var lastAlert bson.M
+	err := MI.DB.Collection("alerts").FindOne(ctx, bson.M{}, opts).Decode(&lastAlert)
+
+	nextNumber := 1
+	if err == nil {
+		// ถ้าเจอตัวล่าสุด ให้แงะเลขออกมาบวก 1 (เช่น จาก A005 เป็น 6)
+		lastIDStr, _ := lastAlert["alert_id"].(string)
+		fmt.Sscanf(lastIDStr, "A%03d", &nextNumber)
+		nextNumber++
+	}
+	nextAlertID := fmt.Sprintf("A%03d", nextNumber)
+
+	// 2. เตรียมข้อมูล
+	newEntry := bson.M{
+		"alert_id":    nextAlertID,
+		"elder_id":    elderID,
+		"title":       title,
+		"description": desc,
+		"severity":    severity,
+		"type":        alertType,
+		"status":      "unread",
+		"created_at":  time.Now().Format(time.RFC3339),
+	}
+
+	// 3. Insert ลง DB
+	_, err = MI.DB.Collection("alerts").InsertOne(ctx, newEntry)
+	if err != nil {
+		fmt.Printf("Error inserting alert: %v\n", err)
+		return err
+	}
+
+	return nil
+}
+
+func GetAlerts(c *fiber.Ctx) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var alerts []Alert
+	// ดึง 20 อันล่าสุด และเรียงจากใหม่ไปเก่า
+	opts := options.Find().SetSort(bson.D{{"created_at", -1}}).SetLimit(20)
+
+	cursor, err := getCollection("alerts").Find(ctx, bson.D{}, opts)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	if err = cursor.All(ctx, &alerts); err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(alerts)
+}
+
+var hrCounters = make(map[string]int)
+
+func checkHR(elderID string, currentHR int, elderName string) {
+	if currentHR > 120 {
+		hrCounters[elderID]++
+		if hrCounters[elderID] >= 3 {
+
+			CreateAlertWithCheck(elderID, "💓 หัวใจเต้นเร็วเกินไป", elderName+" มีอัตราการเต้นหัวใจสูงติดต่อกัน 3 ครั้ง ("+fmt.Sprintf("%d", currentHR)+")", "medium", "HR")
+			hrCounters[elderID] = 0
+		}
+	} else if currentHR < 50 && currentHR > 0 {
+
+		CreateAlertWithCheck(elderID, "💙 หัวใจเต้นช้าผิดปกติ", elderName+" มีอัตราการเต้นหัวใจต่ำ ("+fmt.Sprintf("%d", currentHR)+")", "high", "HR")
+	} else {
+		hrCounters[elderID] = 0
+	}
+}
+
+func MarkAlertRead(c *fiber.Ctx) error {
+	alertID := c.Params("id")
+	objID, _ := primitive.ObjectIDFromHex(alertID)
+
+	filter := bson.M{"_id": objID}
+	update := bson.M{"$set": bson.M{"status": "read"}}
+
+	_, err := MI.DB.Collection("alerts").UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		return c.Status(500).SendString("Update failed")
+	}
+	return c.SendStatus(200)
+}
+
+func GetUnreadCount(c *fiber.Ctx) error {
+	count, err := MI.DB.Collection("alerts").CountDocuments(context.Background(), bson.M{"status": "unread"})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"count": 0})
+	}
+	return c.JSON(fiber.Map{"count": count})
+}
+
+func DeleteAlert(c *fiber.Ctx) error {
+	// 1. รับ ID จาก URL Parameter (เช่น /api/alerts/65f123...)
+	id := c.Params("id")
+
+	// 2. แปลง string ID เป็น ObjectID ของ MongoDB
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "ID ไม่ถูกต้อง"})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// 3. สั่งลบจาก Collection "alerts"
+	result, err := MI.DB.Collection("alerts").DeleteOne(ctx, bson.M{"_id": objID})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "ลบการแจ้งเตือนไม่สำเร็จ"})
+	}
+
+	// 4. เช็คว่ามีข้อมูลให้ลบไหม
+	if result.DeletedCount == 0 {
+		return c.Status(404).JSON(fiber.Map{"error": "ไม่พบการแจ้งเตือนที่ต้องการลบ"})
+	}
+
+	return c.JSON(fiber.Map{"message": "ลบการแจ้งเตือนเรียบร้อยแล้ว"})
+}
+
+func StartAlertMonitor() {
+	go func() {
+		for {
+			ctx := context.Background()
+			cursor, err := MI.DB.Collection("devices").Find(ctx, bson.M{"status": "online"})
+			if err == nil {
+				var devices []bson.M
+				cursor.All(ctx, &devices)
+
+				for _, device := range devices {
+
+					checkDeviceAndCreateAlert(device)
+				}
+			}
+			time.Sleep(30 * time.Second)
+		}
+	}()
+}
+
+func checkDeviceAndCreateAlert(device bson.M) {
+	ctx := context.Background()
+	targetName := device["device_name"]
+	assignedName, _ := device["assigned_to"].(string)
+
+	var elder bson.M
+	elderID := ""
+	filter := bson.M{
+		"$expr": bson.M{
+			"$eq": bson.A{
+				bson.M{"$concat": bson.A{"$first_name", " ", "$last_name"}},
+				assignedName,
+			},
+		},
+	}
+
+	err := MI.DB.Collection("elders").FindOne(ctx, filter).Decode(&elder)
+
+	if err == nil {
+		elderID, _ = elder["elder_id"].(string)
+	}
+
+	if elderID == "" {
+		return
+	}
+
+	var latestData bson.M
+	opts := options.FindOne().SetSort(bson.D{{Key: "timestamp", Value: -1}})
+	err = MI.DB.Collection("device_data").FindOne(ctx, bson.M{"device.device_name": targetName}, opts).Decode(&latestData)
+
+	if err == nil {
+		if swData, ok := latestData["smartwatch_data"].(bson.M); ok {
+			fmt.Println(elderID, swData)
+			// --- 🚨 1. เช็คการล้ม (Boolean) ---
+			if fall, ok := swData["is_fallen"].(bool); ok && fall {
+
+				CreateAlertWithCheck(elderID, "🔴 ตรวจพบการล้ม!", "คุณ "+assignedName+" อาจเกิดอุบัติเหตุล้มลง", "high", "FALL")
+			}
+
+			// --- 💓 2. เช็คอัตราการเต้นหัวใจ ---
+			var hr float64
+			if val, ok := swData["heart_rate"]; ok {
+				switch v := val.(type) {
+				case float64:
+					hr = v
+				case int32:
+					hr = float64(v)
+				}
+			}
+			if hr > 0 {
+				// เรียกใช้ checkHR ที่พี่เขียนไว้ (มันมีตัวนับ 3 ครั้งอยู่แล้ว แจ่มมากครับ)
+				checkHR(elderID, int(hr), assignedName)
+			}
+
+			// --- 🪫 3. เช็คแบตเตอรี่ ---
+			var batt float64
+			if val, ok := swData["device_battery"]; ok {
+				switch v := val.(type) {
+				case float64:
+					batt = v
+				case int32:
+					batt = float64(v)
+				}
+			}
+			if batt < 20 && batt > 0 {
+				CreateAlertWithCheck(elderID, "🪫 แบตเตอรี่ต่ำ", "นาฬิกาของ "+assignedName+" เหลือ "+fmt.Sprintf("%.0f", batt)+"%", "low", "BATT")
+			}
+		}
+	}
+}
+
+// ฟังก์ชันใหม่: เช็คก่อนสร้าง เพื่อไม่ให้ Alert ขยะเต็ม DB
+func CreateAlertWithCheck(elderID, title, desc, severity, alertType string) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// เช็คว่ามี Alert ประเภทนี้ ของผู้สูงอายุคนนี้ ที่ "ยังไม่อ่าน" ค้างอยู่ไหม
+	filter := bson.M{
+		"elder_id": elderID,
+		"type":     alertType,
+		"status":   "unread",
+	}
+
+	count, _ := MI.DB.Collection("alerts").CountDocuments(ctx, filter)
+
+	// ถ้าไม่มีอันเดิมค้างอยู่ (count == 0) ถึงจะสร้างอันใหม่
+	if count == 0 {
+		CreateAlert(elderID, title, desc, severity, alertType)
+	}
 }

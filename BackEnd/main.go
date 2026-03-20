@@ -23,7 +23,7 @@ func main() {
 	ConnectMongo() // เรียกใช้ฟังก์ชันเชื่อมต่อ DB
 
 	app := fiber.New()
-
+	StartAlertMonitor()
 	// CORS Setup
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
@@ -88,6 +88,13 @@ func main() {
 	app.Get("/dashboard/summary", getDashSum)          //✅
 	app.Get("/dashboard/top-zones", getTopZones)       //✅
 	app.Get("/system/health/servers", getSystemHealth) //mock
+
+	// --Alerts--
+
+	app.Get("/alerts", GetAlerts)
+	app.Put("/alerts/:id/read", MarkAlertRead)
+	app.Delete("/alerts/:id", DeleteAlert)
+	app.Get("/alerts/unread-count", GetUnreadCount)
 
 	// Start Server
 	log.Fatal(app.Listen(":8080"))
