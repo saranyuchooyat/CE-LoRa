@@ -17,7 +17,7 @@ function NotificationBell() {
   useEffect(() => {
     fetchUnread();
 
-    const interval = setInterval(fetchUnread, 30000);
+    const interval = setInterval(fetchUnread, 1000); // เช็คแจ้งเตือนหลังบ้าน 1 วิ
     return () => clearInterval(interval);
   }, []);
 
