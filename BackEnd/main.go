@@ -73,7 +73,7 @@ func main() {
 	app.Get("/elders", getAllElderly) //✅
 	app.Put("/elders/:id", updateElder)
 	app.Delete("/elders/:id", deleteElder)
-	// app.Get("/elders/:id", getElderDetail)
+	app.Get("/elders/:id", getElderDetail)
 
 	// --- Devices ---
 	app.Get("/devices/:id/owner", getDeviceOwnerbyID)

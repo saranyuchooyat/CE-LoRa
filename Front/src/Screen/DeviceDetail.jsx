@@ -47,10 +47,10 @@ function DeviceDetail() {
         </div>
         <div className="text-right">
           <span
-            className={`px-4 py-1 rounded-full text-sm font-medium ${sw?.is_wearing === "Worn" ? "bg-blue-100 text-blue-700" : "bg-gray-200 text-gray-600"}`}
+            className={`px-4 py-1 rounded-full text-sm font-medium ${sw?.is_wearing == true ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}
           >
             {/* {sw?.is_wearing === "Worn" ? "⌚ สวมใส่อยู่" : "⭕ ไม่ได้สวมใส่"} */}
-            {sw?.is_wearing === "Worn" ? "สวมใส่อยู่" : "ไม่ได้สวมใส่"}
+            {sw?.is_wearing == true ? "สวมใส่อยู่" : "ไม่ได้สวมใส่"}
           </span>
         </div>
       </div>
@@ -108,7 +108,7 @@ function DeviceDetail() {
                 sw?.is_fallen ? (
                   <div className="flex items-center gap-2 text-red-600 animate-bounce">
                     {/* <span className="text-3xl font-black">🚨 ล้ม!</span> */}
-                    <span className="text-3xl font-black">ล้ม!</span>  
+                    <span className="text-3xl font-black">ล้ม!</span>
                   </div>
                 ) : (
                   /* 3. ถ้าไม่เข้าทั้งสองอย่าง คือปกติ */

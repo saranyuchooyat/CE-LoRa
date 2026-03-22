@@ -105,6 +105,7 @@ type Server struct {
 type Alert struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
 	AlertID     string             `json:"alert_id" bson:"alert_id"`
+	ZoneID      string             `json:"zone_id" bson:"zone_id"`
 	ElderID     string             `json:"elder_id" bson:"elder_id"`
 	Title       string             `json:"title" bson:"title"`             // เช่น "ตรวจพบการล้ม"
 	Description string             `json:"description" bson:"description"` // เช่น "คุณสมชาย ล้มที่โซน A"

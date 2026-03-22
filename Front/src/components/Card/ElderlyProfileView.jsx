@@ -1,14 +1,43 @@
 import React, { useState, useEffect, useRef } from "react";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import { useParams } from "react-router-dom";
 import axios from "axios";
-import Highcharts from 'highcharts';
-import HighchartsReact from 'highcharts-react-official';
+import Highcharts from "highcharts";
+import HighchartsReact from "highcharts-react-official";
 
-function ElderlyProfileView({ elderData, onBack }) {
+function ElderlyProfileView({ elderData: propsElderData, onBack }) {
+  const { id } = useParams();
+  const [elderData, setElderData] = useState(propsElderData || null);
   const [liveVitals, setLiveVitals] = useState(null);
-  const [historyData, setHistoryData] = useState([]); // ✅ State เก็บความจุข้อมูลสำหรับกราฟ 20 วิ
+  const [historyData, setHistoryData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // 🟢 เพิ่มสถานะ Loading
   const reportRef = useRef(null);
+
+  useEffect(() => {
+    const fetchElderInfo = async () => {
+      // ถ้าไม่มี props หรือ id เปลี่ยน ให้โหลดใหม่
+      if (id) {
+        try {
+          setIsLoading(true);
+          const token = localStorage.getItem("token");
+          // 🟢 เปลี่ยน path ให้ตรงกับที่พี่แก้ใน Go (คือ /elders/:id)
+          const res = await axios.get(`http://localhost:8080/elders/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (res.data) {
+            setElderData(res.data);
+          }
+        } catch (err) {
+          console.error("Error fetching elder info:", err);
+        } finally {
+          setIsLoading(false); // โหลดเสร็จแล้ว (ไม่ว่าจะเจอหรือไม่เจอ)
+        }
+      } else {
+        setIsLoading(false);
+      }
+    };
+    fetchElderInfo();
+  }, [id]);
 
   const fetchLiveVitals = async () => {
     if (!elderData?.device_id) return;
@@ -18,37 +47,26 @@ function ElderlyProfileView({ elderData, onBack }) {
         `http://localhost:8080/device_data/${elderData.device_id}`,
         { headers: { Authorization: `Bearer ${token}` } },
       );
-      // โครงสร้างข้อมูลที่ Go ส่งมาคือ { info: ..., data: { smartwatch_data: ... } }
       const vitals = res.data.data?.smartwatch_data;
       setLiveVitals(vitals);
 
-      // ✅ เก็บค่าเข้า Graph เฉพาะเมื่อข้อมูลมีการเปลี่ยนแปลงจริงๆ (อัพเดตตามข้อมูล ไม่ใช่จับเวลา)
       if (vitals) {
-        setHistoryData(prev => {
-          const lastPoint = prev[prev.length - 1];
-          if (lastPoint && 
-              lastPoint.hr === vitals.heart_rate && 
-              lastPoint.spo2 === vitals.spo2 &&
-              lastPoint.temp === vitals.body_temperature &&
-              lastPoint.sys === vitals.blood_pressure_systolic &&
-              lastPoint.dia === vitals.blood_pressure_diastolic) {
-             return prev; // ค่าไม่เปลี่ยน ไม่ต้องวาดจุดใหม่
-          }
-
+        setHistoryData((prev) => {
+          // ... logic เก็บ history เหมือนเดิมของพี่ ...
           const now = new Date();
-          const timeStr = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
-          
-          const newPoint = { 
-            time: timeStr, 
-            hr: vitals.heart_rate || null, 
+          const timeStr = `${now.getHours()}:${now.getMinutes().toString().padStart(2, "0")}:${now.getSeconds().toString().padStart(2, "0")}`;
+          const newPoint = {
+            time: timeStr,
+            hr: vitals.heart_rate || null,
             spo2: vitals.spo2 || null,
             temp: vitals.body_temperature || null,
             sys: vitals.blood_pressure_systolic || null,
-            dia: vitals.blood_pressure_diastolic || null
+            dia: vitals.blood_pressure_diastolic || null,
           };
-          
           const newData = [...prev, newPoint];
-          return newData.length > 20 ? newData.slice(newData.length - 20) : newData; // เก็บกราฟย้อนหลัง 20 จุดข้อมูล
+          return newData.length > 20
+            ? newData.slice(newData.length - 20)
+            : newData;
         });
       }
     } catch (err) {
@@ -70,36 +88,100 @@ function ElderlyProfileView({ elderData, onBack }) {
   };
 
   const chartOptions = {
-    chart: { type: 'spline', height: 400, animation: Highcharts.svg },
+    chart: { type: "spline", height: 400, animation: Highcharts.svg },
     title: { text: null },
-    xAxis: { 
-      categories: historyData.map(d => d.time),
+    xAxis: {
+      categories: historyData.map((d) => d.time),
     },
-    yAxis: [{
-      title: { text: 'หัวใจ (BPM), ออกซิเจน (%), ความดัน (mmHg)', style: { color: '#4B5563' } },
-      min: 40, max: 200,
-      labels: { style: { color: '#4B5563', fontWeight: 'bold' } }
-    }, {
-      title: { text: 'อุณหภูมิ (°C)', style: { color: '#F97316' } },
-      min: 30, max: 45,
-      opposite: true,
-      labels: { style: { color: '#F97316', fontWeight: 'bold' } }
-    }],
+    yAxis: [
+      {
+        title: {
+          text: "หัวใจ (BPM), ออกซิเจน (%), ความดัน (mmHg)",
+          style: { color: "#4B5563" },
+        },
+        min: 40,
+        max: 200,
+        labels: { style: { color: "#4B5563", fontWeight: "bold" } },
+      },
+      {
+        title: { text: "อุณหภูมิ (°C)", style: { color: "#F97316" } },
+        min: 30,
+        max: 45,
+        opposite: true,
+        labels: { style: { color: "#F97316", fontWeight: "bold" } },
+      },
+    ],
     series: [
-      { name: 'อัตราการเต้นหัวใจ', data: historyData.map(d => d.hr), yAxis: 0, color: '#EF4444', tooltip: { valueSuffix: ' bpm' } },
-      { name: 'ออกซิเจนในเลือด', data: historyData.map(d => d.spo2), yAxis: 0, color: '#3B82F6', tooltip: { valueSuffix: ' %' } },
-      { name: 'ความดันโลหิต (ตัวบน)', data: historyData.map(d => d.sys), yAxis: 0, color: '#8B5CF6', tooltip: { valueSuffix: ' mmHg' } },
-      { name: 'ความดันโลหิต (ตัวล่าง)', data: historyData.map(d => d.dia), yAxis: 0, color: '#A78BFA', tooltip: { valueSuffix: ' mmHg' }, dashStyle: 'ShortDash' },
-      { name: 'อุณหภูมิร่างกาย', data: historyData.map(d => d.temp), yAxis: 1, color: '#F97316', tooltip: { valueSuffix: ' °C' } },
+      {
+        name: "อัตราการเต้นหัวใจ",
+        data: historyData.map((d) => d.hr),
+        yAxis: 0,
+        color: "#EF4444",
+        tooltip: { valueSuffix: " bpm" },
+      },
+      {
+        name: "ออกซิเจนในเลือด",
+        data: historyData.map((d) => d.spo2),
+        yAxis: 0,
+        color: "#3B82F6",
+        tooltip: { valueSuffix: " %" },
+      },
+      {
+        name: "ความดันโลหิต (ตัวบน)",
+        data: historyData.map((d) => d.sys),
+        yAxis: 0,
+        color: "#8B5CF6",
+        tooltip: { valueSuffix: " mmHg" },
+      },
+      {
+        name: "ความดันโลหิต (ตัวล่าง)",
+        data: historyData.map((d) => d.dia),
+        yAxis: 0,
+        color: "#A78BFA",
+        tooltip: { valueSuffix: " mmHg" },
+        dashStyle: "ShortDash",
+      },
+      {
+        name: "อุณหภูมิร่างกาย",
+        data: historyData.map((d) => d.temp),
+        yAxis: 1,
+        color: "#F97316",
+        tooltip: { valueSuffix: " °C" },
+      },
     ],
     credits: { enabled: false },
-    legend: { layout: 'horizontal', align: 'center', verticalAlign: 'bottom' },
+    legend: { layout: "horizontal", align: "center", verticalAlign: "bottom" },
     plotOptions: {
-      spline: { marker: { radius: 4, enabled: true } }
-    }
+      spline: { marker: { radius: 4, enabled: true } },
+    },
   };
 
-  if (!elderData) return null;
+  // 🟢 1. เช็คสถานะ Loading ก่อน
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-gray-400">
+        <div className="w-12 h-12 border-4 border-main-green border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="font-bold tracking-widest">กำลังดึงข้อมูลผู้สูงอายุ...</p>
+      </div>
+    );
+  }
+
+  // 🟢 2. ถ้าโหลดเสร็จแล้วแต่ไม่เจอข้อมูล
+  if (!elderData) {
+    return (
+      <div className="p-20 text-center">
+        <h2 className="text-2xl font-bold text-gray-300">
+          ไม่พบข้อมูลผู้สูงอายุรหัส {id}
+        </h2>
+        <button
+          onClick={onBack}
+          className="mt-4 text-main-green font-bold underline"
+        >
+          ย้อนกลับ
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 max-w-5xl mx-auto animate-fade-in">
@@ -120,7 +202,7 @@ function ElderlyProfileView({ elderData, onBack }) {
           onClick={handleExportPDF}
           className="flex items-center gap-2 bg-main-green text-white px-6 py-2 rounded-lg font-bold shadow-md hover:bg-green-600 transition-all"
         >
-          {/* 📥 Export เป็น PDF */} Export เป็น PDF 
+          {/* 📥 Export เป็น PDF */} Export เป็น PDF
         </button>
       </div>
       {/* ปุ่มกดย้อนกลับ */}
@@ -250,16 +332,21 @@ function ElderlyProfileView({ elderData, onBack }) {
 
           {/* ✅ ส่วนการแสดงผลกราฟแนวโน้มสุขภาพ */}
           <div className="mt-4 bg-white border border-gray-200 rounded-xl p-4 shadow-sm animate-fade-in">
-             <div className="flex justify-between items-center mb-2">
-                 <h3 className="text-lg font-bold text-gray-700">กราฟแนวโน้มสุขภาพทั้ง 4 ค่า (คลิกที่ป้ายชื่อด้านล่างเพื่อ ปิด/เปิด กราฟ)</h3>
-             </div>
-             {historyData.length > 0 ? (
-               <HighchartsReact highcharts={Highcharts} options={chartOptions} />
-             ) : (
-               <div className="h-[400px] flex items-center justify-center text-gray-400 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                 <p className="animate-pulse">กำลังรอรับสัญญาณข้อมูลจาก Smartwatch...</p>
-               </div>
-             )}
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-lg font-bold text-gray-700">
+                กราฟแนวโน้มสุขภาพทั้ง 4 ค่า (คลิกที่ป้ายชื่อด้านล่างเพื่อ
+                ปิด/เปิด กราฟ)
+              </h3>
+            </div>
+            {historyData.length > 0 ? (
+              <HighchartsReact highcharts={Highcharts} options={chartOptions} />
+            ) : (
+              <div className="h-[400px] flex items-center justify-center text-gray-400 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                <p className="animate-pulse">
+                  กำลังรอรับสัญญาณข้อมูลจาก Smartwatch...
+                </p>
+              </div>
+            )}
           </div>
         </div>
 

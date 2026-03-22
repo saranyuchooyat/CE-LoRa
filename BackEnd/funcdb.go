@@ -515,7 +515,29 @@ func getAllElderly(c *fiber.Ctx) error {
 
 	return c.JSON(elders)
 }
+func getElderDetail(c *fiber.Ctx) error {
+	// 1. รับ ID จาก URL (เช่น /elders/E001)
+	id := c.Params("id")
+	if id == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "ID is required"})
+	}
 
+	// 2. ดึงคอลเลกชัน (ตรวจสอบชื่อ collection ให้ตรงกับที่พี่ใช้นะครับ)
+	collection := getCollection("elders")
+
+	var elder bson.M
+
+	// 3. ค้นหาด้วยฟิลด์ "elder_id" โดยตรง (ใช้ id ที่เป็น string ได้เลย)
+	err := collection.FindOne(context.Background(), bson.M{"elder_id": id}).Decode(&elder)
+
+	if err != nil {
+		// กรณีหาไม่เจอในระบบ
+		return c.Status(404).JSON(fiber.Map{"error": "ไม่พบข้อมูลผู้สูงอายุรหัสนี้"})
+	}
+
+	// 4. ส่งข้อมูลกลับไปให้ React
+	return c.Status(200).JSON(elder)
+}
 func getElderinZone(c *fiber.Ctx) error {
 	zoneID := c.Params("id")
 
@@ -1051,7 +1073,7 @@ func getZoneStaff(c *fiber.Ctx) error {
 	return c.JSON(users)
 }
 
-func CreateAlert(elderID string, title string, desc string, severity string, alertType string) error {
+func CreateAlert(elderID, zoneID, title, desc, severity, alertType string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -1072,6 +1094,7 @@ func CreateAlert(elderID string, title string, desc string, severity string, ale
 	// 2. เตรียมข้อมูล
 	newEntry := bson.M{
 		"alert_id":    nextAlertID,
+		"zone_id":     zoneID,
 		"elder_id":    elderID,
 		"title":       title,
 		"description": desc,
@@ -1270,7 +1293,7 @@ func CreateAlertWithCheck(elderID, title, desc, severity, alertType string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// เช็คว่ามี Alert ประเภทนี้ ของผู้สูงอายุคนนี้ ที่ "ยังไม่อ่าน" ค้างอยู่ไหม
+	// 1. เช็คว่ามี Alert ประเภทนี้ ของผู้สูงอายุคนนี้ ที่ "ยังไม่อ่าน" ค้างอยู่ไหม
 	filter := bson.M{
 		"elder_id": elderID,
 		"type":     alertType,
@@ -1279,9 +1302,18 @@ func CreateAlertWithCheck(elderID, title, desc, severity, alertType string) {
 
 	count, _ := MI.DB.Collection("alerts").CountDocuments(ctx, filter)
 
-	// ถ้าไม่มีอันเดิมค้างอยู่ (count == 0) ถึงจะสร้างอันใหม่
+	// 2. ถ้าไม่มีอันเดิมค้างอยู่ ถึงจะสร้างอันใหม่
 	if count == 0 {
-		CreateAlert(elderID, title, desc, severity, alertType)
+		var elder bson.M
+		err := MI.DB.Collection("elders").FindOne(ctx, bson.M{"elder_id": elderID}).Decode(&elder)
+
+		zoneID := ""
+		if err == nil {
+			zoneID, _ = elder["zone_id"].(string)
+		}
+
+		// 3. ส่ง zoneID เข้าไปในฟังก์ชัน CreateAlert ด้วย
+		CreateAlert(elderID, zoneID, title, desc, severity, alertType)
 	}
 }
 

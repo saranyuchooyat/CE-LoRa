@@ -15,6 +15,7 @@ import DeviceDetail from "./DeviceDetail";
 import ElderlyMonitoring from "./ZoneStaffMenu/ElderlyMonitoring";
 import AlertManagement from "./ZoneStaffMenu/AlertManagement";
 import CareGiver from "./ZoneStaffMenu/CareGiver";
+import ElderlyProfileView from "../components/Card/ElderlyProfileView";
 
 function MainLayout() {
   return (
@@ -57,7 +58,10 @@ function MainLayout() {
             path="/emergency-respond"
             element={<EmergencyRespondDashboard />}
           />
-
+          <Route
+            path="/eldery-monitoring/:id"
+            element={<ElderlyProfileView />}
+          />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>

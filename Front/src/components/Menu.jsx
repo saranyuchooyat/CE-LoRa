@@ -42,14 +42,13 @@ function Menu() {
     },
     "Zone Admin": {
       "Zone Dashboard": "/zone-dashboard",
+      "Alert Management": "/alert-management",
       "Device Management": "/device-management",
       "Zone Staff Management": "/zone-staff-management",
     },
     "Zone Staff": {
       "Eldery Monitoring": "/eldery-monitoring",
       "Alert Management": "/alert-management",
-      Reports: "/reports",
-      "Zone Map Overview": "/zone-map-overview",
     },
     "Elderly Caregiver": {
       "My Elders Dashboard": "/caregiver",
