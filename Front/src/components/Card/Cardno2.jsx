@@ -4,10 +4,10 @@ function Cardno2({data}){
 
     return(
         <>
-            <div className="flex justify-between h-fit text-center gap-4">
-                {data.map((card, index) => (
-                <div key={index} className="card flex flex-col justify-center items-center">
-                    <p className="text-[40px] font-bold">{card.value}</p>
+            <div className="flex justify-between items-stretch h-fit text-center gap-4">
+                {data.map((card, index) => (    
+                <div key={index} className="card flex-1 flex flex-col justify-center items-center p-4">
+                    <p className="text-[40px] font-bold leading-tight">{card.value}</p>
                     <p className="">{card.name}</p>
                 </div>  
                 ))}

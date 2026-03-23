@@ -171,7 +171,7 @@ function AlertManagement() {
       <div className="grid gap-4">
         {isLoading ? (
           <div className="text-center py-24 animate-pulse text-gray-300 font-bold tracking-widest">
-            LOADING DATA...
+            กำลังโหลดข้อมูล...
           </div>
         ) : displayAlerts.length > 0 ? (
           displayAlerts.map((item) => (
@@ -234,8 +234,8 @@ function AlertManagement() {
           ))
         ) : (
           <div className="text-center py-32 bg-gray-50/50 rounded-[3rem] border border-dashed border-gray-200">
-            <p className="text-gray-400 font-bold italic">
-              No incidents found in this category
+            <p className="text-gray-400">
+              ไม่พบรายงานเหตุการณ์
             </p>
           </div>
         )}

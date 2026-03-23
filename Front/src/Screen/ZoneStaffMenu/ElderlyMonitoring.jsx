@@ -142,9 +142,6 @@ function ElderlyMonitoring() {
             {/* แสดงการ์ดสรุปข้อมูล 3 ชุด */}
             <Cardno2 data={CardNo2Data} />
 
-            <CardFull
-                data={allAlertDetail}/>
-
             <CardFilter
                 name="Elder"
                 placeholderName="ชื่อผู้สูงอายุ, รหัสผู้สูงอายุ, ที่อยู่"
