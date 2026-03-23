@@ -200,7 +200,7 @@ function DeviceDetail() {
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
               <h3 className="font-bold text-slate-700 text-sm mb-2 uppercase">
-                📍 พิกัดล่าสุด
+                พิกัดล่าสุด
               </h3>
               <p className="text-slate-500 font-mono text-sm">
                 Lat: {data.location?.latitude} , Long:{" "}

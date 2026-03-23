@@ -61,7 +61,7 @@ function ElderlyRow({ card, index, onRowClick, handleEditClick, handleSettingCli
     
     return(
         <tr 
-            className={`${rowBgClass} cursor-pointer hover:bg-green-100 transition-colors duration-200`}
+            className={`${rowBgClass} cursor-pointer hover:bg-[#ccfccb] transition-colors duration-200`}
             onClick={() => {
                 if (onRowClick) onRowClick(card);
             }}

@@ -91,7 +91,7 @@ function DeviceCard({ data, onSetting, onEdit }) {
         return (
           <button
             key={index}
-            className={`flex flex-col items-center  border-l-0 border-y-5 ${CardstatusCheck(status)} rounded-[15px] gap-4 p-3 drop-shadow-lg hover:bg-main-card/30 cursor-pointer transition-colors duration-150`}
+            className={`flex flex-col items-center  border-l-0 border-y-5 ${CardstatusCheck(status)} rounded-[15px] gap-4 p-3 drop-shadow-lg hover:bg-[#ccfccb] cursor-pointer transition-colors duration-150`}
             onClick={() => handleRowClick(card.device_id)}
           >
             <div

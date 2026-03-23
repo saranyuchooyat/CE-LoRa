@@ -84,7 +84,7 @@ function ZoneTable({ data, onEdit, showActions=true }) {
                             return(
                                 <tr 
                                     key={card.zone_id || index} 
-                                    className={`${rowBgClass} hover:bg-main-blue/10 cursor-pointer transition-colors duration-150`} 
+                                     className={`${rowBgClass} cursor-pointer hover:bg-[#ccfccb] transition-colors duration-200`}
                                     // ✅ แก้ไข: ใช้ card.zone_id
                                     onClick={() => handleRowClick(card.zone_id)}
                                 >

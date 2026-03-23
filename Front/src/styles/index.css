@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
-@font-face{
+@font-face {
     font-family: Mitr;
     src: url("../assets/fonts/Mitr-Regular.ttf");
 }
 
-@theme{
+@theme {
     --color-main-green: #40916C;
-    
+
     --color-main-red: #FF4043;
     --color-alert-bg: #FFE2E2;
 
@@ -26,65 +26,70 @@
 
 @layer components {
 
-    .card{
+    /* .card{
         @apply bg-linear-to-bl from-main-green via-[#95d5b2] to-main-card h-full w-full text-center mb-4 rounded-[15px] p-4
+    } */
+
+    .card {
+        @apply bg-[#95d5b2] to-main-card h-full w-full text-center mb-4 rounded-[15px] p-4 shadow-md
     }
 
-    .card-noti{
+
+    .card-noti {
         @apply w-full h-fit text-start pl-3 rounded-[15px] border-l-[10px] cursor-pointer
     }
 
-    .color-alert{
-        @apply border-main-red bg-alert-bg 
+    .color-alert {
+        @apply border-main-red bg-alert-bg
     }
 
-    .color-warn{
+    .color-warn {
         @apply border-main-yellow bg-warn-bg
     }
 
-    .color-complete{
+    .color-complete {
         @apply border-main-blue bg-complete-bg
     }
 
-    .menu-btn{
+    .menu-btn {
         @apply bg-main-green/50 px-[20px] rounded-md mr-3 text-[16px] font-bold text-white/50 hover:bg-main-green hover:text-white cursor-pointer
     }
 
-    .add-btn{
-        @apply bg-red-300 mr-3 py-5 px-6 rounded-[10px] font-bold hover:text-white hover:bg-main-red cursor-pointer
+    .add-btn {
+        @apply bg-white mr-3 py-5 px-6 rounded-[10px] font-bold hover:text-white hover:bg-main-green cursor-pointer shadow-md
     }
 
-    .dropdown-btn{
+    .dropdown-btn {
         @apply flex justify-start bg-gray-200 px-5 py-2 rounded-[5px] w-[200px] cursor-pointer
     }
 
-    .dropdown-menu{
+    .dropdown-menu {
         @apply absolute top-full mt-1 bg-white w-[300px] top-[45px] border-[1px] shadow-md text-start
     }
 
-    .table-header{
+    .table-header {
         @apply p-2 text-sm font-semibold tracking-wide text-left w-fit
     }
 
-    .table-data{
+    .table-data {
         @apply p-3 text-sm text-gray-700 text-left
     }
 
-    .table-status{
+    .table-status {
         @apply p-1.5 text-xs uppercase tracking-wider rounded-lg
     }
 
-    .table-btn{
+    .table-btn {
         @apply cursor-pointer p-1 m-2 ml-0 text-gray-700 tracking-wider bg-gray-300 rounded-lg whitespace-nowrap
     }
 }
 
-body{
+body {
     font-family: Mitr;
     background-color: #D8F3DC;
 }
 
-.background{
+.background {
     background-color: #EFF9F7;
     border-top-left-radius: 30px;
     border-top-right-radius: 30px;
@@ -94,6 +99,6 @@ body{
 
 }
 
-.custom-scrollbar::-webkit-scrollbar{
-  display: none;
+.custom-scrollbar::-webkit-scrollbar {
+    display: none;
 }
