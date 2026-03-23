@@ -47,7 +47,7 @@ function EditDeviceForm({ onClose, onSaveSuccess, deviceData }) {
     try {
       await api.put(`/devices/${formData.deviceId}`, payload, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
         },
       });
 

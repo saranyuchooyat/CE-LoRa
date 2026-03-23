@@ -69,7 +69,7 @@ function EditElderlyForm({ elderData, onClose, onSaveSuccess }) {
         try {
             await api.put(`/elders/${formData.elderId}`, dataToSend, {
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`
                 }
             });
             showPopup("สำเร็จ", "บันทึกการแก้ไขสำเร็จ", "success");

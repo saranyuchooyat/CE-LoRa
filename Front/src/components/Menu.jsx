@@ -16,14 +16,14 @@ function Menu() {
 
     // ข. หากไม่มีใน Route State ให้พยายามดึงจาก Local Storage (กรณี Refresh)
     else {
-      const storedUser = localStorage.getItem("user");
+      const storedUser = sessionStorage.getItem("user");
       if (storedUser) {
         try {
           const userData = JSON.parse(storedUser);
           userRole = userData.role;
         } catch (e) {
           // จัดการหากข้อมูล Local Storage เสียหาย
-          console.error("Failed to parse user data from localStorage:", e);
+          console.error("Failed to parse user data from sessionStorage:", e);
         }
       }
     }
@@ -35,7 +35,7 @@ function Menu() {
   }, [location.state]);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+    const storedUser = sessionStorage.getItem("user");
     if (storedUser) {
       const userData = JSON.parse(storedUser);
 

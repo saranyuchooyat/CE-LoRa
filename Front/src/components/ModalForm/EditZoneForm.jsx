@@ -34,7 +34,7 @@ function EditZoneForm({ zoneId, zoneData, onClose, onSaveSuccess }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
 
         const dataToSend = {
             zoneName: formData.zonename,

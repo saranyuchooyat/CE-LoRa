@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
-import api from "./API"; // ✅ Path ถูกต้อง ไม่หลงโฟลเดอร์แล้ว
+import api from "./API";
 
 function Header() {
 
@@ -10,7 +10,7 @@ function Header() {
 
     const handleLogoutClick = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
             if (token) {
                 // ยิง API ไปหา Go เพื่อบอกว่าขอออกจากระบบ
                 await api.post('/logout', {}, {
@@ -21,8 +21,8 @@ function Header() {
             console.error("Logout API Error:", error);
         } finally {
             // ลบ Token และเด้งกลับไปหน้าแรก (Login)
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('user');
             navigate(`/`); 
         }
     };
@@ -32,8 +32,7 @@ function Header() {
         if (location.state?.user) {
             setCurrentUser(location.state.user);
         } else {
-            // ดึงข้อมูลจาก localStorage ถ้ารีเฟรชแล้ว state หายไป
-            const storedUser = localStorage.getItem('user');
+            const storedUser = sessionStorage.getItem('user');
             if (storedUser) {
                 try {
                     const parsedUser = JSON.parse(storedUser);
@@ -41,7 +40,7 @@ function Header() {
                         setCurrentUser(parsedUser.username);
                     }
                 } catch (error) {
-                    console.error("Failed to parse user from localStorage", error);
+                    console.error("Failed to parse user from sessionStorage", error);
                 }
             }
         }

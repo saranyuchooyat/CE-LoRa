@@ -72,13 +72,13 @@ function ZoneDashboardDetail() {
     if (location.state?.role) {
       role = location.state.role;
     } else {
-      const storedUser = localStorage.getItem("user");
+      const storedUser = sessionStorage.getItem("user");
       if (storedUser) {
         try {
           const userData = JSON.parse(storedUser);
           role = userData.role;
         } catch (e) {
-          console.error("Failed to parse user data from localStorage:", e);
+          console.error("Failed to parse user data from sessionStorage:", e);
         }
       }
     }
@@ -86,9 +86,9 @@ function ZoneDashboardDetail() {
   }, [location.state]);
 
   useEffect(() => {
-    const tokenInStorage = localStorage.getItem("token");
+    const tokenInStorage = sessionStorage.getItem("token");
     if (location.state?.token && location.state.token !== tokenInStorage) {
-      localStorage.setItem("token", location.state.token);
+      sessionStorage.setItem("token", location.state.token);
     }
   }, [location.state]);
 

@@ -25,8 +25,8 @@ function AddZoneForm({ onClose, onSaveSuccess }){
         e.preventDefault(); 
         setIsSubmitting(true);
 
-        // 1. ดึง Token จาก localStorage (เปลี่ยนชื่อ Key ตามที่คุณตั้งไว้ตอน Login)
-        const token = localStorage.getItem('token'); 
+        // 1. ดึง Token จาก sessionStorage (เปลี่ยนชื่อ Key ตามที่คุณตั้งไว้ตอน Login)
+        const token = sessionStorage.getItem('token'); 
 
         const dataToSend = {
             zone_name: formData.zonename,    // แก้จาก zoneName -> zone_name

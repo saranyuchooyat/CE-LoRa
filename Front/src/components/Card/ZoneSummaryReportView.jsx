@@ -12,7 +12,7 @@ function ZoneSummaryReportView({ zoneId, zoneName, eldersData, onBack }) {
     const { data: reportData, isLoading, isError, error } = useQuery({
         queryKey: ["zoneSummaryReport", zoneId, timeFilter],
         queryFn: async () => {
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
             const res = await api.get(`/zones/${zoneId}/summary?filter=${timeFilter}`, {
                 headers: token ? { 'Authorization': `Bearer ${token}` } : {}
             });

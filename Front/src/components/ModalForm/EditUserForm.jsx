@@ -23,7 +23,7 @@ function EditUserForm({ userId, onClose, onSaveSuccess }) {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const token = localStorage.getItem('token');
+                const token = sessionStorage.getItem('token');
                 const response = await api.get(`/users/${userId}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -63,7 +63,7 @@ function EditUserForm({ userId, onClose, onSaveSuccess }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
 
         const dataToSend = {
             first_name: formData.first_name.trim(),

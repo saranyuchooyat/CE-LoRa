@@ -123,7 +123,7 @@ function SetDeviceForm({ deviceId, onClose }) {
 
       await api.put(`/devices/${deviceId}`, payload, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
         },
       });
 
