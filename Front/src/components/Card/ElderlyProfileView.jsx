@@ -50,6 +50,8 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
       const vitals = res.data.data?.smartwatch_data;
       setLiveVitals(vitals);
 
+      console.log("vitals", vitals);
+
       if (vitals) {
         setHistoryData((prev) => {
           // ... logic เก็บ history เหมือนเดิมของพี่ ...

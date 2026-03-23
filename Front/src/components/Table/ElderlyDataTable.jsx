@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import api from "../../components/API";
@@ -18,7 +18,39 @@ function ElderlyRow({ card, index, onRowClick, handleEditClick, handleSettingCli
     });
 
     const liveVitals = deviceResponse?.data?.smartwatch_data || card.vitals;
-    const lastUpdatedTime = deviceResponse?.data?.updated_at || card.last_updated || "-";
+    
+    // ตั้งเวลาให้คอมโพเนนต์ re-render เพื่ออัปเดตข้อความ "x นาทีที่แล้ว" แบบ Realtime
+    const [now, setNow] = useState(new Date());
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setNow(new Date());
+        }, 10000); // ตรวจสอบทุก 10 วินาที
+        return () => clearInterval(timer);
+    }, []);
+
+    // คำนวณเวลาแบบ "X นาทีที่แล้ว"
+    const rawTime = deviceResponse?.data?.timestamp || card.last_updated;
+    let lastUpdatedTime = "-";
+    if (rawTime) {
+        const then = new Date(rawTime);
+        if (!isNaN(then.getTime())) {
+            const diffMs = now - then;
+            const diffSecs = Math.floor(diffMs / 1000);
+            const diffMins = Math.floor(diffSecs / 60);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+
+            if (diffMs < 0 || diffSecs < 60) {
+                lastUpdatedTime = "เพิ่งอัปเดต";
+            } else if (diffMins < 60) {
+                lastUpdatedTime = `${diffMins} นาทีที่แล้ว`;
+            } else if (diffHours < 24) {
+                lastUpdatedTime = `${diffHours} ชั่วโมงที่แล้ว`;
+            } else {
+                lastUpdatedTime = `${diffDays} วันที่แล้ว`;
+            }
+        }
+    }
     
     // ✅ 1. คำนวณสถานะสดๆ จากข้อมูล Vitals ปัจจุบัน (ฉลาดกว่ารอค่าจาก DB)
     const currentStatus = calculateStatus(liveVitals, card.health_status);
