@@ -54,10 +54,18 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
 
       if (vitals) {
         setHistoryData((prev) => {
-          // ... logic เก็บ history เหมือนเดิมของพี่ ...
-          const now = new Date();
-          const timeStr = `${now.getHours()}:${now.getMinutes().toString().padStart(2, "0")}:${now.getSeconds().toString().padStart(2, "0")}`;
+          const rawTime = res.data.data?.timestamp;
+          const dateObj = rawTime ? new Date(rawTime) : new Date();
+          const timeStr = `${dateObj.getHours().toString().padStart(2, "0")}:${dateObj.getMinutes().toString().padStart(2, "0")}:${dateObj.getSeconds().toString().padStart(2, "0")}`;
+          
+          // ป้องกันการแอดข้อมูลเดิมซ้ำ ถ้ารับข้อมูลที่เวลาเดิมมา
+          const uniqueKey = rawTime || timeStr;
+          if (prev.length > 0 && prev[prev.length - 1].uniqueKey === uniqueKey) {
+            return prev;
+          }
+
           const newPoint = {
+            uniqueKey,
             time: timeStr,
             hr: vitals.heart_rate || null,
             spo2: vitals.spo2 || null,
@@ -65,6 +73,7 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
             sys: vitals.blood_pressure_systolic || null,
             dia: vitals.blood_pressure_diastolic || null,
           };
+          
           const newData = [...prev, newPoint];
           return newData.length > 20
             ? newData.slice(newData.length - 20)
@@ -302,11 +311,10 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
             </div>
           </div>
 
-          {/* ข้อมูลเพิ่มเติม: แบตเตอรี่และการเดิน */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          {/* ข้อมูลเพิ่มเติม: แบตเตอรี่ การเดิน และการล้ม */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
             <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 flex justify-between items-center">
               <span className="text-gray-600 font-bold">
-                {/* 🔋 แบตเตอรี่นาฬิกา */}
                 แบตเตอรี่นาฬิกา
               </span>
               <div className="flex items-center gap-3 w-1/2">
@@ -321,13 +329,24 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
                 </span>
               </div>
             </div>
+            
             <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 flex justify-between items-center">
               <span className="text-gray-600 font-bold">
-                {/* 👣 จำนวนก้าววันนี้ */}
                 จำนวนก้าววันนี้
               </span>
               <span className="font-bold text-lg text-main-green">
                 {liveVitals?.steps?.toLocaleString() || 0} ก้าว
+              </span>
+            </div>
+
+            {/* ตรวจจับการล้ม */}
+            <div className={`p-4 rounded-xl border flex justify-between items-center transition-colors ${liveVitals?.is_fallen ? 'bg-red-50 border-red-300 shadow-sm' : 'bg-gray-50 border-gray-200'}`}>
+              <span className={`font-bold ${liveVitals?.is_fallen ? 'text-red-700' : 'text-gray-600'}`}>
+                การตรวจจับการล้ม
+              </span>
+              <span className={`font-bold text-lg ${liveVitals?.is_fallen ? 'text-red-600 animate-pulse' : 'text-main-green'}`}>
+                {/* {liveVitals?.is_fallen ? "⚠️ ตรวจพบการล้ม!" : "ปกติ"} */}
+                {liveVitals?.is_fallen ? "ตรวจพบการล้ม!" : "ปกติ"}
               </span>
             </div>
           </div>
