@@ -20,6 +20,7 @@ type User struct {
 	Phone          string             `bson:"phone" json:"phone"`
 	Email          string             `bson:"email" json:"email"`
 	LastLogin      time.Time          `bson:"last_login" json:"last_login"`
+	IsOnline       bool               `bson:"is_online" json:"is_online"`
 	AccountStatus  string             `bson:"account_status" json:"account_status"`
 	IsCaregiver    bool               `json:"is_caregiver" bson:"is_caregiver"`
 	AssignedElders []string           `json:"assigned_elders" bson:"assigned_elders"`

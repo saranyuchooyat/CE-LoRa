@@ -51,6 +51,18 @@ func login(c *fiber.Ctx) error {
 		})
 	}
 
+	_, updateErr := getCollection("users").UpdateOne(ctx,
+		bson.M{"_id": user.ID},
+		bson.M{"$set": bson.M{
+			"is_online":  true,
+			"last_login": time.Now(),
+		}},
+	)
+
+	if updateErr != nil {
+		fmt.Println("Warning: Failed to update online status:", updateErr)
+	}
+
 	claims := jwt.MapClaims{
 		"user_id":  user.UserID,
 		"username": user.Username,
@@ -75,6 +87,29 @@ func login(c *fiber.Ctx) error {
 			"is_caregiver": user.IsCaregiver,
 		},
 	})
+}
+
+func logout(c *fiber.Ctx) error {
+	// ดึง Token จาก Header ออกมาเพื่อเช็คว่าใครกำลังเรียกใช้
+	userToken := c.Locals("user").(*jwt.Token)
+	claims := userToken.Claims.(jwt.MapClaims)
+	userID := claims["user_id"].(string)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// 🎯 สั่งให้ MongoDB อัปเดตสถานะ is_online กลับเป็น false
+	_, err := getCollection("users").UpdateOne(ctx,
+		bson.M{"user_id": userID},
+		bson.M{"$set": bson.M{"is_online": false}},
+	)
+
+	if err != nil {
+		fmt.Println("Error updating offline status:", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to logout"})
+	}
+
+	return c.JSON(fiber.Map{"message": "Logout successful"})
 }
 
 // DASHBOARD FUNCTIONS

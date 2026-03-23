@@ -5,10 +5,9 @@ import api from "../../components/API";
 import ApiDelete from "../API-Delete";
 import { showConfirm, showPopup } from "../../components/Popup";
 
-function ElderlyRow({ card, index, onRowClick, handleEditClick, handleSettingClick, handleDeleteClick, isPending, showActions, statusCheck }) {
+function ElderlyRow({ card, index, onRowClick, handleEditClick, handleSettingClick, handleDeleteClick, isPending, showActions, getStatusStyle, calculateStatus }) {
     const isOddRow = (index % 2 === 0);
     const rowBgClass = isOddRow ? 'bg-gray-100' : 'bg-gray-50';
-    const statusClass = statusCheck(card.health_status);                             
     
     // ดึงข้อมูล Realtime 
     const { data: deviceResponse } = useQuery({
@@ -19,9 +18,13 @@ function ElderlyRow({ card, index, onRowClick, handleEditClick, handleSettingCli
     });
 
     const liveVitals = deviceResponse?.data?.smartwatch_data || card.vitals;
-    console.log("liveVitals", liveVitals);
-
     const lastUpdatedTime = deviceResponse?.data?.updated_at || card.last_updated || "-";
+    
+    // ✅ 1. คำนวณสถานะสดๆ จากข้อมูล Vitals ปัจจุบัน (ฉลาดกว่ารอค่าจาก DB)
+    const currentStatus = calculateStatus(liveVitals, card.health_status);
+    
+    // ✅ 2. ดึงสไตล์สีมาใส่ให้ตรงกับสถานะ
+    const statusClass = getStatusStyle(currentStatus);                             
     
     return(
         <tr 
@@ -43,7 +46,10 @@ function ElderlyRow({ card, index, onRowClick, handleEditClick, handleSettingCli
                 </div>
             </td>
             <td className="table-data whitespace-nowrap">
-                <span className={`table-status ${statusClass}`}>{card.health_status}</span>
+                {/* ✅ 3. แสดงชื่อสถานะที่คำนวณมาแล้วแบบเป็นตัวพิมพ์ใหญ่ให้ดูสวยๆ */}
+                <span className={`table-status ${statusClass}`}>
+                    {currentStatus.toUpperCase()}
+                </span>
             </td>
             <td className="table-data whitespace-nowrap">{liveVitals?.device_battery ?? card.vitals?.device_battery ?? "-"}</td>
             <td className="table-data whitespace-nowrap">{lastUpdatedTime}</td>
@@ -67,20 +73,45 @@ function ElderlyRow({ card, index, onRowClick, handleEditClick, handleSettingCli
 }
 
 function ElderlyDataTable({ data, onEdit, onSetting, onDeleteSuccess, onRowClick, showActions = true }) {
-
-    console.log("table data", data);
     
-    const statusCheck = (status) => {
-        switch (status) {
-                case 'critical':
-                    return 'bg-red-100 text-red-700 border border-red-400';
-                case 'warning':
-                    return 'bg-yellow-100 text-yellow-800 border border-yellow-400';
-                case 'stable':
-                    return 'bg-green-100 text-green-700 border border-green-400';
-                default:
-                    return 'bg-gray-100 text-gray-700 border border-gray-300';
-            } 
+    // ✅ 4. ฟังก์ชันหมอจำลอง: วิเคราะห์อาการจากตัวเลข
+    const calculateStatus = (vitals, dbStatus) => {
+        if (!vitals) return dbStatus || 'NORMAL'; // ถ้าไม่มีข้อมูลสุขภาพ ให้ยึดจาก DB หรือเซ็ต Normal 
+
+        const hr = vitals.heart_rate || 0;
+        const spo2 = vitals.spo2 || 100;
+        const isFallen = vitals.is_fallen === true;
+        const isSos = vitals.is_sos_called === true;
+
+        // ถ้าล้ม หรือกด SOS หรือหัวใจหยุดเต้น (แต่นาฬิกายังใส่ยู่) = CRITICAL ทันที
+        if (isFallen || isSos || (hr > 0 && hr < 40)) {
+            return 'CRITICAL';
+        }
+        
+        // ถ้าหัวใจเต้นเร็ว/ช้าผิดปกติ หรือออกซิเจนตก = WARNING
+        if (hr > 120 || (hr < 50 && hr > 0) || (spo2 < 95 && spo2 > 0)) {
+            return 'WARNING';
+        }
+
+        // ถ้าค่าปกติทั้งหมด
+        return 'NORMAL';
+    };
+
+    // ✅ 5. ปรับปรุงฟังก์ชันคืนค่าสี ให้รองรับทั้งตัวพิมพ์เล็ก/ใหญ่
+    const getStatusStyle = (status) => {
+        const safeStatus = (status || "").toLowerCase();
+        
+        switch (safeStatus) {
+            case 'critical':
+                return 'bg-red-100 text-red-700 border border-red-400 font-bold';
+            case 'warning':
+                return 'bg-yellow-100 text-yellow-800 border border-yellow-400 font-bold';
+            case 'normal':
+            case 'stable':
+                return 'bg-green-100 text-green-700 border border-green-400 font-bold';
+            default:
+                return 'bg-gray-100 text-gray-700 border border-gray-300';
+        } 
     };
 
     // Delete Button
@@ -90,24 +121,20 @@ function ElderlyDataTable({ data, onEdit, onSetting, onDeleteSuccess, onRowClick
         event.stopPropagation(); 
         showConfirm("ยืนยันลบข้อมูล", `คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลผู้สูงอายุรหัส: ${elderId}?`).then((isConfirmed) => {
             if (isConfirmed) {
-                // Because ApiDelete takes an ID directly and prefixes the base table name internally, we just pass ID.
                 deleteElder(elderId); 
                 showPopup("สำเร็จ", "ลบข้อมูลเรียบร้อยแล้ว", "success");
             }
         });
     };
-    // Delete Button
 
-    // Edit Button
     const handleEditClick = (cardData, event) => {
         event.stopPropagation();
-        onEdit(cardData); // ส่ง data โยนไปให้ modal
+        onEdit(cardData); 
     };
 
-    //Setting Button (กำลังพัฒนา)
     const handleSettingClick = (elderId, event) => {
         event.stopPropagation();
-        if (onSetting) onSetting(elderId); // ป้องกัน Error หาก onSetting ไม่มีค่า
+        if (onSetting) onSetting(elderId); 
     };
 
     return(
@@ -121,7 +148,7 @@ function ElderlyDataTable({ data, onEdit, onSetting, onDeleteSuccess, onRowClick
                             <th className="table-header">ชื่อ</th>
                             <th className="table-header">อายุ</th>
                             <th className="table-header">ข้อมูลสุขภาพ</th>
-                            <th className="table-header">สถานะ</th>
+                            <th className="table-header text-center">สถานะ</th>
                             <th className="table-header">แบตเตอรี่</th>
                             <th className="table-header">อัพดตข้อมูลล่าสุด</th>
                             {showActions && <th className="table-header">เมนู</th>}
@@ -139,7 +166,8 @@ function ElderlyDataTable({ data, onEdit, onSetting, onDeleteSuccess, onRowClick
                                 handleDeleteClick={handleDeleteClick}
                                 isPending={isPending}
                                 showActions={showActions}
-                                statusCheck={statusCheck}
+                                getStatusStyle={getStatusStyle}   // ส่งฟังก์ชันสีลงไป
+                                calculateStatus={calculateStatus} // ส่งฟังก์ชันหมอจำลองลงไป
                             />
                         ))}
                     </tbody>

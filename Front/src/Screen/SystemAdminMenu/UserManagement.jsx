@@ -105,13 +105,26 @@ function UserManagement(){
             });
         }
 
+        // กรองตามบทบาท (Role)
         if (role && role !== "ทั้งหมด") {
             data = data.filter((user) => user.role === role);
         }
 
+        // ✅ กรองตามสถานะ (Online / Offline)
         if (status && status !== 'ทั้งหมด') {
-            data = data.filter((user) => user.account_status === status || user.status === status);
+            data = data.filter((user) => {
+                const checkStatus = status.toLowerCase(); // ดักตัวพิมพ์เล็ก-ใหญ่
+                
+                if (checkStatus === 'online') {
+                    return user.is_online === true;
+                } else if (checkStatus === 'offline') {
+                    return user.is_online === false || user.is_online === undefined; // เผื่อย้อนหลังไม่มีฟิลด์นี้ ให้มองเป็น Offline
+                }
+                
+                return true;
+            });
         }
+        
         return data;
     }, [userData, filters]);
     // ระบบ filter
@@ -155,7 +168,7 @@ function UserManagement(){
                 <MenuNameCard
                 title="จัดการผู้ใช้งาน"
                 description="ระบบจัดการบัญชีผู้ใช้และสิทธิ์การเข้าถึง"
-                onButtonClick={handleOpenModal} // ต้องเพิ่ม Prop นี้ใน MenuNameCard
+                onButtonClick={handleOpenModal} 
                 detail={false}
                 buttonText="ผู้ใช้งาน"/>
 
@@ -171,6 +184,8 @@ function UserManagement(){
                     onClear={handleClearFilters}
                     option2Key="role"
                 />
+                
+                {/* 🎯 ตารางแสดงผลหลัก */}
                 <Cardno5 
                     data={filteredUsers}
                     onEdit={handleOpenEditModal}

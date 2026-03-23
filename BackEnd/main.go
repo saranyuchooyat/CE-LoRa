@@ -48,6 +48,8 @@ func main() {
 		SigningKey: jwtware.SigningKey{Key: []byte(secret)},
 	}))
 
+	app.Post("/logout", logout)
+
 	// --- Users ---
 	app.Get("/users", getAllUser)        //✅
 	app.Post("/users", createUser)       //✅

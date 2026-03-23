@@ -29,7 +29,7 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
 
     const zoneData = userQueries[0].data || [];
 
-    // ✅ แก้ไข 1: ฟังก์ชันเก็ทชื่อโซนเวอร์ชันอัปเกรด (รับมือได้ทั้ง String และ Array)
+    // ✅ ฟังก์ชันเก็ทชื่อโซนเวอร์ชันอัปเกรด (รับมือได้ทั้ง String และ Array)
     const getZoneName = (userZoneId, zoneData) => {
         if (!userZoneId) return "N/A"; 
 
@@ -68,10 +68,10 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
         switch (lowerStatus) {
             case 'online':
             case 'active':
-                return 'text-main-blue bg-complete-bg';
+                return 'text-main-blue bg-complete-bg'; // สีฟ้า/เขียว สบายตา
             case 'offline':
             case 'inactive':
-                return 'text-gray-800 bg-gray-300';
+                return 'text-gray-800 bg-gray-300'; // สีเทา
             default:
                 return 'text-gray-700 bg-gray-200';
         } 
@@ -126,7 +126,7 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
                             <th className="table-header">ตำแหน่ง</th>
                             <th className="table-header">พื้นที่ดูแล</th>
                             <th className="table-header">เบอร์โทรศัพท์</th>
-                            <th className="table-header">สถานะ</th>
+                            <th className="table-header text-center">สถานะ</th>
                             {showActions && <th className="table-header">เมนู</th>}
                         </tr>
                     </thead>
@@ -134,7 +134,11 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
                         {data.map((card, index) => {
                             const isOddRow = (index % 2 === 0);
                             const rowBgClass = isOddRow ? 'bg-gray-100' : 'bg-gray-50';
-                            const statusClass = statusCheck(card.account_status || card.status);                            
+                            
+                            // ✅ แก้ตรงนี้: ให้เช็คจาก is_online ว่าเป็น true หรือ false
+                            const currentStatus = card.is_online ? 'online' : 'offline';
+                            const statusClass = statusCheck(currentStatus);                            
+                            
                             return(
                                 // ใช้ card.user_id เป็น Key เพื่อความเสถียร
                                 <tr key={card.user_id || index} className={rowBgClass}>
@@ -156,8 +160,10 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
                                     </td>
                                     
                                     <td className="table-data whitespace-nowrap">{card.phone || "-"}</td>
-                                    <td className="table-data whitespace-nowrap">
-                                        <span className={`table-status ${statusClass}`}>{card.account_status || card.status || "-"}</span>
+                                    
+                                    {/* ✅ แสดงป้าย Online / Offline แบบหล่อๆ */}
+                                    <td className="table-data whitespace-nowrap text-center">
+                                        <span className={`table-status ${statusClass}`}>{currentStatus.toUpperCase()}</span>
                                     </td>
                                     
                                     {showActions && (
