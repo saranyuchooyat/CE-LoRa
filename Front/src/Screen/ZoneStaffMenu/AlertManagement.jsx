@@ -49,7 +49,7 @@ function AlertManagement() {
 
   const summaryCards = [
     {
-      name: "All New Alert",
+      name: "รายงานทั้งหมด",
       value: alerts.filter(
         (a) =>
           (a.severity?.toLowerCase() === "high" ||
@@ -83,12 +83,14 @@ function AlertManagement() {
   ];
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-10 antialiased">
+    // <div className="mx-auto max-w-6xl px-6 py-10 antialiased">
+    <div className="mx-5">
       {/* Header Section: ล้ำๆ สะอาดๆ */}
       <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <h1 className="text-3xl font-black text-gray-900 tracking-tight">
-            Incident <span className="text-red-600">Reports</span>
+            รายงานเหตุการณ์
+            {/* <span className="text-red-600">Reports</span> */}
           </h1>
           <p className="text-gray-400 font-medium mt-1">
             Real-time safety monitoring system
@@ -96,14 +98,20 @@ function AlertManagement() {
         </div>
 
         {/* Advanced Filter Pills */}
-        <div className="flex bg-gray-100/80 p-1.5 rounded-2xl backdrop-blur-md">
+        <div className="flex bg-gray-100/80 p-1.5 rounded-2xl backdrop-blur-md gap-1">
           {["all", "high", "medium", "low"].map((s) => (
             <button
               key={s}
               onClick={() => setSeverityFilter(s)}
               className={`px-5 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${
                 severityFilter === s
-                  ? "bg-white text-gray-900 shadow-sm scale-105"
+                  ? s === "high"
+                    ? "bg-red-500 text-white shadow-md scale-105"
+                    : s === "medium"
+                    ? "bg-blue-500 text-white shadow-md scale-105"
+                    : s === "low"
+                    ? "bg-green-500 text-white shadow-md scale-105"
+                    : "bg-white text-gray-900 shadow-sm scale-105"
                   : "text-gray-400 hover:text-gray-600"
               }`}
             >
@@ -113,9 +121,11 @@ function AlertManagement() {
         </div>
       </div>
 
-      <div className="mb-10 transition-all duration-500 hover:scale-[1.01]">
+      {/* <div className="mb-10 transition-all duration-500 hover:scale-[1.01]"> */}
+      <div className="mb-10">
         <Cardno2 data={summaryCards} />
       </div>
+      
 
       {/* Tab Management */}
       <div className="flex items-center justify-between mb-8 border-b border-gray-100">
@@ -168,7 +178,7 @@ function AlertManagement() {
             <div
               key={item._id}
               onClick={() => navigate(`/eldery-monitoring/${item.elder_id}`)}
-              className="group flex items-center gap-6 p-6 bg-white rounded-[2rem] border border-gray-50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:shadow-[0_20px_40px_rgb(0,0,0,0.06)] hover:-translate-y-1 cursor-pointer"
+              className="group flex items-center gap-6 p-6 bg-white rounded-[2rem] border border-gray-50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:bg-amber-100 hover:shadow-[0_20px_40px_rgb(0,0,0,0.06)] hover:-translate-y-1 cursor-pointer"
             >
               {/* <div
                 className={`w-3 h-3 rounded-full shrink-0 ${
@@ -189,11 +199,11 @@ function AlertManagement() {
                   >
                     {item.severity?.toUpperCase()}
                   </span>
-                  <span className="text-[11px] font-bold text-gray-300 uppercase tracking-tighter">
+                  <span className="text-[12px] font-bold text-gray-400 uppercase tracking-tighter">
                     {new Date(item.created_at).toLocaleTimeString("th-TH")} น.
                   </span>
                 </div>
-                <h3 className="text-lg font-bold text-gray-800 group-hover:text-red-600 transition-colors">
+                <h3 className="text-lg font-bold text-gray-800 transition-colors">
                   {item.title}
                 </h3>
                 <p className="text-sm text-gray-400 font-medium line-clamp-1">
@@ -206,16 +216,18 @@ function AlertManagement() {
                 {item.status === "unread" && (
                   <button
                     onClick={(e) => handleAction(item._id, "read", e)}
-                    className="px-6 py-2.5 bg-gray-900 text-white text-xs font-bold rounded-2xl hover:bg-red-600 transition-all shadow-lg shadow-gray-200"
+                    // className="px-6 py-2.5 bg-[#95d5b2] text-gray-800 text-xs font-bold rounded-2xl hover:bg-main-green hover:text-white transition-all shadow-lg shadow-gray-200"
+                    className="px-2 py-1 table-btn hover:bg-green-500 hover:text-white transition-all"
                   >
-                    RESOLVE
+                    ดำเนินการเสร็จสิ้น
                   </button>
                 )}
                 <button
                   onClick={(e) => handleAction(item._id, "delete", e)}
-                  className="w-10 h-10 flex items-center justify-center bg-gray-50 text-gray-300 hover:bg-red-50 hover:text-red-500 rounded-2xl transition-all"
+                  // className="w-10 h-10 px-6 py-2.5 flex items-center justify-center bg-gray-50 text-gray-300 hover:bg-red-50 hover:text-red-500 rounded-2xl transition-all"
+                  className="px-2 py-1 table-btn hover:bg-main-red hover:text-white transition-all"
                 >
-                  <span className="text-lg">🗑️</span>
+                  <span className="text-lg">ลบ</span>
                 </button>
               </div>
             </div>

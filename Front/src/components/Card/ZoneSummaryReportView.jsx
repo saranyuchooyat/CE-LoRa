@@ -104,7 +104,8 @@ function ZoneSummaryReportView({ zoneId, zoneName, eldersData, onBack }) {
                             disabled={isLoading || isError || !reportData}
                             className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-bold py-2 px-5 rounded-lg shadow-sm flex items-center gap-2 transition-all"
                         >
-                            📥 Export CSV
+                            {/* 📥 Export CSV */}
+                            Export CSV
                         </button>
                         
                         {/* ✅ Checkbox เลือกว่าจะแนบรายชื่อมั้ย */}
@@ -134,7 +135,7 @@ function ZoneSummaryReportView({ zoneId, zoneName, eldersData, onBack }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {/* (โค้ด Card ส่วนตัวเลขสรุปเดิมยังคงอยู่ครบถ้วน) */}
                     <div className="col-span-1 md:col-span-2 lg:col-span-4 bg-white rounded-2xl p-6 shadow-sm border-t-4 border-teal-500">
-                        <h2 className="text-xl font-bold text-gray-800 mb-4">🚨 สรุปการแจ้งเตือน (Alerts)</h2>
+                        <h2 className="text-xl font-bold text-gray-800 mb-4">สรุปการแจ้งเตือน (Alerts)</h2>
                         <div className="grid grid-cols-3 gap-4 text-center">
                             <div className="bg-red-50 p-4 rounded-xl border border-red-100">
                                 <div className="text-red-500 font-bold text-sm mb-1">Critical (ฉุกเฉิน)</div>
@@ -155,19 +156,19 @@ function ZoneSummaryReportView({ zoneId, zoneName, eldersData, onBack }) {
                     </div>
 
                     <div className="bg-white rounded-2xl p-6 shadow-sm flex flex-col justify-center items-center border border-gray-100">
-                        <div className="text-gray-500 font-bold mb-2">👥 จำนวนผู้สูงอายุ</div>
+                        <div className="text-gray-500 font-bold mb-2">จำนวนผู้สูงอายุ</div>
                         <div className="text-5xl font-black text-teal-700">{reportData.total_elders}</div>
                         <div className="text-sm text-gray-400 mt-2">คนในโซนนี้</div>
                     </div>
 
                     <div className="bg-white rounded-2xl p-6 shadow-sm flex flex-col justify-center items-center border border-gray-100">
-                        <div className="text-gray-500 font-bold mb-2">👨‍⚕️ จำนวน Zone Staff</div>
+                        <div className="text-gray-500 font-bold mb-2">จำนวน Zone Staff</div>
                         <div className="text-5xl font-black text-blue-600">{reportData.total_staff}</div>
                         <div className="text-sm text-gray-400 mt-2">ผู้ดูแลในโซนนี้</div>
                     </div>
 
                     <div className="col-span-1 md:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                        <h2 className="text-lg font-bold text-gray-800 mb-4 text-center">⌚ สถานะอุปกรณ์ (Smartwatch)</h2>
+                        <h2 className="text-lg font-bold text-gray-800 mb-4 text-center">สถานะอุปกรณ์ (Smartwatch)</h2>
                         <div className="flex justify-around items-center h-full pb-4">
                             <div className="text-center">
                                 <div className="w-4 h-4 rounded-full bg-green-500 mx-auto mb-2 shadow-sm"></div>
