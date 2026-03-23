@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../../components/API";
 import ApiDelete from "../API-Delete";
 import { showConfirm, showPopup } from "../../components/Popup";
-import SetElderlyDeviceForm from "../ModalForm/SetElderlyDeviceForm";
+
 
 function ElderlyRow({ card, index, onRowClick, handleEditClick, handleSettingClick, handleDeleteClick, isPending, showActions, getStatusStyle, calculateStatus, userRole }) {
     const isOddRow = (index % 2 === 0);
@@ -232,16 +232,6 @@ function ElderlyDataTable({ data, onEdit, onSetting, onDeleteSuccess, onRowClick
                     </tbody>
                 </table>
             </div>
-
-            <SetElderlyDeviceForm
-                isOpen={isDeviceModalOpen}
-                onClose={() => setIsDeviceModalOpen(false)}
-                elderData={selectedElderForDevice}
-                onSuccess={() => {
-                    // ให้ React Query ทำการรีเฟรชข้อมูลที่ถูกดึงด้วย useQuery/useQueries ทั้งหมดอัตโนมัติ
-                    queryClient.invalidateQueries(); 
-                }}
-            />
         </>
     )
 }

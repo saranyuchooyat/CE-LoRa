@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useParams } from "react-router-dom";
-import { useQueries } from "@tanstack/react-query";
+import { useQueries, useQueryClient } from "@tanstack/react-query";
 import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
 import MenuNameCard2 from "../../components/MainCardOption/MenuNameCard2";
@@ -11,10 +11,12 @@ import AddElderlyform from "../../components/ModalForm/AddElderly";
 import EditElderlyForm from "../../components/ModalForm/EditElderlyForm";
 import ElderlyProfileView from "../../components/Card/ElderlyProfileView";
 import ZoneSummaryReportView from "../../components/Card/ZoneSummaryReportView"; 
+import SetElderlyDeviceForm from "../../components/ModalForm/SetElderlyDeviceForm";
 
 function ZoneDashboardDetail() {
   const { zoneid } = useParams();
   const location = useLocation();
+  const queryClient = useQueryClient();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const handleOpenModal = () => setIsModalOpen(true);
@@ -33,6 +35,14 @@ function ZoneDashboardDetail() {
   const handleCloseEditElderlyModal = () => {
     setSelectedElderly(null);
     setIsEditElderlyModalOpen(false);
+  };
+
+  const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
+  const [selectedElderForDevice, setSelectedElderForDevice] = useState(null);
+
+  const handleOpenDeviceModal = (elderId) => {
+    // ใช้ zoneDashboardQueries ตรงๆ ไม่ได้เพราะ data อยู่ใน allEldery ตัวแปรข้างล่าง
+    // งั้นเราหาจาก elders ใน this scope
   };
 
   const [viewingProfile, setViewingProfile] = useState(null);
@@ -144,6 +154,15 @@ function ZoneDashboardDetail() {
     );
   }
 
+  // เติมฟังก์ชันการค้นหา elder สำหรับ Modal ให้อยู่ข้างล่างที่เรามีตัวแปร allEldery แล้ว
+  const executeOpenDeviceModal = (elderId) => {
+    const elder = allEldery.find(e => e.elder_id === elderId);
+    if (elder) {
+        setSelectedElderForDevice(elder);
+        setIsDeviceModalOpen(true);
+    }
+  };
+
   return (
     <>
       <div className="mx-5">
@@ -182,6 +201,7 @@ function ZoneDashboardDetail() {
           data={allEldery}
           showActions={userRole === "Zone Admin" || true}
           onEdit={handleOpenEditElderlyModal}
+          onSetting={executeOpenDeviceModal}
           onDeleteSuccess={() => zoneDashboardQueries[0].refetch()}
           onRowClick={setViewingProfile} 
         />
@@ -195,6 +215,16 @@ function ZoneDashboardDetail() {
 
       <Modal title="แก้ไขข้อมูลผู้สูงอายุ" isOpen={isEditElderlyModalOpen} onClose={handleCloseEditElderlyModal}>
         <EditElderlyForm elderData={selectedElderly} onClose={handleCloseEditElderlyModal} onSaveSuccess={() => { handleCloseEditElderlyModal(); zoneDashboardQueries[0].refetch(); }} />
+      </Modal>
+      <Modal title="ตั้งค่าอุปกรณ์" isOpen={isDeviceModalOpen} onClose={() => setIsDeviceModalOpen(false)}>
+        <SetElderlyDeviceForm 
+          isOpen={isDeviceModalOpen}
+          onClose={() => setIsDeviceModalOpen(false)}
+          elderData={selectedElderForDevice}
+          onSuccess={() => {
+            zoneDashboardQueries[0].refetch(); // โหลดข้อมูลใหม่
+          }}
+        />
       </Modal>
     </>
   );
