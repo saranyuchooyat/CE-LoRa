@@ -129,7 +129,7 @@ function ZoneDashboardDetail() {
     { name: "Online", value: deviceStatus?.online || 0 },
     { name: "Offline", value: deviceStatus?.offline || 0 }
   ];
-
+  
   const allEldery = elders;
   const zoneDetail = zone;
 
