@@ -8,7 +8,7 @@ function DeviceDetail() {
   const [deviceData, setDeviceData] = useState(null);
   const fetchData = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const res = await axios.get(
         `http://localhost:8080/device_data/${device_id}`,
         {

@@ -18,7 +18,7 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
       if (id) {
         try {
           setIsLoading(true);
-          const token = localStorage.getItem("token");
+          const token = sessionStorage.getItem("token");
           // 🟢 เปลี่ยน path ให้ตรงกับที่พี่แก้ใน Go (คือ /elders/:id)
           const res = await axios.get(`http://localhost:8080/elders/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
@@ -42,7 +42,7 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
   const fetchLiveVitals = async () => {
     if (!elderData?.device_id) return;
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const res = await axios.get(
         `http://localhost:8080/device_data/${elderData.device_id}`,
         { headers: { Authorization: `Bearer ${token}` } },

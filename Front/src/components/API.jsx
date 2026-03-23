@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-console.log(localStorage)
+console.log(sessionStorage)
 const api = axios.create({
   // กำหนด Base URL
   baseURL: 'http://localhost:8080', 
@@ -10,8 +10,8 @@ const api = axios.create({
 // 💡 Interceptor: จะทำงานก่อนที่ Request จะถูกส่งออกไป
 api.interceptors.request.use(
   (config) => {
-    // 💡 แก้ไข: ดึง Token จาก localStorage แทน location.state
-    const token = localStorage.getItem('token'); 
+    // 💡 แก้ไข: ดึง Token จาก sessionStorage แทน location.state
+    const token = sessionStorage.getItem('token'); 
     console.log("token",token)
     
     // ถ้ามี Token อยู่ใน Local Storage ให้แนบ Header Authorization

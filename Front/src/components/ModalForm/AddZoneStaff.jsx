@@ -35,8 +35,8 @@ function AddZoneStaffForm({ onClose, onSaveSuccess, zones }) {
         e.preventDefault(); 
         setIsSubmitting(true);
 
-        // ดึง Token จาก localStorage มาใช้ยืนยันตัวตน
-        const token = localStorage.getItem('token'); 
+        // ดึง Token จาก sessionStorage มาใช้ยืนยันตัวตน
+        const token = sessionStorage.getItem('token'); 
 
         const currentZoneId = formData.zoneIds[0];
 

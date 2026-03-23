@@ -17,7 +17,7 @@ function CareGiver() {
         const fetchCareGiverData = async () => {
             setIsLoading(true);
             try {
-                const storedUser = localStorage.getItem("user");
+                const storedUser = sessionStorage.getItem("user");
                 if (!storedUser) return;
                 
                 const userObj = JSON.parse(storedUser);

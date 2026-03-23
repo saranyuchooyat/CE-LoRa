@@ -10,7 +10,7 @@ function NotificationBell() {
 
   const fetchData = async () => {
     try {
-      const storedUser = JSON.parse(localStorage.getItem("user"));
+      const storedUser = JSON.parse(sessionStorage.getItem("user"));
       console.log("User Data:", storedUser);
 
       let endpoint = "/alerts";

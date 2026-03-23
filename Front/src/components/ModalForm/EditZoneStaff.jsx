@@ -21,7 +21,7 @@ function EditZoneStaff({ userId, onClose, onSaveSuccess, zones }) {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const token = localStorage.getItem('token');
+                const token = sessionStorage.getItem('token');
                 const response = await api.get(`/users/${userId}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -65,7 +65,7 @@ function EditZoneStaff({ userId, onClose, onSaveSuccess, zones }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
 
         const dataToSend = {
             first_name: formData.first_name.trim(),

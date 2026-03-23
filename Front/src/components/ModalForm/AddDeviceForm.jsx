@@ -65,7 +65,7 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     const dataToSend = {
       device_id: nextId,

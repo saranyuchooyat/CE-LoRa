@@ -60,9 +60,9 @@ function DeviceManagement() {
   const isSystemError = deviceQueries.some((query) => query.isError);
 
   useEffect(() => {
-    const tokenInStorage = localStorage.getItem("token");
+    const tokenInStorage = sessionStorage.getItem("token");
     if (location.state?.token && location.state.token !== tokenInStorage) {
-      localStorage.setItem("token", location.state.token);
+      sessionStorage.setItem("token", location.state.token);
       // 💡 เมื่อบันทึก Token ใหม่แล้ว React Query จะทำการ Refetch ให้อัตโนมัติ
       // เนื่องจากทุก Query จะถูก Trigger เมื่อ Token ถูกบันทึกและ Component Rerender
     }

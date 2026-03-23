@@ -40,8 +40,8 @@ function AddUserForm({ onClose, onSaveSuccess }){
         e.preventDefault(); 
         setIsSubmitting(true);
 
-        // ดึง Token จาก localStorage มาใช้ยืนยันตัวตน
-        const token = localStorage.getItem('token'); 
+        // ดึง Token จาก sessionStorage มาใช้ยืนยันตัวตน
+        const token = sessionStorage.getItem('token'); 
 
         // จัดเตรียม Object สำหรับส่งไป API (รวมชื่อ-นามสกุล และ map ค่าให้ตรงกับ Backend)
         const dataToSend = {

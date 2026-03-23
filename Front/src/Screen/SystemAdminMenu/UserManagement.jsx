@@ -56,9 +56,9 @@ function UserManagement(){
     const userData = userQueries[0].data || [];
 
     useEffect(() => {
-        const tokenInStorage = localStorage.getItem('token');
+        const tokenInStorage = sessionStorage.getItem('token');
         if (location.state?.token && location.state.token !== tokenInStorage) {
-            localStorage.setItem('token', location.state.token);
+            sessionStorage.setItem('token', location.state.token);
         }
     }, [location.state]);
     //ดึงข้อมูลหลังบ้าน
