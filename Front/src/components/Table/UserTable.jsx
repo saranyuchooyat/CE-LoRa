@@ -68,10 +68,10 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
         switch (lowerStatus) {
             case 'online':
             case 'active':
-                return 'text-main-blue bg-complete-bg'; // สีฟ้า/เขียว สบายตา
+                return 'text-green-700 bg-green-100 border border-green-400 font-semibold';
             case 'offline':
             case 'inactive':
-                return 'text-gray-800 bg-gray-300'; // สีเทา
+                return 'text-gray-600 bg-gray-200 border border-gray-400 font-semibold';
             default:
                 return 'text-gray-700 bg-gray-200';
         } 
