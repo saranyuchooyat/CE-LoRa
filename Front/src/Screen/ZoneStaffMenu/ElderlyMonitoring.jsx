@@ -158,6 +158,7 @@ function ElderlyMonitoring() {
 
             <CardFull
                 data={filteredElderly}
+                showActions={false}
             />
         </div>
     );

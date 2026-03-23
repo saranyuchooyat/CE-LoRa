@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../../components/API";
 import ApiDelete from "../API-Delete";
 import { showConfirm, showPopup } from "../../components/Popup";
+import SetElderlyDeviceForm from "../ModalForm/SetElderlyDeviceForm";
 
-function ElderlyRow({ card, index, onRowClick, handleEditClick, handleSettingClick, handleDeleteClick, isPending, showActions, getStatusStyle, calculateStatus }) {
+function ElderlyRow({ card, index, onRowClick, handleEditClick, handleSettingClick, handleDeleteClick, isPending, showActions, getStatusStyle, calculateStatus, userRole }) {
     const isOddRow = (index % 2 === 0);
     const rowBgClass = isOddRow ? 'bg-gray-100' : 'bg-gray-50';
     
@@ -91,9 +92,13 @@ function ElderlyRow({ card, index, onRowClick, handleEditClick, handleSettingCli
                 <button className="table-btn hover:bg-main-yellow hover:text-white"
                         onClick={(event) => handleEditClick(card, event)}>
                     แก้ไข</button>
-                <button className="table-btn hover:bg-green-500 hover:text-white"
-                        onClick={(event) => handleSettingClick(card.elder_id, event)}>
-                    ตั้งค่า</button>
+
+                {userRole !== "Zone Staff" && (
+                    <button className="table-btn hover:bg-green-500 hover:text-white"
+                            onClick={(event) => handleSettingClick(card.elder_id, event)}>
+                        ตั้งค่า</button>
+                )}
+
                 <button className="table-btn hover:bg-main-red hover:text-white"
                         onClick={(event) => handleDeleteClick(card.elder_id, event)}
                         disabled={isPending} >
@@ -105,6 +110,22 @@ function ElderlyRow({ card, index, onRowClick, handleEditClick, handleSettingCli
 }
 
 function ElderlyDataTable({ data, onEdit, onSetting, onDeleteSuccess, onRowClick, showActions = true }) {
+    const queryClient = useQueryClient();
+    const [userRole, setUserRole] = useState(null);
+    const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
+    const [selectedElderForDevice, setSelectedElderForDevice] = useState(null);
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            try {
+                const userData = JSON.parse(storedUser);
+                setUserRole(userData.role);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    }, []);
     
     // ✅ 4. ฟังก์ชันหมอจำลอง: วิเคราะห์อาการจากตัวเลข
     const calculateStatus = (vitals, dbStatus) => {
@@ -164,8 +185,13 @@ function ElderlyDataTable({ data, onEdit, onSetting, onDeleteSuccess, onRowClick
         onEdit(cardData); 
     };
 
-    const handleSettingClick = (elderId, event) => {
+    const handleSettingClickInternal = (elderId, event) => {
         event.stopPropagation();
+        const elder = data.find(e => e.elder_id === elderId);
+        if (elder) {
+            setSelectedElderForDevice(elder);
+            setIsDeviceModalOpen(true);
+        }
         if (onSetting) onSetting(elderId); 
     };
 
@@ -194,17 +220,28 @@ function ElderlyDataTable({ data, onEdit, onSetting, onDeleteSuccess, onRowClick
                                 index={index}
                                 onRowClick={onRowClick}
                                 handleEditClick={handleEditClick}
-                                handleSettingClick={handleSettingClick}
+                                handleSettingClick={handleSettingClickInternal}
                                 handleDeleteClick={handleDeleteClick}
                                 isPending={isPending}
                                 showActions={showActions}
                                 getStatusStyle={getStatusStyle}   // ส่งฟังก์ชันสีลงไป
                                 calculateStatus={calculateStatus} // ส่งฟังก์ชันหมอจำลองลงไป
+                                userRole={userRole}
                             />
                         ))}
                     </tbody>
                 </table>
             </div>
+
+            <SetElderlyDeviceForm
+                isOpen={isDeviceModalOpen}
+                onClose={() => setIsDeviceModalOpen(false)}
+                elderData={selectedElderForDevice}
+                onSuccess={() => {
+                    // ให้ React Query ทำการรีเฟรชข้อมูลที่ถูกดึงด้วย useQuery/useQueries ทั้งหมดอัตโนมัติ
+                    queryClient.invalidateQueries(); 
+                }}
+            />
         </>
     )
 }
