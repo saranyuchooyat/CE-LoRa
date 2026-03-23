@@ -8,7 +8,6 @@ function Header() {
     const location = useLocation(); 
     const navigate = useNavigate();
 
-    // 🟢 เอาแค่ปุ่มกด Log out แบบธรรมดา เน้นชัวร์!
     const handleLogoutClick = async () => {
         try {
             const token = localStorage.getItem('token');
@@ -23,6 +22,7 @@ function Header() {
         } finally {
             // ลบ Token และเด้งกลับไปหน้าแรก (Login)
             localStorage.removeItem('token');
+            localStorage.removeItem('user');
             navigate(`/`); 
         }
     };
@@ -31,6 +31,19 @@ function Header() {
         console.log("header", location.state)
         if (location.state?.user) {
             setCurrentUser(location.state.user);
+        } else {
+            // ดึงข้อมูลจาก localStorage ถ้ารีเฟรชแล้ว state หายไป
+            const storedUser = localStorage.getItem('user');
+            if (storedUser) {
+                try {
+                    const parsedUser = JSON.parse(storedUser);
+                    if (parsedUser && parsedUser.username) {
+                        setCurrentUser(parsedUser.username);
+                    }
+                } catch (error) {
+                    console.error("Failed to parse user from localStorage", error);
+                }
+            }
         }
     }, [location.state]);
 
