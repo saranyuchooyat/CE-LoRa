@@ -8,10 +8,20 @@ function NotificationBell() {
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
-  // 1. ดึงข้อมูลแจ้งเตือนทั้งหมด
   const fetchData = async () => {
     try {
-      const res = await api.get("/alerts");
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+      console.log("User Data:", storedUser);
+
+      let endpoint = "/alerts";
+      if (
+        storedUser?.role === "Zone Staff" &&
+        storedUser?.is_caregiver === true
+      ) {
+        endpoint = "/alerts/my";
+      }
+
+      const res = await api.get(endpoint);
       if (Array.isArray(res.data)) {
         setAlerts(res.data);
       }
@@ -40,6 +50,19 @@ function NotificationBell() {
     return () => document.removeEventListener("mousedown", close);
   }, []);
 
+  const handleMarkAsRead = async (id, alertId) => {
+    setAlerts((prev) =>
+      prev.map((a) => (a.alert_id === alertId ? { ...a, status: "read" } : a)),
+    );
+
+    try {
+      await api.put(`/alerts/${id}/read`);
+      fetchData();
+    } catch (err) {
+      console.error(err);
+      fetchData();
+    }
+  };
   return (
     <div className="relative ml-4" ref={dropdownRef}>
       {/* 🔔 ปุ่มกระดิ่ง */}
@@ -89,7 +112,8 @@ function NotificationBell() {
               unreadList.map((item) => (
                 <div
                   key={item._id}
-                  onClick={() => {
+                  onClick={async () => {
+                    await handleMarkAsRead(item._id, item.alert_id);
                     navigate(`/eldery-monitoring/${item.elder_id}`);
                     setIsOpen(false);
                   }}
@@ -117,7 +141,7 @@ function NotificationBell() {
 
           <button
             onClick={() => {
-              navigate("/alert-management");
+              navigate("/my-alerts");
               setIsOpen(false);
             }}
             className="w-full py-3 text-xs font-bold text-blue-600 hover:bg-gray-50 transition-colors border-t border-gray-50"

@@ -16,7 +16,7 @@ import ElderlyMonitoring from "./ZoneStaffMenu/ElderlyMonitoring";
 import AlertManagement from "./ZoneStaffMenu/AlertManagement";
 import CareGiver from "./ZoneStaffMenu/CareGiver";
 import ElderlyProfileView from "../components/Card/ElderlyProfileView";
-
+import MyAlertManagement from "./ZoneStaffMenu/MyAlertManagement";
 function MainLayout() {
   return (
     <div className="flex flex-col h-screen">
@@ -47,13 +47,12 @@ function MainLayout() {
           />
 
           <Route path="/deivce-details/:device_id" element={<DeviceDetail />} />
-          {/* ... ส่วนที่เหลือ ... */}
 
           {/* Zone Staff Menu */}
           <Route path="/caregiver" element={<CareGiver />} />
           <Route path="/eldery-monitoring" element={<ElderlyMonitoring />} />
           <Route path="/alert-management" element={<AlertManagement />} />
-
+          <Route path="/my-alerts" element={<MyAlertManagement />} />
           <Route
             path="/emergency-respond"
             element={<EmergencyRespondDashboard />}
@@ -62,6 +61,7 @@ function MainLayout() {
             path="/eldery-monitoring/:id"
             element={<ElderlyProfileView />}
           />
+
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>

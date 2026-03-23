@@ -34,6 +34,18 @@ function Menu() {
     }
   }, [location.state]);
 
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const userData = JSON.parse(storedUser);
+
+      if (userData.role === "Zone Staff" && userData.is_caregiver === true) {
+        setCurrentRole("Elderly Caregiver");
+      } else {
+        setCurrentRole(userData.role);
+      }
+    }
+  }, [location.pathname]);
   const roleRoutes = {
     "System Admin": {
       "System Overview Dashboard": "/system-overview-dashboard",
@@ -52,7 +64,7 @@ function Menu() {
     },
     "Elderly Caregiver": {
       "My Elders Dashboard": "/caregiver",
-      "Alert Management": "/alert-management",
+      "My Alert": "/my-alerts",
     },
   };
 

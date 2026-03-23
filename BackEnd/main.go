@@ -92,6 +92,7 @@ func main() {
 	// --Alerts--
 
 	app.Get("/alerts", GetAlerts)
+	app.Get("/alerts/my", GetMyAlerts)
 	app.Put("/alerts/:id/read", MarkAlertRead)
 	app.Delete("/alerts/:id", DeleteAlert)
 	app.Get("/alerts/unread-count", GetUnreadCount)

@@ -5,7 +5,7 @@ import api from "../../components/API";
 import MenuNameCard2 from "../../components/MainCardOption/MenuNameCard2";
 import Cardno2 from "../../components/Card/Cardno2";
 
-function AlertManagement() {
+function MyAlertManagement() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -13,9 +13,9 @@ function AlertManagement() {
   const [severityFilter, setSeverityFilter] = useState("all");
 
   const { data: alerts = [], isLoading } = useQuery({
-    queryKey: ["allAlerts"],
+    queryKey: ["myAlerts"],
     queryFn: async () => {
-      const res = await api.get("/alerts");
+      const res = await api.get("/alerts/my");
       return res.data;
     },
     refetchInterval: 3000,
@@ -30,7 +30,8 @@ function AlertManagement() {
           return;
         await api.delete(`/alerts/${id}`);
       }
-      queryClient.invalidateQueries(["allAlerts"]);
+
+      queryClient.invalidateQueries(["myAlerts"]);
     } catch (err) {
       console.error(`Error ${action}:`, err);
     }
@@ -232,4 +233,4 @@ function AlertManagement() {
   );
 }
 
-export default AlertManagement;
+export default MyAlertManagement;

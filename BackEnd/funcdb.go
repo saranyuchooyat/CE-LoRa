@@ -1113,6 +1113,40 @@ func CreateAlert(elderID, zoneID, title, desc, severity, alertType string) error
 
 	return nil
 }
+func GetMyAlerts(c *fiber.Ctx) error {
+	// 1. ดึง Token ออกมา (ปกติ JWT Middleware ของ Fiber จะเก็บไว้ใน "user")
+	userToken := c.Locals("user").(*jwt.Token)
+	claims := userToken.Claims.(jwt.MapClaims)
+
+	// 2. ดึง user_id ออกมาจาก Claims (ต้องชื่อเดียวกับตอนพี่ Generate Token นะ)
+	userID, ok := claims["user_id"].(string)
+	if !ok {
+		return c.Status(401).JSON(fiber.Map{"error": "ไม่พบข้อมูลผู้ใช้ใน Token"})
+	}
+
+	// --- ส่วน Query เหมือนเดิม ---
+	var user bson.M
+	err := MI.DB.Collection("users").FindOne(context.Background(), bson.M{"user_id": userID}).Decode(&user)
+	if err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "User not found"})
+	}
+
+	assigned, ok := user["assigned_elders"].(primitive.A)
+	if !ok {
+		return c.JSON([]interface{}{})
+	}
+
+	filter := bson.M{
+		"status":   "unread",
+		"elder_id": bson.M{"$in": assigned},
+	}
+
+	cursor, err := MI.DB.Collection("alerts").Find(context.Background(), filter)
+	var alerts []bson.M
+	cursor.All(context.Background(), &alerts)
+
+	return c.JSON(alerts)
+}
 
 func GetAlerts(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
