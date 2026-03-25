@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import api from "../../components/API";
-import CardFull from "../../components/Card/Cardno5";
+import DataTableCard from "../../components/Card/DataTableCard";
 import ElderlyProfileView from "../../components/Card/ElderlyProfileView";
 import MenuNameCard2 from "../../components/MainCardOption/MenuNameCard2";
 
@@ -82,7 +82,7 @@ function CareGiver() {
             
             <div className="mt-4">
                 {assignedEldersData.length > 0 ? (
-                    <CardFull 
+                    <DataTableCard 
                         data={assignedEldersData}
                         showActions={false}
                         onRowClick={setViewingProfile}

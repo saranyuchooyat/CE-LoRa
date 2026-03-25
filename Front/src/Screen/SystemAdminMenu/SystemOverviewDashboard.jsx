@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
-import Cardno2 from "../../components/Card/Cardno2";
+import SummaryCard from "../../components/Card/SummaryCard";
 import CardTwoGraph from "../../components/Card/CardTwoGraph";
 import CardServerData from "../../components/Card/CardServerData";
 
@@ -60,7 +60,7 @@ function SystemOverviewDashboard(){
     return(
         <>
             <div className="mx-5">
-                <Cardno2 data={systemData}/>
+                <SummaryCard data={systemData}/>
                 <CardTwoGraph graphdata={UsageTrendData} piedata={topZoneData}/>
                 <CardServerData data={serverData}/>
             </div>

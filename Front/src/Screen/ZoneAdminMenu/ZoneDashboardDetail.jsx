@@ -4,8 +4,8 @@ import { useQueries, useQueryClient } from "@tanstack/react-query";
 import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
 import MenuNameCard2 from "../../components/MainCardOption/MenuNameCard2";
-import Cardno2 from "../../components/Card/Cardno2";
-import CardFull from "../../components/Card/Cardno5";
+import SummaryCard from "../../components/Card/SummaryCard";
+import DataTableCard from "../../components/Card/DataTableCard";
 import Modal from "../../components/ModalForm/Modal";
 import AddElderlyform from "../../components/ModalForm/AddElderly";
 import EditElderlyForm from "../../components/ModalForm/EditElderlyForm";
@@ -183,13 +183,13 @@ function ZoneDashboardDetail() {
           detail={filteredZoneStaffData.length + " คน"}
           buttonText="ผู้ดูแล"
         />
-        <CardFull
+        <DataTableCard
           data={filteredZoneStaffData}
           showActions={false}
           onEdit={(user) => console.log("Edit User:", user)}
         />
-        <CardFull data={allAlertDetail} />
-        <Cardno2 data={allDeviceStatus} />
+        <DataTableCard data={allAlertDetail} />
+        <SummaryCard data={allDeviceStatus} />
 
         <MenuNameCard2
           title={allEldery.length}
@@ -197,7 +197,7 @@ function ZoneDashboardDetail() {
           onButtonClick={handleOpenModal}
           buttonText="เพิ่มผู้สูงอายุ"
         />
-        <CardFull
+        <DataTableCard
           data={allEldery}
           showActions={userRole === "Zone Admin" || true}
           onEdit={handleOpenEditElderlyModal}

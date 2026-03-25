@@ -5,9 +5,9 @@ import UserTable from "../Table/UserTable";
 import ElderlyDataTable from "../Table/ElderlyDataTable";
 
 // ✅ 1. เพิ่ม onRowClick มารับค่าตรงนี้ (นอกนั้นโค้ดเดิมจารย์ทั้งหมดครับ ไม่แตะเลย)
-function CardFull({ data, onEdit, onSetting, onDeleteSuccess, onRowClick, showActions=true }) {
+function DataTableCard({ data, onEdit, onSetting, onDeleteSuccess, onRowClick, showActions=true }) {
 
-    console.log("dataCardFull",data)
+    console.log("dataDataTableCard",data)
 
     let displayContent = null
     let displayHeader = null
@@ -91,4 +91,4 @@ function CardFull({ data, onEdit, onSetting, onDeleteSuccess, onRowClick, showAc
     )
 }
 
-export default CardFull;
+export default DataTableCard;

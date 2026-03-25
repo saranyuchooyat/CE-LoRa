@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../../components/API";
 import MenuNameCard2 from "../../components/MainCardOption/MenuNameCard2";
-import Cardno2 from "../../components/Card/Cardno2";
+import SummaryCard from "../../components/Card/SummaryCard";
 
 function AlertManagement() {
   const navigate = useNavigate();
@@ -123,7 +123,7 @@ function AlertManagement() {
 
       {/* <div className="mb-10 transition-all duration-500 hover:scale-[1.01]"> */}
       <div className="mb-10">
-        <Cardno2 data={summaryCards} />
+        <SummaryCard data={summaryCards} />
       </div>
       
 

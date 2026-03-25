@@ -3,8 +3,8 @@ import { useLocation } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
-import Cardno2 from "../../components/Card/Cardno2";
-import CardFull from "../../components/Card/Cardno5";
+import SummaryCard from "../../components/Card/SummaryCard";
+import DataTableCard from "../../components/Card/DataTableCard";
 import CardFilter from "../../components/Card/CardFilter";
 
 const initialFilters ={
@@ -140,7 +140,7 @@ function ElderlyMonitoring() {
             <MenuNameCard title="ติดตามข้อมูลผู้สูงอายุ" />
 
             {/* แสดงการ์ดสรุปข้อมูล 3 ชุด */}
-            <Cardno2 data={CardNo2Data} />
+            <SummaryCard data={CardNo2Data} />
 
             <CardFilter
                 name="Elder"
@@ -153,7 +153,7 @@ function ElderlyMonitoring() {
                 option2Key="Elder"
             />
 
-            <CardFull
+            <DataTableCard
                 data={filteredElderly}
                 showActions={false}
             />

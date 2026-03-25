@@ -4,7 +4,7 @@ import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
 import CardFilter from "../../components/Card/CardFilter";
-import Cardno2 from "../../components/Card/Cardno2";
+import SummaryCard from "../../components/Card/SummaryCard";
 import CardLayouts from "../../components/Card/CardLayouts";
 import Modal from "../../components/ModalForm/Modal";
 import AddDeviceForm from "../../components/ModalForm/AddDeviceForm";
@@ -190,7 +190,7 @@ function DeviceManagement() {
           buttonText="อุปกรณ์"
         />
 
-        <Cardno2 data={deviceStatusData} />
+        <SummaryCard data={deviceStatusData} />
 
         <div className="relative z-10">
           <CardFilter

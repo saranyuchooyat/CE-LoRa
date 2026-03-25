@@ -5,7 +5,7 @@ import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
 import CardFilter from "../../components/Card/CardFilter";
-import CardFull from "../../components/Card/Cardno5";
+import DataTableCard from "../../components/Card/DataTableCard";
 
 const initialFilters = {
     search: "", 
@@ -104,7 +104,7 @@ function ZoneDashboard(){
                     option2Key="province"
                 />
                 
-                <CardFull data={filteredZones} showActions={false}/>
+                <DataTableCard data={filteredZones} showActions={false}/>
             </div>
         </>
     );

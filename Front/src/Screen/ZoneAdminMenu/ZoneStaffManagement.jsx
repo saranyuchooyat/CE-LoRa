@@ -4,9 +4,9 @@ import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
 import MenuNameCard2 from '../../components/MainCardOption/MenuNameCard2';
-import Cardno2 from "../../components/Card/Cardno2";
+import SummaryCard from "../../components/Card/SummaryCard";
 import CardFilter from "../../components/Card/CardFilter";
-import Cardno5 from "../../components/Card/Cardno5";
+import DataTableCard from "../../components/Card/DataTableCard";
 import Modal from "../../components/ModalForm/Modal";
 import EditZoneStaff from "../../components/ModalForm/EditZoneStaff";
 import AddZoneStaffForm from "../../components/ModalForm/AddZoneStaff";
@@ -177,7 +177,7 @@ function ZoneStaffManagement(){
                 detail={false}
                 buttonText="ผู้ใช้งาน"/>
 
-                {/* <Cardno2 data={staffData}/> */}
+                {/* <SummaryCard data={staffData}/> */}
                 <MenuNameCard2
                     title={zonestaffData.length}
                     description=" จำนวน Zone Staff ทั้งหมด"
@@ -195,7 +195,7 @@ function ZoneStaffManagement(){
                     option2Key="zonestaff"
                     data={zoneOptions}
                 />
-                <Cardno5 
+                <DataTableCard 
                     data={filteredUsers}
                     onEdit={handleOpenEditModal}
                     onSetting={handleOpenSettingModal}

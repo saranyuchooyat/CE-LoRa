@@ -3,9 +3,9 @@ import { useLocation } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
-import Cardno2 from "../../components/Card/Cardno2";
+import SummaryCard from "../../components/Card/SummaryCard";
 import CardFilter from "../../components/Card/CardFilter";
-import Cardno5 from "../../components/Card/Cardno5";
+import DataTableCard from "../../components/Card/DataTableCard";
 import Modal from "../../components/ModalForm/Modal";
 import AddUserForm from "../../components/ModalForm/AddUserForm";
 import EditUserForm from "../../components/ModalForm/EditUserForm";
@@ -172,7 +172,7 @@ function UserManagement(){
                 detail={false}
                 buttonText="ผู้ใช้งาน"/>
 
-                <Cardno2 data={staffData}/>
+                <SummaryCard data={staffData}/>
 
                 <CardFilter
                     name="ผู้ใช้งาน"
@@ -186,7 +186,7 @@ function UserManagement(){
                 />
                 
                 {/* 🎯 ตารางแสดงผลหลัก */}
-                <Cardno5 
+                <DataTableCard 
                     data={filteredUsers}
                     onEdit={handleOpenEditModal}
                     onSetting={handleOpenSettingModal}

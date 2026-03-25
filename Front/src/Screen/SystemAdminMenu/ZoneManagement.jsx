@@ -4,7 +4,7 @@ import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
 import CardFilter from "../../components/Card/CardFilter";
-import CardFull from "../../components/Card/Cardno5";
+import DataTableCard from "../../components/Card/DataTableCard";
 import Modal from "../../components/ModalForm/Modal";
 import AddZoneForm from "../../components/ModalForm/AddZoneForm";
 import EditZoneForm from "../../components/ModalForm/EditZoneForm";
@@ -141,7 +141,7 @@ function ZoneManagement() {
           onClear={handleClearFilters}
           option2Key="province"
         />
-        <CardFull 
+        <DataTableCard 
           data={filteredZones} 
           onEdit={handleOpenEditModal}
         />

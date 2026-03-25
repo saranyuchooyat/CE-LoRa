@@ -1,4 +1,4 @@
-function Cardno2({data}){
+function SummaryCard({data}){
 
     console.log("data in cardno2",data)
 
@@ -16,4 +16,4 @@ function Cardno2({data}){
     )
 }
 
-export default Cardno2;
+export default SummaryCard;
