@@ -77,7 +77,7 @@ function ZoneSummaryReportView({ zoneId, zoneName, eldersData, onBack }) {
             <div className="mt-2 mb-4">
                 <button 
                     onClick={onBack} 
-                    className="text-gray-600 hover:text-teal-700 font-bold flex items-center gap-2 border-2 border-gray-200 hover:border-teal-500 hover:bg-teal-50 px-4 py-2 rounded-xl transition-all w-fit shadow-sm"
+                    className="return-btn"
                 >
                     ← กลับไปหน้า Dashboard
                 </button>

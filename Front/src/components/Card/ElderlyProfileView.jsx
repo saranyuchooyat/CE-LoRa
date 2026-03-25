@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 
 function ElderlyProfileView({ elderData: propsElderData, onBack }) {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [elderData, setElderData] = useState(propsElderData || null);
   const [liveVitals, setLiveVitals] = useState(null);
   const [historyData, setHistoryData] = useState([]);
@@ -184,12 +185,14 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
         <h2 className="text-2xl font-bold text-gray-300">
           ไม่พบข้อมูลผู้สูงอายุรหัส {id}
         </h2>
-        <button
-          onClick={onBack}
-          className="mt-4 text-main-green font-bold underline"
-        >
-          ย้อนกลับ
-        </button>
+        {(onBack || id) && (
+          <button
+            onClick={onBack ? onBack : () => navigate(-1)}
+            className="mt-4 text-main-green font-bold underline"
+          >
+            ย้อนกลับ
+          </button>
+        )}
       </div>
     );
   }
@@ -198,10 +201,10 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
     <div className="p-6 max-w-5xl mx-auto animate-fade-in">
       <div className="flex justify-between items-center mb-6">
         <div>
-          {onBack && (
+          {(onBack || id) && (
             <button
-              onClick={onBack}
-              className="flex items-center text-gray-600 hover:text-main-green font-bold bg-white px-4 py-2 rounded-lg shadow-sm border transition-all"
+              onClick={onBack ? onBack : () => navigate(-1)}
+              className="return-btn"
             >
               ← ย้อนกลับ
             </button>

@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
 import api from "../../components/API";
 import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
@@ -15,6 +15,7 @@ const initialFilters ={
 function ElderlyMonitoring() {
 
     const location = useLocation();
+    const navigate = useNavigate();
     const [filters, setFilters] = useState(initialFilters);
 
     // 1. ดึงข้อมูล Zone พื้นฐาน
@@ -160,6 +161,7 @@ function ElderlyMonitoring() {
             <DataTableCard
                 data={filteredElderly}
                 showActions={false}
+                onRowClick={(row) => navigate(`/eldery-monitoring/${row.elder_id}`)}
             />
         </div>
     );

@@ -20,7 +20,7 @@ function MenuNameCard({
         {/* 2. ตรวจสอบและแสดงปุ่มเพิ่ม ถ้ามีฟังก์ชัน onButtonClick */}
         {onButtonClick && (
           <Addbutton
-            buttonText={`เพิ่ม${buttonText}ใหม่`}
+            buttonText={`+ เพิ่ม${buttonText}ใหม่`}
             onButtonClick={onButtonClick}
           />
         )}
