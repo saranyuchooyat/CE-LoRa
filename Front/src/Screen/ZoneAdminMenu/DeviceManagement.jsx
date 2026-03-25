@@ -125,7 +125,7 @@ function DeviceManagement() {
     // 2. กรองตามประเภท (Type)
     // เช็คให้ชัวร์ว่าค่าจาก Frontend (deviceType) ตรงกับค่าใน DB (device.type)
     if (deviceType && deviceType !== "ทั้งหมด") {
-      data = data.filter((device) => device.type === deviceType);
+      data = data.filter((device) => device.model === deviceType);
     }
 
     // 3. กรองตามสถานะ (Status)

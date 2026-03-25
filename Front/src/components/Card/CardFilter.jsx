@@ -37,7 +37,7 @@ function CardFilter({name, placeholderName, option1Name, option2Name, filters, o
                     <form onSubmit={(e) => e.preventDefault()}> 
                         <p className="text-start">ค้นหา {name}</p>
                         <input 
-                            className="w-[400px] bg-gray-200 py-2 rounded-lg" 
+                            className="w-[400px] bg-gray-200 py-2 rounded-lg px-2" 
                             type="search" 
                             placeholder={placeholderName}
                             value={filters.search}

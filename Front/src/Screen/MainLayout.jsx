@@ -4,7 +4,6 @@ import Menu from "../components/Menu";
 import SystemOverviewDashboard from "./SystemAdminMenu/SystemOverviewDashboard";
 import ZoneManagement from "./SystemAdminMenu/ZoneManagement";
 import UserManagement from "./SystemAdminMenu/UserManagement";
-import EmergencyRespondDashboard from "./EmergencyRespondDashboard";
 import ZoneDashboard from "./ZoneAdminMenu/ZoneDashboard";
 import ZoneDashboardDetail from "./ZoneAdminMenu/ZoneDashboardDetail";
 import DeviceManagement from "./ZoneAdminMenu/DeviceManagement";
@@ -27,25 +26,15 @@ function MainLayout() {
           <Route path="/" element={<LoginPage />} />
 
           {/*System Admin Menu*/}
-          <Route
-            path="/system-overview-dashboard"
-            element={<SystemOverviewDashboard />}
-          />
+          <Route path="/system-overview-dashboard" element={<SystemOverviewDashboard />} />
           <Route path="/zone-management" element={<ZoneManagement />} />
           <Route path="/user-management" element={<UserManagement />} />
 
           {/*Zone Admin Menu*/}
           <Route path="/zone-dashboard" element={<ZoneDashboard />} />
-          <Route
-            path="/zone-details/:zoneid"
-            element={<ZoneDashboardDetail />}
-          />
+          <Route path="/zone-details/:zoneid" element={<ZoneDashboardDetail />} />
           <Route path="/device-management" element={<DeviceManagement />} />
-          <Route
-            path="/zone-staff-management"
-            element={<ZoneStaffManagement />}
-          />
-
+          <Route path="/zone-staff-management" element={<ZoneStaffManagement />} />
           <Route path="/deivce-details/:device_id" element={<DeviceDetail />} />
 
           {/* Zone Staff Menu */}
@@ -53,15 +42,7 @@ function MainLayout() {
           <Route path="/eldery-monitoring" element={<ElderlyMonitoring />} />
           <Route path="/alert-management" element={<AlertManagement />} />
           <Route path="/my-alerts" element={<MyAlertManagement />} />
-          <Route
-            path="/emergency-respond"
-            element={<EmergencyRespondDashboard />}
-          />
-          <Route
-            path="/eldery-monitoring/:id"
-            element={<ElderlyProfileView />}
-          />
-
+          <Route path="/eldery-monitoring/:id" element={<ElderlyProfileView />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>
