@@ -110,7 +110,7 @@ function AddZoneForm({ onClose, onSaveSuccess }){
             <div className="mt-6 pt-4 border-t flex justify-end gap-4">
                 <button 
                     type="submit" 
-                    className="bg-complete-bg text-main-blue px-4 py-2 rounded-lg hover:bg-main-blue hover:text-white cursor-pointer"
+                    className="submit-btn"
                     disabled={isSubmitting}
                 >
                     {isSubmitting ? 'กำลังบันทึก...' : 'บันทึก'}
@@ -119,7 +119,7 @@ function AddZoneForm({ onClose, onSaveSuccess }){
                 <button 
                     type="button" 
                     onClick={onClose} 
-                    className="bg-gray-300 px-4 py-2 rounded-lg hover:bg-gray-400 hover:text-white cursor-pointer"
+                    className="cancel-btn"
                     disabled={isSubmitting}
                 >
                     ยกเลิก

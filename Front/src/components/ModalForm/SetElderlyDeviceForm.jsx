@@ -141,7 +141,7 @@ function SetElderlyDeviceForm({ isOpen, onClose, elderData, onSuccess }) {
         <button
           type="submit"
           disabled={isSubmitting || !selectedDevice}
-          className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 disabled:bg-gray-400"
+          className="submit-btn"
         >
           {isSubmitting ? "กำลังบันทึก..." : "บันทึก"}
         </button>
@@ -149,7 +149,7 @@ function SetElderlyDeviceForm({ isOpen, onClose, elderData, onSuccess }) {
           type="button"
           onClick={onClose}
           disabled={isSubmitting}
-          className="bg-gray-200 px-6 py-2 rounded-lg hover:bg-gray-300 disabled:bg-gray-100"
+          className="cancel-btn"
         >
           ยกเลิก
         </button>

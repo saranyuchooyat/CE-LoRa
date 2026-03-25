@@ -59,6 +59,14 @@
         @apply bg-white mr-3 py-5 px-6 rounded-[10px] font-bold hover:text-white hover:bg-main-green cursor-pointer shadow-md
     }
 
+    .submit-btn {
+        @apply bg-main-green/60 text-white px-6 py-2 rounded-[10px] font-bold hover:bg-main-green cursor-pointer shadow-md
+    }
+
+    .cancel-btn {
+        @apply bg-gray-200 px-6 py-2 rounded-[10px] font-bold hover:bg-gray-300 cursor-pointer shadow-md
+    }
+
     .dropdown-btn {
         @apply flex justify-start bg-gray-200 px-5 py-2 rounded-[5px] w-[200px] cursor-pointer
     }

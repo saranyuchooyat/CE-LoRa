@@ -109,10 +109,10 @@ function EditZoneForm({ zoneId, zoneData, onClose, onSaveSuccess }) {
             </div>
 
             <div className="pt-4 border-t flex justify-end gap-3">
-                <button type="submit" disabled={isSubmitting} className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 disabled:bg-gray-400">
+                <button type="submit" disabled={isSubmitting} className="submit-btn">
                     {isSubmitting ? 'กำลังบันทึก...' : 'บันทึกการแก้ไข'}
                 </button>
-                <button type="button" onClick={onClose} className="bg-gray-200 px-6 py-2 rounded-lg hover:bg-gray-300">
+                <button type="button" onClick={onClose} className="cancel-btn">
                     ยกเลิก
                 </button>
             </div>

@@ -167,14 +167,14 @@ function EditElderlyForm({ elderData, onClose, onSaveSuccess }) {
                 <button 
                     type="submit" 
                     disabled={isSubmitting}
-                    className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 disabled:bg-gray-400"
+                    className="submit-btn"
                 >
                     {isSubmitting ? 'กำลังบันทึก...' : 'บันทึกการแก้ไข'}
                 </button>
                 <button 
                     type="button" 
                     onClick={onClose} 
-                    className="bg-gray-200 px-6 py-2 rounded-lg hover:bg-gray-300"
+                    className="cancel-btn"
                 >
                     ยกเลิก
                 </button>

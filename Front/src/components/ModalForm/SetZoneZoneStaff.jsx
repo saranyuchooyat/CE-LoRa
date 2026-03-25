@@ -324,10 +324,10 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
             </div>
 
             <div className="flex justify-end gap-3 mt-6 border-t pt-4">
-                <button type="submit" disabled={isSubmitting} className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400">
+                <button type="submit" disabled={isSubmitting} className="submit-btn">
                     {isSubmitting ? "กำลังบันทึก..." : "ยืนยันการตั้งค่า"}
                 </button>
-                <button type="button" onClick={onClose} className="bg-gray-200 px-6 py-2 rounded-lg hover:bg-gray-300">ยกเลิก</button>
+                <button type="button" onClick={onClose} className="cancel-btn">ยกเลิก</button>
             </div>
         </form>
     );

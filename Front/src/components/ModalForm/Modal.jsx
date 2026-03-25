@@ -21,7 +21,7 @@ function Modal({ title, isOpen, onClose, children }) {
                 </div>
 
                 {/* Body ส่วนเนื้อหา */}
-                <div className="modal-body overflow-y-auto pr-1">
+                <div className="modal-body overflow-y-auto pr-2 pb-4">
                     {children}
                 </div>               
             </div>
