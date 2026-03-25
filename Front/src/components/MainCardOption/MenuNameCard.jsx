@@ -8,11 +8,12 @@ function MenuNameCard({
   buttonText,
   onButtonClick,
   detail,
+  children,
 }) {
   const componentCheck = () => {
     return (
       <div className="flex items-center gap-4 mr-3">
-        {" "}
+        {children}
         {/* 💡 เพิ่ม Container เพื่อจัดกลุ่มปุ่มและ Banner */}
         {/* 1. ตรวจสอบและแสดง Banner ถ้ามีข้อมูล detail */}
         {detail !== false && <Banner text={buttonText} detail={detail} />}
@@ -29,10 +30,10 @@ function MenuNameCard({
 
   return (
     <>
-      <div className="card flex justify-between items-center">
+      <div className="card flex justify-between items-center py-5">
         <div className="ml-3">
-          <p className="text-[22px] font-bold text-start">{title}</p>
-          <p>{description}</p>
+          <h1 className="text-3xl font-extrabold text-start py-1">{title}</h1>
+          <p className="text-gray-800 text-start">{description}</p>
         </div>
         {componentCheck()}
       </div>

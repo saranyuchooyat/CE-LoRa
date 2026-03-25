@@ -32,9 +32,9 @@ function StatusDropdown({ onSelect, currentValue, optionalKey }) {
         else if (optionalKey === "Elder") {
             // ตั้งค่าสำหรับ Device Type
             setStatusValues({
-                value1: 'stable',
-                value2: 'warning',
-                value3: 'critical'
+                value1: 'Normal',
+                value2: 'Warning',
+                value3: 'Critical'
             });
         }
         else {

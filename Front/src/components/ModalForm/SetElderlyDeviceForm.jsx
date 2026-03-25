@@ -116,6 +116,7 @@ function SetElderlyDeviceForm({ isOpen, onClose, elderData, onSuccess }) {
             disabled={isDevicesLoading || isSubmitting}
             required
           >
+          
             <option value="">-- กรุณาเลือกอุปกรณ์ --</option>
             {isDevicesLoading ? (
               <option value="" disabled>กำลังโหลดอุปกรณ์...</option>
@@ -136,7 +137,6 @@ function SetElderlyDeviceForm({ isOpen, onClose, elderData, onSuccess }) {
         </div>
       </div>
 
-      {/* Footer Buttons แบบเดียวกับ SetDeviceForm แป๊ะๆ */}
       <div className="pt-6 mt-4 border-t flex justify-end gap-3">
         <button
           type="submit"

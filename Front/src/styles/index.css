@@ -26,14 +26,10 @@
 
 @layer components {
 
-    /* .card{
-        @apply bg-linear-to-bl from-main-green via-[#95d5b2] to-main-card h-full w-full text-center mb-4 rounded-[15px] p-4
-    } */
 
     .card {
-        @apply bg-[#95d5b2] to-main-card w-full text-center mb-4 rounded-[15px] p-4 shadow-md
+        @apply bg-[#95d5b2] w-full text-center mb-4 rounded-[15px] p-4 shadow-md
     }
-
 
     .card-noti {
         @apply w-full h-fit text-start pl-3 rounded-[15px] border-l-[10px] cursor-pointer
@@ -68,7 +64,7 @@
     }
 
     .dropdown-btn {
-        @apply flex justify-start bg-gray-200 px-5 py-2 rounded-[5px] w-[200px] cursor-pointer
+        @apply flex justify-start bg-gray-200 px-5 py-2 rounded-lg w-[200px] cursor-pointer
     }
 
     .dropdown-menu {

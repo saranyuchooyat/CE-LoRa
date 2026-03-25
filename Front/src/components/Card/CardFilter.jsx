@@ -37,7 +37,7 @@ function CardFilter({name, placeholderName, option1Name, option2Name, filters, o
                     <form onSubmit={(e) => e.preventDefault()}> 
                         <p className="text-start">ค้นหา {name}</p>
                         <input 
-                            className="w-[400px] bg-gray-200" 
+                            className="w-[400px] bg-gray-200 py-2 rounded-lg" 
                             type="search" 
                             placeholder={placeholderName}
                             value={filters.search}
@@ -49,8 +49,9 @@ function CardFilter({name, placeholderName, option1Name, option2Name, filters, o
                {/* Dropdown 1: สถานะ */}
                 <div className="relative mr-3">
                     <p className="text-start">{option1Name}</p>
-                    <button className="dropdown-btn" onClick={() => setOpenStatus((prev) => !prev)}>
-                        {filters.status} 
+                    <button className="dropdown-btn flex justify-between items-center" onClick={() => setOpenStatus((prev) => !prev)}>
+                        <span>{filters.status}</span>
+                        <svg className={`w-4 h-4 ml-2 text-gray-500 transition-transform duration-200 ${openStatus ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                     </button>
                     {openStatus && <StatusDropdown 
                         currentValue={filters.status}
@@ -63,8 +64,9 @@ function CardFilter({name, placeholderName, option1Name, option2Name, filters, o
                 {option2Name && (
                     <div className="relative mr-3">
                         <p className="text-start">{option2Name}</p>
-                        <button className="dropdown-btn" onClick={() => setOpenDropdown2((prev) => !prev)}>
-                            {filters[option2Key]} 
+                        <button className="dropdown-btn flex justify-between items-center" onClick={() => setOpenDropdown2((prev) => !prev)}>
+                            <span>{filters[option2Key]}</span>
+                            <svg className={`w-4 h-4 ml-2 text-gray-500 transition-transform duration-200 ${openDropdown2 ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                         </button>
                         {openDropdown2 && <FilterDropdown
                             currentValue={filters[option2Key]}

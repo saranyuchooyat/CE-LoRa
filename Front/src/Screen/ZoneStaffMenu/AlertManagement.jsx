@@ -2,8 +2,8 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../../components/API";
-import MenuNameCard2 from "../../components/MainCardOption/MenuNameCard2";
 import SummaryCard from "../../components/Card/SummaryCard";
+import MenuNameCard from "../../components/MainCardOption/MenuNameCard";
 
 function AlertManagement() {
   const navigate = useNavigate();
@@ -85,40 +85,36 @@ function AlertManagement() {
   return (
     // <div className="mx-auto max-w-6xl px-6 py-10 antialiased">
     <div className="mx-5">
-      {/* Header Section: ล้ำๆ สะอาดๆ */}
-      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div>
-          <h1 className="text-3xl font-black text-gray-900 tracking-tight">
-            รายงานเหตุการณ์
-            {/* <span className="text-red-600">Reports</span> */}
-          </h1>
-          <p className="text-gray-400 font-medium mt-1">
-            Real-time safety monitoring system
-          </p>
-        </div>
-
-        {/* Advanced Filter Pills */}
-        <div className="flex bg-gray-100/80 p-1.5 rounded-2xl backdrop-blur-md gap-1">
-          {["all", "high", "medium", "low"].map((s) => (
-            <button
-              key={s}
-              onClick={() => setSeverityFilter(s)}
-              className={`px-5 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${
-                severityFilter === s
-                  ? s === "high"
-                    ? "bg-red-500 text-white shadow-md scale-105"
-                    : s === "medium"
-                    ? "bg-blue-500 text-white shadow-md scale-105"
-                    : s === "low"
-                    ? "bg-green-500 text-white shadow-md scale-105"
-                    : "bg-white text-gray-900 shadow-sm scale-105"
-                  : "text-gray-400 hover:text-gray-600"
-              }`}
-            >
-              {s.toUpperCase()}
-            </button>
-          ))}
-        </div>
+      {/* Header Section: ล้ำๆ สะอาดๆ */}   
+      <div className="mb-6">
+        <MenuNameCard
+            title="รายงานเหตุการณ์"
+            description="Real-time safety monitoring system"
+            detail={false}
+        >
+          {/* Advanced Filter Pills */}
+          <div className="flex bg-gray-100/80 p-1.5 rounded-2xl backdrop-blur-md gap-1">
+            {["all", "high", "medium", "low"].map((s) => (
+              <button
+                key={s}
+                onClick={() => setSeverityFilter(s)}
+                className={`px-5 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${
+                  severityFilter === s
+                    ? s === "high"
+                      ? "bg-red-500 text-white shadow-md scale-105"
+                      : s === "medium"
+                      ? "bg-blue-500 text-white shadow-md scale-105"
+                      : s === "low"
+                      ? "bg-green-500 text-white shadow-md scale-105"
+                      : "bg-white text-gray-900 shadow-sm scale-105"
+                    : "text-gray-400 hover:text-gray-600"
+                }`}
+              >
+                {s.toUpperCase()}
+              </button>
+            ))}
+          </div>
+        </MenuNameCard>
       </div>
 
       {/* <div className="mb-10 transition-all duration-500 hover:scale-[1.01]"> */}

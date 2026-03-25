@@ -137,7 +137,11 @@ function ElderlyMonitoring() {
 
     return (
         <div className="mx-5">
-            <MenuNameCard title="ติดตามข้อมูลผู้สูงอายุ" />
+            <MenuNameCard 
+                title="ติดตามข้อมูลผู้สูงอายุ"
+                detail={false}
+                
+            />
 
             {/* แสดงการ์ดสรุปข้อมูล 3 ชุด */}
             <SummaryCard data={CardNo2Data} />

@@ -40,10 +40,10 @@ function ZoneDashboardDetail() {
   const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
   const [selectedElderForDevice, setSelectedElderForDevice] = useState(null);
 
-  const handleOpenDeviceModal = (elderId) => {
-    // ใช้ zoneDashboardQueries ตรงๆ ไม่ได้เพราะ data อยู่ใน allEldery ตัวแปรข้างล่าง
-    // งั้นเราหาจาก elders ใน this scope
-  };
+  // const handleOpenDeviceModal = (elderId) => {
+  //   // ใช้ zoneDashboardQueries ตรงๆ ไม่ได้เพราะ data อยู่ใน allEldery ตัวแปรข้างล่าง
+  //   // งั้นเราหาจาก elders ใน this scope
+  // };
 
   const [viewingProfile, setViewingProfile] = useState(null);
   
@@ -168,27 +168,28 @@ function ZoneDashboardDetail() {
       <div className="mx-5">
         {/* ✅ 4. เพิ่มปุ่ม Report ไว้มุมขวาบน */}
         <div className="flex justify-end mb-3 mt-2">
-            <button 
-              onClick={() => setShowSummaryReport(true)}
-              className="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-2"
-            >
-              Zone Summary Report
-            </button>
+            
         </div>
 
         <MenuNameCard
           title={zoneDetail?.name || "Zone Detail"}
           description={"Zone Admin Dashboard"}
           onButtonClick={null}
-          detail={filteredZoneStaffData.length + " คน"}
-          buttonText="ผู้ดูแล"
-        />
+          // detail={filteredZoneStaffData.length + " คน"}
+          detail={false}
+        >
+          <button 
+              onClick={() => setShowSummaryReport(true)}
+              className="bg-white hover:bg-main-green text-main-green hover:text-white px-5 py-2.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-2"
+            >
+              Zone Summary Report
+            </button>
+        </MenuNameCard>
         <DataTableCard
           data={filteredZoneStaffData}
           showActions={false}
           onEdit={(user) => console.log("Edit User:", user)}
         />
-        <DataTableCard data={allAlertDetail} />
         <SummaryCard data={allDeviceStatus} />
 
         <MenuNameCard2
