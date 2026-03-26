@@ -141,10 +141,21 @@ function NotificationBell() {
 
           <button
             onClick={() => {
-              navigate("/my-alerts");
+              const rawData = sessionStorage.getItem("user");
+              const userData = rawData ? JSON.parse(rawData) : null;
+
+              if (
+                userData?.role === "Zone Staff" &&
+                userData?.is_caregiver === true
+              ) {
+                navigate("/my-alerts");
+              } else {
+                navigate("/alert-management");
+              }
+
               setIsOpen(false);
             }}
-            className="w-full py-3 text-xs font-bold text-blue-600 hover:bg-gray-50 transition-colors border-t border-gray-50"
+            className="w-full py-3 text-xs font-bold text-blue-600 hover:bg-gray-100 transition-colors border-t border-gray-50"
           >
             จัดการรายการทั้งหมด
           </button>
