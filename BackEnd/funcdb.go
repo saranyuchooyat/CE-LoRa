@@ -979,69 +979,59 @@ func getZoneDashboard(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	var zone Zone
-	err := getCollection("zones").FindOne(ctx, bson.M{"zone_id": zoneID}).Decode(&zone)
-	if err != nil {
-		return c.Status(404).JSON(fiber.Map{"error": "Zone not found"})
-	}
-
-	var zoneElders []Elder = []Elder{}
+	// 1. ดึงรายชื่อผู้สูงอายุใน Zone นี้ (ได้ zoneElders)
+	var zoneElders []Elder
 	cursor, err := getCollection("elders").Find(ctx, bson.M{"zone_id": zoneID})
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Error fetching elders"})
 	}
-	if err = cursor.All(ctx, &zoneElders); err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Error decoding elders"})
+	cursor.All(ctx, &zoneElders)
+
+	// 2. ดึง Devices ทั้งหมดมาทำ Map (Key คือ assigned_to) เพื่อให้ Match เร็วๆ
+	var allDevices []bson.M
+	deviceCursor, _ := getCollection("devices").Find(ctx, bson.M{})
+	deviceCursor.All(ctx, &allDevices)
+
+	// สร้างตัวช่วยค้นหา: [ชื่อ-นามสกุล] -> "online"/"offline"
+	deviceStatusMap := make(map[string]string)
+	for _, d := range allDevices {
+		// ดึงค่าจากฟิลด์ assigned_to และ status ตามรูปที่พี่ส่งมา
+		assignedTo, _ := d["assigned_to"].(string)
+		status, _ := d["status"].(string)
+
+		if assignedTo != "" {
+			deviceStatusMap[assignedTo] = status
+			fmt.Println(deviceStatusMap[assignedTo])
+		}
 	}
 
-	deviceStatus := map[string]int{"online": 0, "offline": 0, "total": 0}
-	var alertsInZone []Alert = []Alert{}
+	// 3. เตรียมตัวนับสรุปผล
+	summary := map[string]int{
+		"online":  0,
+		"offline": 0,
+		"total":   0,
+	}
 
-	// for _, e := range zoneElders {
-	// 	if e.DeviceID != "" {
-	// 		deviceStatus["total"]++
+	// 4. วนลูป zoneElders เพื่อ Match กับ deviceStatusMap
+	for _, e := range zoneElders {
+		summary["total"]++
 
-	// 		status := "online"
-	// 		if rand.Intn(10) < 2 {
-	// 			status = "offline"
-	// 		}
+		// ประกอบชื่อให้ตรงกับ format ใน assigned_to (สมมติว่าใน DB เก็บ "ชื่อ นามสกุล")
+		fullName := e.FirstName + " " + e.LastName
 
-	// 		if status == "online" {
-	// 			deviceStatus["online"]++
-	// 		} else {
-	// 			deviceStatus["offline"]++
-	// 			alertsInZone = append(alertsInZone, Alert{
-	// 				ID:          rand.Intn(10000),
-	// 				Title:       "Device Offline",
-	// 				Description: fmt.Sprintf("อุปกรณ์ของ %s %s ขาดการเชื่อมต่อ", e.FirstName, e.LastName),
-	// 				CreatedAt:   time.Now().Format(time.RFC3339),
-	// 				Severity:    "High", // เพิ่มความรุนแรง (ถ้ามี field นี้)
-	// 			})
-	// 		}
-	// 	}
+		status, found := deviceStatusMap[fullName]
+		if found && status == "online" {
+			summary["online"]++
+		} else {
+			summary["offline"]++
+		}
+	}
 
-	// 	if e.HealthStatus == "Critical" {
-	// 		alertsInZone = append(alertsInZone, Alert{
-	// 			ID:          rand.Intn(10000),
-	// 			Title:       "Critical Health",
-	// 			Description: fmt.Sprintf("ผู้สูงอายุ %s %s อยู่ในภาวะวิกฤต", e.FirstName, e.LastName),
-	// 			CreatedAt:   time.Now().Format(time.RFC3339),
-	// 			Severity:    "Critical",
-	// 		})
-	// 	}
-	// }
-
+	// 5. ส่งผลลัพธ์กลับไปให้ ZoneDashboardDetail.js
 	return c.JSON(fiber.Map{
-		"zone": fiber.Map{
-			"id":          zone.ZoneID,
-			"name":        zone.ZoneName,
-			"status":      zone.Status,
-			"activeUsers": len(zoneElders),
-		},
-		"elderlyCount": len(zoneElders),
-		"deviceStatus": deviceStatus,
-		"alerts":       alertsInZone,
+		"deviceStatus": summary,
 		"elders":       zoneElders,
+		"alerts":       []string{}, // เว้นไว้ก่อนหรือใส่แจ้งเตือนตามเดิม
 	})
 }
 

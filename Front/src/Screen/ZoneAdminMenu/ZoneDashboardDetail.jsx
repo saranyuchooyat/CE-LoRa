@@ -10,7 +10,7 @@ import Modal from "../../components/ModalForm/Modal";
 import AddElderlyform from "../../components/ModalForm/AddElderly";
 import EditElderlyForm from "../../components/ModalForm/EditElderlyForm";
 import ElderlyProfileView from "../../components/Card/ElderlyProfileView";
-import ZoneSummaryReportView from "../../components/Card/ZoneSummaryReportView"; 
+import ZoneSummaryReportView from "../../components/Card/ZoneSummaryReportView";
 import SetElderlyDeviceForm from "../../components/ModalForm/SetElderlyDeviceForm";
 
 function ZoneDashboardDetail() {
@@ -46,7 +46,7 @@ function ZoneDashboardDetail() {
   // };
 
   const [viewingProfile, setViewingProfile] = useState(null);
-  
+
   // ✅ 2. สร้าง State ควบคุมการสลับไปหน้า Report
   const [showSummaryReport, setShowSummaryReport] = useState(false);
 
@@ -58,6 +58,7 @@ function ZoneDashboardDetail() {
         queryFn: () =>
           api.get(`/zones/${zoneid}/dashboard`).then((res) => res.data),
         retry: false,
+        refetchInterval: 5000,
       },
       {
         queryKey: ["zoneStaffData", zoneid],
@@ -76,6 +77,11 @@ function ZoneDashboardDetail() {
   const zoneDashboard = zoneDashboardQueries[0].data || [];
   const zoneStaffData = zoneDashboardQueries[1].data || [];
 
+  // 🚩 เพิ่ม Log ตรงนี้ครับพี่
+  console.log("--- DEBUG DASHBOARD ---");
+  console.log("Raw Data from Backend:", zoneDashboardQueries[0].data);
+  console.log("Device Status Object:", zoneDashboard?.deviceStatus);
+  console.log("Elders Array:", zoneDashboard);
   const [userRole, setUserRole] = useState(null);
   useEffect(() => {
     let role = null;
@@ -110,37 +116,48 @@ function ZoneDashboardDetail() {
   });
 
   if (isDashboardLoading || !zoneid) {
-    return <div className="mx-5 mt-10 text-center text-xl">Loading Zone Dashboard...</div>;
+    return (
+      <div className="mx-5 mt-10 text-center text-xl">
+        Loading Zone Dashboard...
+      </div>
+    );
   }
 
   if (isDashboardError) {
-    return <div className="mx-5 mt-10 text-center text-xl text-red-600">Error fetching data</div>;
+    return (
+      <div className="mx-5 mt-10 text-center text-xl text-red-600">
+        Error fetching data
+      </div>
+    );
   }
 
   if (!zoneDashboard || Object.keys(zoneDashboard).length === 0) {
-    return <div className="mx-5 mt-10 text-center text-xl text-red-600">Zone ID "{zoneid}" not found.</div>;
+    return (
+      <div className="mx-5 mt-10 text-center text-xl text-red-600">
+        Zone ID "{zoneid}" not found.
+      </div>
+    );
   }
 
-  const { alerts, deviceStatus, elders, zone } = zoneDashboard;
+  const { deviceStatus, elders, zone } = zoneDashboard;
 
-  const allAlertDetail = alerts;
   const allDeviceStatus = [
     { name: "เชื่อมต่อ Smartwatch ทั้งหมด", value: deviceStatus?.total || 0 },
     { name: "Online", value: deviceStatus?.online || 0 },
-    { name: "Offline", value: deviceStatus?.offline || 0 }
+    { name: "Offline", value: deviceStatus?.offline || 0 },
   ];
-  
+
   const allEldery = elders;
   const zoneDetail = zone;
 
   // ✅ 3. สลับหน้าจอมาที่ Report ถ้า State เป็น true
   if (showSummaryReport) {
     return (
-      <ZoneSummaryReportView 
-        zoneId={zoneid} 
+      <ZoneSummaryReportView
+        zoneId={zoneid}
         zoneName={zoneDetail?.name}
         eldersData={allEldery}
-        onBack={() => setShowSummaryReport(false)} 
+        onBack={() => setShowSummaryReport(false)}
       />
     );
   }
@@ -149,17 +166,17 @@ function ZoneDashboardDetail() {
     return (
       <ElderlyProfileView
         elderData={viewingProfile}
-        onBack={() => setViewingProfile(null)} 
+        onBack={() => setViewingProfile(null)}
       />
     );
   }
 
   // เติมฟังก์ชันการค้นหา elder สำหรับ Modal ให้อยู่ข้างล่างที่เรามีตัวแปร allEldery แล้ว
   const executeOpenDeviceModal = (elderId) => {
-    const elder = allEldery.find(e => e.elder_id === elderId);
+    const elder = allEldery.find((e) => e.elder_id === elderId);
     if (elder) {
-        setSelectedElderForDevice(elder);
-        setIsDeviceModalOpen(true);
+      setSelectedElderForDevice(elder);
+      setIsDeviceModalOpen(true);
     }
   };
 
@@ -167,9 +184,7 @@ function ZoneDashboardDetail() {
     <>
       <div className="mx-5">
         {/* ✅ 4. เพิ่มปุ่ม Report ไว้มุมขวาบน */}
-        <div className="flex justify-end mb-3 mt-2">
-            
-        </div>
+        <div className="flex justify-end mb-3 mt-2"></div>
 
         <MenuNameCard
           title={zoneDetail?.name || "Zone Detail"}
@@ -177,12 +192,12 @@ function ZoneDashboardDetail() {
           onButtonClick={null}
           detail={false}
         >
-          <button 
-              onClick={() => setShowSummaryReport(true)}
-              className="bg-white hover:bg-main-green text-main-green hover:text-white px-5 py-2.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-2"
-            >
-              Zone Summary Report
-            </button>
+          <button
+            onClick={() => setShowSummaryReport(true)}
+            className="bg-white hover:bg-main-green text-main-green hover:text-white px-5 py-2.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-2"
+          >
+            Zone Summary Report
+          </button>
         </MenuNameCard>
         <DataTableCard
           data={filteredZoneStaffData}
@@ -192,7 +207,7 @@ function ZoneDashboardDetail() {
         <SummaryCard data={allDeviceStatus} />
 
         <MenuNameCard
-          title= {"จำนวนผู้สูงอายุทั้งหมด" + " " + allEldery.length + " คน"}
+          title={"จำนวนผู้สูงอายุทั้งหมด" + " " + allEldery.length + " คน"}
           description={false}
           onButtonClick={handleOpenModal}
           detail={false}
@@ -204,21 +219,51 @@ function ZoneDashboardDetail() {
           onEdit={handleOpenEditElderlyModal}
           onSetting={executeOpenDeviceModal}
           onDeleteSuccess={() => zoneDashboardQueries[0].refetch()}
-          onRowClick={setViewingProfile} 
+          onRowClick={setViewingProfile}
         />
       </div>
 
-      <Modal title="เพิ่มข้อมูลผู้สูงอายุ" isOpen={isModalOpen} onClose={handleCloseModal}>
-        <AddElderlyform zoneid={zoneid} onClose={handleCloseModal} onSaveSuccess={() => { handleCloseModal(); zoneDashboardQueries[0].refetch(); }} />
+      <Modal
+        title="เพิ่มข้อมูลผู้สูงอายุ"
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      >
+        <AddElderlyform
+          zoneid={zoneid}
+          onClose={handleCloseModal}
+          onSaveSuccess={() => {
+            handleCloseModal();
+            zoneDashboardQueries[0].refetch();
+          }}
+        />
       </Modal>
 
-      <Modal title="เพิ่มผู้ดูแลโซน" isOpen={isModalOpenStaff} onClose={handleCloseModalStaff}></Modal>
+      <Modal
+        title="เพิ่มผู้ดูแลโซน"
+        isOpen={isModalOpenStaff}
+        onClose={handleCloseModalStaff}
+      ></Modal>
 
-      <Modal title="แก้ไขข้อมูลผู้สูงอายุ" isOpen={isEditElderlyModalOpen} onClose={handleCloseEditElderlyModal}>
-        <EditElderlyForm elderData={selectedElderly} onClose={handleCloseEditElderlyModal} onSaveSuccess={() => { handleCloseEditElderlyModal(); zoneDashboardQueries[0].refetch(); }} />
+      <Modal
+        title="แก้ไขข้อมูลผู้สูงอายุ"
+        isOpen={isEditElderlyModalOpen}
+        onClose={handleCloseEditElderlyModal}
+      >
+        <EditElderlyForm
+          elderData={selectedElderly}
+          onClose={handleCloseEditElderlyModal}
+          onSaveSuccess={() => {
+            handleCloseEditElderlyModal();
+            zoneDashboardQueries[0].refetch();
+          }}
+        />
       </Modal>
-      <Modal title="ตั้งค่าอุปกรณ์" isOpen={isDeviceModalOpen} onClose={() => setIsDeviceModalOpen(false)}>
-        <SetElderlyDeviceForm 
+      <Modal
+        title="ตั้งค่าอุปกรณ์"
+        isOpen={isDeviceModalOpen}
+        onClose={() => setIsDeviceModalOpen(false)}
+      >
+        <SetElderlyDeviceForm
           isOpen={isDeviceModalOpen}
           onClose={() => setIsDeviceModalOpen(false)}
           elderData={selectedElderForDevice}
