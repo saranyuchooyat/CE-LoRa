@@ -8,6 +8,7 @@ function Header() {
     const location = useLocation(); 
     const navigate = useNavigate();
 
+    // 🟢 ฟังก์ชัน Log out (กดออกเอง)
     const handleLogoutClick = async () => {
         try {
             const token = sessionStorage.getItem('token');
@@ -27,6 +28,7 @@ function Header() {
         }
     };
 
+    // 👤 จัดการดึงชื่อ User มาแสดงที่มุมขวาบน
     useEffect(() => {
         console.log("header", location.state)
         if (location.state?.user) {
@@ -45,6 +47,34 @@ function Header() {
             }
         }
     }, [location.state]);
+
+    // 💓 ระบบ Heartbeat: ตัวส่งชีพจรไปบอกหลังบ้านทุกๆ 1 นาที
+    useEffect(() => {
+        const sendHeartbeat = async () => {
+            const token = sessionStorage.getItem('token');
+            if (token) {
+                try {
+                    // ยิง API ไปบอก Go ว่า "ฉันยังอยู่นะ!"
+                    await api.post('/heartbeat', {}, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    // จารย์สามารถเอาคอมเมนต์บรรทัดล่างออก เพื่อดูใน Console ได้ครับว่ามันยิงจริงมั้ย
+                    // console.log("💓 Heartbeat sent!"); 
+                } catch (error) {
+                    console.error("Heartbeat failed:", error);
+                }
+            }
+        };
+
+        // 1. หน้า Header โหลดปุ๊บ ยิงบอก Go ทันที 1 รอบ
+        sendHeartbeat();
+
+        // 2. ตั้งเวลาให้ยิงซ้ำอัตโนมัติ ทุกๆ 1 นาที (60000 มิลลิวินาที)
+        const intervalId = setInterval(sendHeartbeat, 60000);
+
+        // 3. Cleanup Function: ถ้า Header โดนทำลาย (เช่น Log out) ให้หยุดส่งชีพจร
+        return () => clearInterval(intervalId);
+    }, []);
 
     return (
         <>

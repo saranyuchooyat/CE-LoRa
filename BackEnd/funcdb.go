@@ -1541,3 +1541,56 @@ func getElderIDByName(name string) string {
 	id, _ := elder["elder_id"].(string)
 	return id
 }
+
+func heartbeat(c *fiber.Ctx) error {
+	// 1. ดึง ID ว่าใครส่งชีพจรมา
+	userToken := c.Locals("user").(*jwt.Token)
+	claims := userToken.Claims.(jwt.MapClaims)
+	userID := claims["user_id"].(string)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// 2. อัปเดตเวลาล่าสุด (last_active) และย้ำว่ายัง Online อยู่
+	_, err := getCollection("users").UpdateOne(ctx,
+		bson.M{"user_id": userID},
+		bson.M{"$set": bson.M{
+			"last_active": time.Now(),
+			"is_online":   true,
+		}},
+	)
+
+	if err != nil {
+		fmt.Println("Error updating heartbeat:", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to beat"})
+	}
+
+	return c.SendStatus(fiber.StatusOK)
+}
+
+func StartOnlineStatusMonitor() {
+	ticker := time.NewTicker(1 * time.Minute) // ยามเดินตรวจทุกๆ 1 นาที
+
+	go func() {
+		for range ticker.C {
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+			// กำหนดเส้นตาย: เวลาปัจจุบัน ถอยหลังไป 2 นาที
+			deadline := time.Now().Add(-2 * time.Minute)
+
+			// ค้นหาคนที่ Online อยู่ แต่ last_active เก่ากว่า 2 นาที แล้วจับเปลี่ยนเป็น false ให้หมด
+			_, err := getCollection("users").UpdateMany(ctx,
+				bson.M{
+					"is_online":   true,
+					"last_active": bson.M{"$lt": deadline}, // $lt = less than (เก่ากว่า)
+				},
+				bson.M{"$set": bson.M{"is_online": false}},
+			)
+
+			if err != nil {
+				fmt.Println("Monitor Error:", err)
+			}
+			cancel()
+		}
+	}()
+}

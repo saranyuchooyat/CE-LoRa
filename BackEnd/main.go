@@ -24,6 +24,7 @@ func main() {
 
 	app := fiber.New()
 	StartAlertMonitor()
+	StartOnlineStatusMonitor()
 	// CORS Setup
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
@@ -49,6 +50,8 @@ func main() {
 	}))
 
 	app.Post("/logout", logout)
+
+	app.Post("/heartbeat", heartbeat)
 
 	// --- Users ---
 	app.Get("/users", getAllUser)        //✅
