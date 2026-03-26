@@ -4,7 +4,7 @@ import api from '../API';
 import ApiDelete from '../API-Delete';
 import { showConfirm, showPopup } from '../Popup';
 
-function ZoneTable({ data, onEdit, showActions=true }) {
+function ZoneTable({ data, onEdit, onSetting, showActions=true }) {
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -51,6 +51,13 @@ function ZoneTable({ data, onEdit, showActions=true }) {
         event.stopPropagation();
         if(onEdit){
             onEdit(zone);
+        }
+    };
+
+    const handleSettingClick = (zone, event) => {
+        event.stopPropagation();
+        if(onSetting){
+            onSetting(zone);
         }
     };
 
@@ -105,7 +112,9 @@ function ZoneTable({ data, onEdit, showActions=true }) {
                                         <button className="table-btn hover:bg-main-yellow hover:text-white"
                                                 onClick={(event) => handleEditClick(card, event)}>
                                             แก้ไข</button>
-                                        <button className="table-btn hover:bg-green-500 hover:text-white">ตั้งค่า</button>
+                                        <button className="table-btn hover:bg-green-500 hover:text-white"
+                                                onClick={(event) => handleSettingClick(card, event)}>
+                                            ตั้งค่า</button>
                                         <button className="table-btn hover:bg-main-red hover:text-white"
                                                 // ✅ แก้ไข: ใช้ card.zone_id
                                                 onClick={(event) => handleDeleteClick(card.zone_id, event)}

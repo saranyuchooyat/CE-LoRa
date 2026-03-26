@@ -175,7 +175,6 @@ function ZoneDashboardDetail() {
           title={zoneDetail?.name || "Zone Detail"}
           description={"Zone Admin Dashboard"}
           onButtonClick={null}
-          // detail={filteredZoneStaffData.length + " คน"}
           detail={false}
         >
           <button 
@@ -192,11 +191,12 @@ function ZoneDashboardDetail() {
         />
         <SummaryCard data={allDeviceStatus} />
 
-        <MenuNameCard2
-          title={allEldery.length}
-          description="จำนวนผู้สูงอายุทั้งหมด"
+        <MenuNameCard
+          title= {"จำนวนผู้สูงอายุทั้งหมด" + " " + allEldery.length + " คน"}
+          description={false}
           onButtonClick={handleOpenModal}
-          buttonText="เพิ่มผู้สูงอายุ"
+          detail={false}
+          buttonText="ผู้สูงอายุ"
         />
         <DataTableCard
           data={allEldery}

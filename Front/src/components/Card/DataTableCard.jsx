@@ -1,6 +1,5 @@
 import CardNotification from "./NotificationCard";
 import ZoneTable from "../Table/ZoneTable";
-import ZoneAdminTable from "../Table/ZoneAdminTable";
 import UserTable from "../Table/UserTable";
 import ElderlyDataTable from "../Table/ElderlyDataTable";
 
@@ -61,7 +60,7 @@ function DataTableCard({ data, onEdit, onSetting, onDeleteSuccess, onRowClick, s
     }
     else if(isZoneData(data)){
         console.log("ZonePass")
-        displayContent = <ZoneTable data={data} onEdit={onEdit} showActions={showActions}/>;
+        displayContent = <ZoneTable data={data} onEdit={onEdit} onSetting={onSetting} showActions={showActions}/>;
     }
     else if(isStaffData(data)){
         console.log("StaffPass")
@@ -73,7 +72,6 @@ function DataTableCard({ data, onEdit, onSetting, onDeleteSuccess, onRowClick, s
     }
     else if(isElderlyData(data)){
         console.log("ElderlyPass")
-        // ✅ 2. ส่งต่อท่อ onRowClick ให้ตาราง ElderlyDataTable
         displayContent = <ElderlyDataTable data={data} showActions={showActions} onEdit={onEdit} onSetting={onSetting} onDeleteSuccess={onDeleteSuccess} onRowClick={onRowClick} />
     }
 

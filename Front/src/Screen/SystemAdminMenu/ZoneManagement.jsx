@@ -8,6 +8,7 @@ import DataTableCard from "../../components/Card/DataTableCard";
 import Modal from "../../components/ModalForm/Modal";
 import AddZoneForm from "../../components/ModalForm/AddZoneForm";
 import EditZoneForm from "../../components/ModalForm/EditZoneForm";
+import SetZoneForm from "../../components/ModalForm/SetZoneForm";
 
 //กำหนดตัวแปรแต่ละช่อง Filter
 const initialFilters = {
@@ -28,6 +29,7 @@ function ZoneManagement() {
 
   const [selectedZoneData, setSelectedZoneData] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isSetModalOpen, setIsSetModalOpen] = useState(false);
 
   //ดึงข้อมูลหลังบ้าน
   const zoneQueries = useQueries({
@@ -62,6 +64,15 @@ function ZoneManagement() {
     setIsEditModalOpen(false);
   }
 
+  // ฟังก์ชันเปิด Modal ตั้งค่า
+  const handleOpenSetModal = (zone) => {
+    setSelectedZoneData(zone);
+    setIsSetModalOpen(true);
+  };
+  const handleCloseSetModal = () => {
+    setSelectedZoneData(null);
+    setIsSetModalOpen(false);
+  }
 
   //ระบบ filter
   const handleFilterChange = (key, value) => {
@@ -144,6 +155,7 @@ function ZoneManagement() {
         <DataTableCard 
           data={filteredZones} 
           onEdit={handleOpenEditModal}
+          onSetting={handleOpenSetModal}
         />
       </div>
 
@@ -173,6 +185,19 @@ function ZoneManagement() {
           onSaveSuccess={() => zoneQueries[0].refetch()}
         />
       </Modal>
+
+      <Modal
+        title="กำหนด Zone"
+        isOpen={isSetModalOpen}
+        onClose={handleCloseSetModal}
+      >
+        <SetZoneForm
+          zoneData={selectedZoneData} 
+          zoneId={selectedZoneData?.zone_id} 
+          onClose={handleCloseSetModal}
+          onSaveSuccess={() => zoneQueries[0].refetch()}
+        />
+      </Modal>  
     </>
   );
 }
