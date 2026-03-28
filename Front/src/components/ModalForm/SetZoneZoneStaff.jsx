@@ -310,22 +310,9 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
                 </div>
             )}
 
-            <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">สถานะบัญชีผู้ใช้งาน:</label>
-                <select
-                    value={accountStatus}
-                    onChange={(e) => setAccountStatus(e.target.value)}
-                    className="border text-sm rounded w-full p-2.5 bg-white"
-                    required
-                >
-                    <option value="Active">Active (เปิดใช้งาน)</option>
-                    <option value="Inactive">Inactive (ระงับบัญชี)</option>
-                </select>
-            </div>
-
             <div className="flex justify-end gap-3 mt-6 border-t pt-4">
                 <button type="submit" disabled={isSubmitting} className="submit-btn">
-                    {isSubmitting ? "กำลังบันทึก..." : "ยืนยันการตั้งค่า"}
+                    {isSubmitting ? "กำลังบันทึก..." : "บันทึกการตั้งค่า"}
                 </button>
                 <button type="button" onClick={onClose} className="cancel-btn">ยกเลิก</button>
             </div>
