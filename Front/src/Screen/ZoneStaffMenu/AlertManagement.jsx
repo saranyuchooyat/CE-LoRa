@@ -15,7 +15,19 @@ function AlertManagement() {
   const { data: alerts = [], isLoading } = useQuery({
     queryKey: ["allAlerts"],
     queryFn: async () => {
-      const res = await api.get("/alerts");
+      const storedUser = sessionStorage.getItem("user");
+      let url = "/alerts";
+      if (storedUser) {
+        try {
+          const userData = JSON.parse(storedUser);
+          if (userData.role === "Zone Staff" && userData.is_caregiver === true) {
+            url = "/alerts/my";
+          }
+        } catch (e) {
+          console.error("Failed to parse user data:", e);
+        }
+      }
+      const res = await api.get(url);
       return res.data;
     },
     refetchInterval: 3000,

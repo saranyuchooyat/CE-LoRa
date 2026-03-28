@@ -90,7 +90,7 @@ function ZoneDashboard(){
                     onButtonClick={false}
                     // ✅ แก้ไข: ดึงจำนวนมาจากข้อมูลโซนจริงๆ ไม่ใช่จากจำนวน Query
                     detail={filteredZones.length + " พื้นที่"} 
-                    buttonText="จำนวนพื้นที่ที่ผู้ใช้งานดูแล => "
+                    buttonText="จำนวนพื้นที่ที่ผู้ใช้งานดูแล "
                 />
 
                 <CardFilter
