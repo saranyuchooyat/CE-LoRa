@@ -6,7 +6,7 @@ services:
       context: ./BackEnd
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "8081:8080"
     environment:
       - MONGO_URI=mongodb://admin_kmitl:kmitl123@100.118.210.62:27017/LoRa?authSource=LoRa
       - JWT_SECRET=xx12345ce
@@ -17,7 +17,7 @@ services:
       context: ./FrontEnd
       dockerfile: Dockerfile
       args:
-        - VITE_API_URL=http://100.118.210.62:8080
+        - VITE_API_URL=http://100.118.210.62:8081
     ports:
       - "3000:80"
     restart: always
