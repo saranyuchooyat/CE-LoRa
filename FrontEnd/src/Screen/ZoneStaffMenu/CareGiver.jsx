@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import api from "../../components/api";
 import DataTableCard from "../../components/card/dataTableCard";
-import ElderlyProfileView from "../../components/card/elderlyProfileView";
-import MenuNameCard2 from "../../components/mainCardOption/menuNameCard2";
+import ElderlyProfileView from "../elderlyProfileView";
+import MenuNameCard from "../../components/mainCardOption/menuNameCard";
 
 function CareGiver() {
     const location = useLocation();
@@ -73,11 +73,12 @@ function CareGiver() {
 
     return (
         <div className="mx-5 mt-5">
-            <MenuNameCard2 
-                title={assignedEldersData.length}
-                description="จำนวนผู้สูงอายุที่อยู่ในความดูแล"
+            <MenuNameCard
+                title={"จำนวนผู้สูงอายุที่อยู่ในการควบคุมดูแล" + " " + assignedEldersData.length + " คน"}
+                description={false}
                 onButtonClick={null}
-                buttonText=""
+                detail={false}
+                buttonText={null}
             />
             
             <div className="mt-4">

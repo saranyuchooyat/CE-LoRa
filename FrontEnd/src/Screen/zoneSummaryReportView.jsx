@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import api from "../api"; 
-import MenuNameCard from "../mainCardOption/menuNameCard";
-import SummaryCard from "./summaryCard";
+import api from "../components/api"; 
+import MenuNameCard from "../components/mainCardOption/menuNameCard";
+import SummaryCard from "../components/card/summaryCard";
 
 // ✅ 1. อย่าลืมรับ props `eldersData` ที่ส่งมาจากหน้าหลักด้วยนะครับ
 function ZoneSummaryReportView({ zoneId, zoneName, eldersData, onBack }) {

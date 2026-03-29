@@ -5,7 +5,7 @@ import SystemOverviewDashboard from "./SystemAdminMenu/SystemOverviewDashboard";
 import ZoneManagement from "./SystemAdminMenu/ZoneManagement";
 import UserManagement from "./SystemAdminMenu/UserManagement";
 import ZoneDashboard from "./ZoneAdminMenu/ZoneDashboard";
-import ZoneDashboardDetail from "./ZoneAdminMenu/ZoneDashboardDetail";
+import ZoneDashboardDetail from "./ZoneDashboardDetail";
 import DeviceManagement from "./ZoneAdminMenu/DeviceManagement";
 import ZoneStaffManagement from "./ZoneAdminMenu/ZoneStaffManagement";
 import NotFoundPage from "./NotFound";
@@ -14,7 +14,7 @@ import DeviceDetail from "./DeviceDetail";
 import ElderlyMonitoring from "./ZoneStaffMenu/ElderlyMonitoring";
 import AlertManagement from "./ZoneStaffMenu/AlertManagement";
 import CareGiver from "./ZoneStaffMenu/CareGiver";
-import ElderlyProfileView from "../components/card/elderlyProfileView";
+import ElderlyProfileView from "./elderlyProfileView";
 
 function MainLayout() {
   return (

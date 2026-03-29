@@ -3,8 +3,6 @@ import { useLocation } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
 import api from "../../components/api";
 import MenuNameCard from "../../components/mainCardOption/menuNameCard";
-import MenuNameCard2 from '../../components/mainCardOption/menuNameCard2';
-import SummaryCard from "../../components/card/summaryCard";
 import CardFilter from "../../components/card/cardFilter";
 import DataTableCard from "../../components/card/dataTableCard";
 import Modal from "../../components/modalForm/modal";
@@ -178,11 +176,13 @@ function ZoneStaffManagement(){
                 buttonText="ผู้ใช้งาน"/>
 
                 {/* <SummaryCard data={staffData}/> */}
-                <MenuNameCard2
-                    title={zonestaffData.length}
-                    description=" จำนวน Zone Staff ทั้งหมด"
-                    detail={false}
-                />
+                <MenuNameCard
+                title={"จำนวนผู้ ZoneStaff ทั้งหมด" + " " + zonestaffData.length + " คน"}
+                description={false}
+                onButtonClick={null}
+                detail={false}
+                buttonText={null}
+            />
  
                 <CardFilter
                     name="ผู้ใช้งาน"

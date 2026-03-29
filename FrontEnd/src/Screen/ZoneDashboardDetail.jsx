@@ -1,17 +1,15 @@
 import { useState, useEffect } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
-import api from "../../components/api";
-import MenuNameCard from "../../components/mainCardOption/menuNameCard";
-import MenuNameCard2 from "../../components/mainCardOption/menuNameCard2";
-import SummaryCard from "../../components/card/summaryCard";
-import DataTableCard from "../../components/card/dataTableCard";
-import Modal from "../../components/modalForm/modal";
-import AddElderlyform from "../../components/modalForm/addElderly";
-import EditElderlyForm from "../../components/modalForm/editElderlyForm";
-import ElderlyProfileView from "../../components/card/elderlyProfileView";
-import ZoneSummaryReportView from "../../components/card/zoneSummaryReportView";
-import SetElderlyDeviceForm from "../../components/modalForm/setElderlyDeviceForm";
+import api from "../components/api";
+import MenuNameCard from "../components/mainCardOption/menuNameCard";
+import SummaryCard from "../components/card/summaryCard";
+import DataTableCard from "../components/card/dataTableCard";
+import Modal from "../components/modalForm/modal";
+import AddElderlyform from "../components/modalForm/addElderly";
+import EditElderlyForm from "../components/modalForm/editElderlyForm";
+import ElderlyProfileView from "./elderlyProfileView";
+import SetElderlyDeviceForm from "../components/modalForm/setElderlyDeviceForm";
 
 function ZoneDashboardDetail() {
   const { zoneid } = useParams();
