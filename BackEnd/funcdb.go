@@ -1247,6 +1247,7 @@ func checkDeviceAndCreateAlert(device bson.M) {
 	var latestData bson.M
 	opts := options.FindOne().SetSort(bson.D{{Key: "timestamp", Value: -1}})
 	err = MI.DB.Collection("device_data").FindOne(ctx, bson.M{"device.device_name": targetName}, opts).Decode(&latestData)
+	dataType, _ := latestData["data_type"].(string)
 
 	if err == nil {
 		if swData, ok := latestData["smartwatch_data"].(bson.M); ok {
@@ -1255,28 +1256,39 @@ func checkDeviceAndCreateAlert(device bson.M) {
 			}
 
 			var hr int
-			if val, ok := swData["heart_rate"]; ok {
-				switch v := val.(type) {
-				case int32:
+			if dataType == "SOS" {
+				CreateAlertWithCheck(
+					elderID,
+					"🆘 แจ้งเตือนฉุกเฉิน (SOS)!",
+					"คุณ "+assignedName+" กดปุ่มขอความช่วยเหลือจากนาฬิกา",
+					"high",
+					"SOS",
+				)
+			}
+			if dataType == "Data" {
+				if val, ok := swData["heart_rate"]; ok {
+					switch v := val.(type) {
+					case int32:
 
-					hr = int(v)
+						hr = int(v)
+					}
 				}
-			}
-			if hr > 0 {
-				checkHR(elderID, int(hr), assignedName)
-			}
+				if hr > 0 {
+					checkHR(elderID, int(hr), assignedName)
+				}
 
-			var batt float64
-			if val, ok := swData["device_battery"]; ok {
-				switch v := val.(type) {
-				case float64:
-					batt = v
-				case int32:
-					batt = float64(v)
+				var batt float64
+				if val, ok := swData["device_battery"]; ok {
+					switch v := val.(type) {
+					case float64:
+						batt = v
+					case int32:
+						batt = float64(v)
+					}
 				}
-			}
-			if batt < 20 && batt > 0 {
-				CreateAlertWithCheck(elderID, "🪫 แบตเตอรี่ต่ำ", "นาฬิกาของ "+assignedName+" เหลือ "+fmt.Sprintf("%.0f", batt)+"%", "low", "BATT")
+				if batt < 20 && batt > 0 {
+					CreateAlertWithCheck(elderID, "🪫 แบตเตอรี่ต่ำ", "นาฬิกาของ "+assignedName+" เหลือ "+fmt.Sprintf("%.0f", batt)+"%", "low", "BATT")
+				}
 			}
 		}
 	}
