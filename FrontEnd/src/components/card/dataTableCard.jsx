@@ -1,4 +1,3 @@
-import CardNotification from "./notificationCard";
 import ZoneTable from "../table/zoneTable";
 import UserTable from "../table/userTable";
 import ElderlyDataTable from "../table/elderlyDataTable";
@@ -10,14 +9,6 @@ function DataTableCard({ data, onEdit, onSetting, onDeleteSuccess, onRowClick, s
 
     let displayContent = null
     let displayHeader = null
-
-    const isNotiData = (arr) => {
-        if (!Array.isArray(arr) || arr.length === 0) {
-            return false;
-        }
-        console.log("arr1",'id' in arr[0] && 'title' in arr[0])
-        return 'id' in arr[0] && 'title' in arr[0];
-    };
 
     const isZoneData = (arr) => {
         if (!Array.isArray(arr) || arr.length === 0) {
@@ -53,12 +44,8 @@ function DataTableCard({ data, onEdit, onSetting, onDeleteSuccess, onRowClick, s
     }
 
 
-    if(isNotiData(data)){
-        console.log("NotiPass")
-        displayHeader = "System Alerts & Notifications";
-        displayContent = <div className="h-[250px]"><CardNotification data={data}/></div>;
-    }
-    else if(isZoneData(data)){
+
+    if(isZoneData(data)){
         console.log("ZonePass")
         displayContent = <ZoneTable data={data} onEdit={onEdit} onSetting={onSetting} showActions={showActions}/>;
     }
