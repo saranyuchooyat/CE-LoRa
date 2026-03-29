@@ -15,6 +15,7 @@ import ElderlyMonitoring from "./ZoneStaffMenu/ElderlyMonitoring";
 import AlertManagement from "./ZoneStaffMenu/AlertManagement";
 import CareGiver from "./ZoneStaffMenu/CareGiver";
 import ElderlyProfileView from "./elderlyProfileView";
+import MyAlertManagement from "./myAlertManagement";
 
 function MainLayout() {
   return (
@@ -42,6 +43,7 @@ function MainLayout() {
           <Route path="/eldery-monitoring" element={<ElderlyMonitoring />} />
           <Route path="/alert-management" element={<AlertManagement />} />
           <Route path="/eldery-monitoring/:id" element={<ElderlyProfileView />} />
+          <Route path="/my-alert-management" element={<MyAlertManagement />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>

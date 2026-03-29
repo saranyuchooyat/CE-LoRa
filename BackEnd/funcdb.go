@@ -1106,12 +1106,11 @@ func GetMyAlerts(c *fiber.Ctx) error {
 	}
 
 	filter := bson.M{
-		"status":   "unread",
 		"elder_id": bson.M{"$in": assigned},
 	}
 
 	cursor, err := MI.DB.Collection("alerts").Find(context.Background(), filter)
-	var alerts []bson.M
+	var alerts []bson.M = []bson.M{}
 	cursor.All(context.Background(), &alerts)
 
 	return c.JSON(alerts)

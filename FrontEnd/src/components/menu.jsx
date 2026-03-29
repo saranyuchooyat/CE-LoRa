@@ -64,7 +64,7 @@ function Menu() {
     },
     "Elderly Caregiver": {
       "My Elders Dashboard": "/caregiver",
-      "Alert Management": "/alert-management",
+      "Alert Management": "/my-alert-management",
     },
   };
 
