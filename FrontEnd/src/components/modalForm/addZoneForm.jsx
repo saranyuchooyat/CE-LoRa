@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../api.jsx";
 
 function AddZoneForm({ onClose, onSaveSuccess }){
 
@@ -25,9 +25,6 @@ function AddZoneForm({ onClose, onSaveSuccess }){
         e.preventDefault(); 
         setIsSubmitting(true);
 
-        // 1. ดึง Token จาก sessionStorage (เปลี่ยนชื่อ Key ตามที่คุณตั้งไว้ตอน Login)
-        const token = sessionStorage.getItem('token'); 
-
         const dataToSend = {
             zone_name: formData.zonename,    // แก้จาก zoneName -> zone_name
             zone_address: formData.address,  // แก้จาก address -> zone_address
@@ -38,12 +35,7 @@ function AddZoneForm({ onClose, onSaveSuccess }){
 
         try {
             // 2. ส่ง request พร้อมแนบ Header Authorization
-            await axios.post("${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/zones", dataToSend, {
-                headers: {
-                    // รูปแบบมาตรฐานคือ 'Bearer [TOKEN]'
-                    'Authorization': `Bearer ${token}` 
-                }
-            }); 
+            await api.post("/zones", dataToSend); 
             
             if (typeof onSaveSuccess === 'function') {
                 onSaveSuccess(); 

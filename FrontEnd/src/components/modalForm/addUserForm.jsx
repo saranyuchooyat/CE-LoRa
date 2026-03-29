@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../api.jsx";
 import { showPopup } from "./popup";
 
 function AddUserForm({ onClose, onSaveSuccess }){
@@ -40,9 +40,6 @@ function AddUserForm({ onClose, onSaveSuccess }){
         e.preventDefault(); 
         setIsSubmitting(true);
 
-        // ดึง Token จาก sessionStorage มาใช้ยืนยันตัวตน
-        const token = sessionStorage.getItem('token'); 
-
         // จัดเตรียม Object สำหรับส่งไป API (รวมชื่อ-นามสกุล และ map ค่าให้ตรงกับ Backend)
         const dataToSend = {
             first_name: formData.firstName.trim(),
@@ -59,11 +56,7 @@ function AddUserForm({ onClose, onSaveSuccess }){
 
         try {
             // ส่ง request ไปยัง Endpoint สำหรับ User (ปกติจะเป็น /users หรือ /create-user)
-            await axios.post("${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/users", dataToSend, {
-                headers: {
-                    'Authorization': `Bearer ${token}` 
-                }
-            }); 
+            await api.post("/users", dataToSend);
             
             showPopup("สำเร็จ", "เพิ่มข้อมูลผู้ใช้เรียบร้อยแล้ว", "success");
             // หากสำเร็จ: แจ้งให้ Component แม่รีเฟรชข้อมูล (refetch) และปิด Modal

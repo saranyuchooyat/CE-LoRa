@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+// 1. ลบ import axios ออก แล้วดึง api เข้ามาแทน
+import api from "../components/api"; // ⚠️ เช็ค path ให้ตรงกับที่อยู่ของไฟล์ api.jsx นะครับ
 
 function DeviceDetail() {
   const { device_id } = useParams();
@@ -8,13 +9,10 @@ function DeviceDetail() {
   const [deviceData, setDeviceData] = useState(null);
   const fetchData = async () => {
     try {
-      const token = sessionStorage.getItem("token");
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/device_data/${device_id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }, // แนบไปด้วย!
-        },
-      );
+      // 2. ลบการดึง Token ด้วยตัวเองออก เพราะ api.jsx จัดการให้แล้ว
+      // 3. เปลี่ยนจาก axios.get เป็น api.get และใช้ URL แบบสั้น
+      const res = await api.get(`/device_data/${device_id}`);
+      
       setDeviceData(res.data); // ข้อมูลประกอบด้วย { info: {...}, data: {...} }
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -23,7 +21,7 @@ function DeviceDetail() {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 1000); // ดึงข้อมูลใหม่ทุก 3 วินาที
+    const interval = setInterval(fetchData, 1000); // ดึงข้อมูลใหม่ทุก 3 วินาที (จริงๆ 1000 คือ 1 วินาทีนะจารย์)
     return () => clearInterval(interval); // ล้างหน่วยความจำเมื่อออกจากหน้า
   }, [device_id]);
 
@@ -49,7 +47,6 @@ function DeviceDetail() {
           <span
             className={`px-4 py-1 rounded-full text-sm font-medium ${sw?.is_wearing == true ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}
           >
-            {/* {sw?.is_wearing === "Worn" ? "⌚ สวมใส่อยู่" : "⭕ ไม่ได้สวมใส่"} */}
             {sw?.is_wearing == true ? "สวมใส่อยู่" : "ไม่ได้สวมใส่"}
           </span>
         </div>
@@ -57,7 +54,6 @@ function DeviceDetail() {
 
       {!data ? (
         <div className="bg-amber-50 p-6 rounded-2xl text-amber-700">
-          {/* ⚠️ ยังไม่มีสัญญาณข้อมูล */}
           ยังไม่มีสัญญาณข้อมูล
         </div>
       ) : (
@@ -101,19 +97,16 @@ function DeviceDetail() {
                 {/* 1. เช็คเคส SOS ก่อน (สำคัญสุด) */}
                 {sw?.is_sos_called === 1 ? (
                   <div className="flex items-center gap-2 text-red-600 animate-pulse">
-                    {/* <span className="text-3xl font-black">🆘 SOS!</span> */}
                     <span className="text-3xl font-black">SOS!</span>
                   </div>
                 ) : /* 2. เช็คเคสล้ม */
                 sw?.is_fallen ? (
                   <div className="flex items-center gap-2 text-red-600 animate-bounce">
-                    {/* <span className="text-3xl font-black">🚨 ล้ม!</span> */}
                     <span className="text-3xl font-black">ล้ม!</span>
                   </div>
                 ) : (
                   /* 3. ถ้าไม่เข้าทั้งสองอย่าง คือปกติ */
                   <div className="flex items-center gap-2 text-emerald-500">
-                    {/* <span className="text-2xl font-bold">✅ ปกติ</span> */}
                     <span className="text-2xl font-bold">ปกติ</span>
                   </div>
                 )}

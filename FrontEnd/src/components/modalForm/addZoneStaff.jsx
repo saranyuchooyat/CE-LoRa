@@ -1,9 +1,8 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../api.jsx";
 import { showPopup } from "./popup";
 
 function AddZoneStaffForm({ onClose, onSaveSuccess, zones }) {
-    // 1. กำหนดโครงสร้าง State ให้ครบตามฟิลด์ที่ต้องการ
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -21,7 +20,6 @@ function AddZoneStaffForm({ onClose, onSaveSuccess, zones }) {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // 2. Handler สำหรับการพิมพ์ใน input ทั่วไป
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -30,17 +28,12 @@ function AddZoneStaffForm({ onClose, onSaveSuccess, zones }) {
         }));
     };
 
-    // 4. ฟังก์ชันส่งข้อมูล (ยึด Logic ตาม AddZoneForm)
     const handleSubmit = async (e) => {
         e.preventDefault(); 
         setIsSubmitting(true);
 
-        // ดึง Token จาก sessionStorage มาใช้ยืนยันตัวตน
-        const token = sessionStorage.getItem('token'); 
-
         const currentZoneId = formData.zoneIds[0];
 
-        // จัดเตรียม Object สำหรับส่งไป API (รวมชื่อ-นามสกุล และ map ค่าให้ตรงกับ Backend)
         const dataToSend = {
             first_name: formData.firstName.trim(),
             last_name: formData.lastName.trim(),
@@ -50,20 +43,16 @@ function AddZoneStaffForm({ onClose, onSaveSuccess, zones }) {
             phone: formData.phone,
             description: formData.description,
             position: formData.position,
-            role: "Zone Staff", // Force Role as Zone Staff
-            zone_id: currentZoneId || "" // Send exact zone string ID
+            role: "Zone Staff",
+            zone_id: currentZoneId || ""
         };
+
         console.log("Data to send:", dataToSend);
+
         try {
-            // ส่ง request ไปยัง Endpoint สำหรับ        try {
-            await axios.post("${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/users", dataToSend, {
-                headers: {
-                    'Authorization': `Bearer ${token}` 
-                }
-            }); 
+            await api.post("/users", dataToSend);
             
             showPopup("สำเร็จ", "เพิ่มหมวดหมู่หรือโซนเรียบร้อยแล้ว", "success");
-            // หากสำเร็จ: แจ้งให้ Component แม่รีเฟรชข้อมูล (refetch) และปิด Modal
             if (typeof onSaveSuccess === 'function') {
                 onSaveSuccess(); 
             }
@@ -72,7 +61,6 @@ function AddZoneStaffForm({ onClose, onSaveSuccess, zones }) {
             }
 
         } catch (error) {
-            // จัดการ Error เหมือนใน AddZoneForm เพื่อการ Debug ที่ง่ายขึ้น
             if (error.response) {
                 console.error("Server Error Detail:", error.response.data);
             }
@@ -85,7 +73,6 @@ function AddZoneStaffForm({ onClose, onSaveSuccess, zones }) {
     
     return (
         <form onSubmit={handleSubmit}> 
-            {/* ส่วนของฟิลด์ข้อมูลจัดเรียงแบบ Grid */}
             <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                 <div className="mb-2">
                     <label className="block text-gray-700 text-sm">ชื่อ</label>
@@ -112,18 +99,16 @@ function AddZoneStaffForm({ onClose, onSaveSuccess, zones }) {
                     <input name="password" type="password" value={formData.password} onChange={handleChange} className="border rounded w-full p-2 bg-white" required />
                 </div>
                 
-                {/* Dropdown โซน */}
                 <div className="mb-2">
                     <label className="block text-gray-700 text-sm">โซนที่ดูแล:</label>
                     <select
-                        name="zoneIds" // 💡 ปรับชื่อให้ตรงกับ state
-                        // เช็คความยาว Array ป้องกัน Error reading '0'
+                        name="zoneIds"
                         value={formData.zoneIds && formData.zoneIds.length > 0 ? formData.zoneIds[0] : ""} 
                         onChange={(e) => {
-                            const selectedId = e.target.value; // Store as string
+                            const selectedId = e.target.value;
                             setFormData(prev => ({
                                 ...prev,
-                                zoneIds: [selectedId] // 💡 เก็บค่า ID ลงใน Array
+                                zoneIds: [selectedId]
                             }));
                         }}
                         className="border rounded w-full p-2 bg-white"
@@ -144,7 +129,6 @@ function AddZoneStaffForm({ onClose, onSaveSuccess, zones }) {
                 </div>
             </div>
 
-            {/* ช่องรายละเอียดเพิ่มเติม (ขยายเต็มกว้าง) */}
             <div className="mb-4 mt-2">
                 <label className="block text-gray-700 text-sm">รายละเอียดเพิ่มเติม</label>
                 <textarea 
@@ -156,7 +140,6 @@ function AddZoneStaffForm({ onClose, onSaveSuccess, zones }) {
                 />
             </div>
 
-            {/* ปุ่มกด (Footer) */}
             <div className="pt-4 border-t flex justify-end gap-3">
                 <button 
                     type="submit" 

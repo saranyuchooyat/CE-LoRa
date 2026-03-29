@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import api from "../api";
 
 function AddDeviceForm({ onClose, onSaveSuccess }) {
@@ -65,7 +64,6 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const token = sessionStorage.getItem("token");
 
     const dataToSend = {
       device_id: nextId,
@@ -80,12 +78,7 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
 
     try {
       // 2. ส่ง request พร้อมแนบ Header Authorization
-      await axios.post("${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/devices", dataToSend, {
-        headers: {
-          // รูปแบบมาตรฐานคือ 'Bearer [TOKEN]'
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await api.post("/devices", dataToSend);
 
       if (typeof onSaveSuccess === "function") {
         onSaveSuccess();

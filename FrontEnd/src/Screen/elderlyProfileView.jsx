@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api.jsx";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 
@@ -19,11 +19,7 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
       if (id) {
         try {
           setIsLoading(true);
-          const token = sessionStorage.getItem("token");
-          // 🟢 เปลี่ยน path ให้ตรงกับที่พี่แก้ใน Go (คือ /elders/:id)
-          const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/elders/${id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const res = await api.get(`/elders/${id}`);
 
           if (res.data) {
             setElderData(res.data);
@@ -43,11 +39,7 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
   const fetchLiveVitals = async () => {
     if (!elderData?.device_id) return;
     try {
-      const token = sessionStorage.getItem("token");
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/device_data/${elderData.device_id}`,
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
+      const res = await api.get(`/device_data/${elderData.device_id}`);
       const vitals = res.data.data?.smartwatch_data;
       setLiveVitals(vitals);
 
