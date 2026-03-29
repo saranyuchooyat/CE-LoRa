@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../components/api.jsx";
 import LoginPic from "../assets/picture/LoginPic.png";
 
 function LoginPage() {
@@ -13,7 +13,7 @@ function LoginPage() {
     e.preventDefault();
 
     try {
-      const res = await axios.post("${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/auth/login", {
+      const res = await api.post("/auth/login", {
         username,
         password,
       });
