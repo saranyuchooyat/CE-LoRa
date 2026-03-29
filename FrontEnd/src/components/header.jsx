@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
 import api from "./api";
-import EmergencyPopup from "./modalForm/EmergencyPopup";
 
 function Header() {
 
@@ -59,8 +58,6 @@ function Header() {
                     await api.post('/heartbeat', {}, {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
-                    // จารย์สามารถเอาคอมเมนต์บรรทัดล่างออก เพื่อดูใน Console ได้ครับว่ามันยิงจริงมั้ย
-                    // console.log("💓 Heartbeat sent!"); 
                 } catch (error) {
                     console.error("Heartbeat failed:", error);
                 }
@@ -116,9 +113,6 @@ function Header() {
                     </div>
                 </div>
             </div>
-
-            {/* 🚨 2. ฝังระเบิด (Popup แจ้งเตือนฉุกเฉิน) ไว้ตรงนี้! มันจะลอยอยู่เหนือทุกสิ่งเมื่อเกิดเหตุ 🚨 */}
-            <EmergencyPopup />
         </>
     )
 }

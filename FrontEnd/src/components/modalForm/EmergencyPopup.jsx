@@ -4,7 +4,7 @@ import api from "../api";
 function EmergencyPopup() {
     const [emergencyAlert, setEmergencyAlert] = useState(null);
     
-    // 🛡️ State ความจำระยะสั้น: จำว่า _id (ObjectID) ไหนที่เราเพิ่งกดปิดไป จะได้ไม่เด้งซ้ำ
+    // 🛡️ State ความจำระยะสั้น: จำว่า _id (ObjectID) ไหนที่เราเพิ่งกดปิดไป
     const [dismissedAlerts, setDismissedAlerts] = useState([]);
 
     useEffect(() => {
@@ -16,23 +16,36 @@ function EmergencyPopup() {
 
         const fetchHighAlerts = async () => {
             try {
-                // 🟢 1. เปลี่ยนมายิง API เส้นใหม่ที่เพื่อน Go ทำไว้ให้ (ดึงเฉพาะ high และ unread)
-                const response = await api.get(`/alerts/emergency?severity=high&status=unread&zone_id=${user.zone_id}`);
+                // 📡 ยิงไปขอข้อมูล Alert ทั้งหมดที่ยังไม่ได้อ่าน ของโซนนี้
+                // (ถ้าเพื่อนมีเส้น /alerts/emergency ก็ใช้เส้นนั้นได้ แต่ถ้าไม่มีก็ใช้เส้น /alerts ปกติได้เลย)
+                const response = await api.get(`/alerts?status=unread`);
                 
                 if (response.data && response.data.length > 0) {
-                    // 🛡️ ดักควาย (เผื่อไว้): กรองเอาเฉพาะ Alert ที่ยังไม่เคยโดนกดปิด (ไม่อยู่ในบัญชีดำ)
-                    // รอบนี้เราใช้ _id (ของ MongoDB) ในการเช็คชัวร์สุดครับ
-                    const validHighAlerts = response.data.filter(alert => 
-                        !dismissedAlerts.includes(alert._id)
-                    );
+                    
+                    // 🚨 ไฮไลท์อยู่ตรงนี้ครับ! ตัวกรองขั้นเด็ดขาด (ดัก 3 ชั้น)
+                    const validHighAlerts = response.data.filter(alert => {
+                        // 1. ดัก severity ต้องเป็น "high" เท่านั้น (แปลงเป็นตัวเล็กเผื่อพิมพ์ใหญ่/เล็กมาไม่ตรง)
+                        const isHighSeverity = alert.severity?.toLowerCase() === 'high';
+                        
+                        // 2. ดัก status ต้องเป็น "unread" เท่านั้น
+                        const isUnread = alert.status === 'unread';
+                        
+                        // 3. เช็คว่า _id นี้ยังไม่เคยโดนกดยกเลิกในบัญชีดำ
+                        const notDismissed = !dismissedAlerts.includes(alert._id);
 
-                    // ถ้ากรองแล้วยังมีของเหลือ ค่อยเอามาโชว์ตัวแรก
+                        return isHighSeverity && isUnread && notDismissed;
+                    });
+
+                    // ถ้ากรองแล้วเจอ High จริงๆ ค่อยเอามาโชว์ตัวแรก
                     if (validHighAlerts.length > 0) {
                         setEmergencyAlert(validHighAlerts[0]); 
+                    } else {
+                        // ถ้าเจอแต่ Medium, Low ก็จะไม่เกิดอะไรขึ้น Popup ไม่เด้ง
+                        setEmergencyAlert(null);
                     }
                 }
             } catch (error) {
-                console.error("Failed to fetch emergency alerts:", error);
+                console.error("Failed to fetch alerts:", error);
             }
         };
 
@@ -45,19 +58,15 @@ function EmergencyPopup() {
     const handleAcknowledge = async () => {
         if (!emergencyAlert) return;
         
-        // 🟢 2. ดึง _id (ObjectID ยาวๆ ของ MongoDB) มาใช้ เพราะฟังก์ชัน MarkAlertRead ของ Go ต้องการตัวนี้!
+        // ใช้ _id จาก Database เป๊ะๆ
         const targetMongoId = emergencyAlert._id; 
         
-        // 1. เอา ID นี้ใส่ใน "บัญชีดำ" เพื่อไม่ให้มันเด้งขึ้นมาอีกในเซสชั่นนี้
         setDismissedAlerts(prev => [...prev, targetMongoId]);
-        
-        // 2. ปิด Popup ทันที (ให้หน้าเว็บลื่นๆ)
         setEmergencyAlert(null); 
         
         try {
-            // 3. แอบยิงไปบอก Go ให้เปลี่ยนสถานะเป็น read 
+            // ยิงไปเปลี่ยนสถานะ
             await api.put(`/alerts/${targetMongoId}/acknowledge`);
-            
         } catch (error) {
             console.error("Failed to acknowledge alert:", error);
         }

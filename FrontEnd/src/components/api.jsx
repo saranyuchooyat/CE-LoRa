@@ -3,7 +3,7 @@ import axios from 'axios';
 console.log(sessionStorage)
 const api = axios.create({
   // กำหนด Base URL
-  baseURL: 'http://100.118.210.62:8080', 
+  baseURL: 'http://localhost:8080', 
   timeout: 50000, // กำหนด Timeout
 });
 

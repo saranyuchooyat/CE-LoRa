@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import LoginPage from "./Screen/Login.jsx";
 import MainLayout from "./Screen/MainLayout.jsx";
 import { GlobalPopup } from "./components/modalForm/popup.jsx";
+import EmergencyPopup from "./components/modalForm/EmergencyPopup.jsx"; 
 
 const queryClient = new QueryClient();
 
@@ -10,11 +11,11 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <GlobalPopup />
-      <Routes>
-        {/* Route สำหรับหน้า Login ที่เป็นหน้าแรก */}
-        <Route path="/" element={<LoginPage />} />
+      
+      <EmergencyPopup />
 
-        {/* Route สำหรับหน้าอื่นๆ ที่ใช้โครงสร้างหลัก (Header, Menu, Contents) */}
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
         <Route path="/*" element={<MainLayout />} />
       </Routes>
     </QueryClientProvider>
