@@ -18,7 +18,6 @@ import (
 
 var jwtSecret = []byte("secret_lora_key_1234")
 
-// Helper: เรียกใช้ MI.DB จาก mongo.go
 func getCollection(collectionName string) *mongo.Collection {
 	return MI.DB.Collection(collectionName)
 }
@@ -90,7 +89,6 @@ func login(c *fiber.Ctx) error {
 }
 
 func logout(c *fiber.Ctx) error {
-	// ดึง Token จาก Header ออกมาเพื่อเช็คว่าใครกำลังเรียกใช้
 	userToken := c.Locals("user").(*jwt.Token)
 	claims := userToken.Claims.(jwt.MapClaims)
 	userID := claims["user_id"].(string)
@@ -98,7 +96,6 @@ func logout(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	// 🎯 สั่งให้ MongoDB อัปเดตสถานะ is_online กลับเป็น false
 	_, err := getCollection("users").UpdateOne(ctx,
 		bson.M{"user_id": userID},
 		bson.M{"$set": bson.M{"is_online": false}},
@@ -321,7 +318,6 @@ func updateUser(c *fiber.Ctx) error {
 		updateFields["account_status"] = userUpdate.AccountStatus
 	}
 
-	// ✅ กรองขยะ (ค่าว่าง) ออกจาก Array ของ AssignedElders ก่อน
 	var validElderIds []string
 	if userUpdate.AssignedElders != nil {
 		for _, eID := range userUpdate.AssignedElders {
@@ -333,24 +329,14 @@ func updateUser(c *fiber.Ctx) error {
 		validElderIds = []string{}
 	}
 
-	// ✅ ยัด 2 ฟิลด์ใหม่ลงไป (ข้อมูลคลีนๆ ไม่มีช่องว่างหลงเหลือ)
 	updateFields["is_caregiver"] = userUpdate.IsCaregiver
 	updateFields["assigned_elders"] = validElderIds
 
-	// =========================================================
-	// 🎯 1. อัปเดตข้อมูลฝั่ง User
-	// =========================================================
 	_, err := getCollection("users").UpdateOne(ctx, bson.M{"user_id": id}, bson.M{"$set": updateFields})
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Update failed"})
 	}
 
-	// =========================================================
-	// 🎯 2. ซิงค์ข้อมูลไปยังฝั่ง Elders
-	// =========================================================
-
-	// 2.1 ล้างไพ่: ดึง user_id ของสตาฟคนนี้ออกจากผู้สูงอายุทุกคนก่อน
-	// (ใช้ $pull เผื่อกรณีที่แอดมินปลดสตาฟออกจากการดูแลคนไข้บางคน)
 	_, err = getCollection("elders").UpdateMany(
 		ctx,
 		bson.M{"caregiver_user_id": id},
@@ -360,9 +346,7 @@ func updateUser(c *fiber.Ctx) error {
 		fmt.Println("Error pulling caregiver from elders:", err)
 	}
 
-	// 2.2 จ่ายไพ่ใหม่: ถ้าเป็น Caregiver ให้เอา user_id ไปใส่ให้ผู้สูงอายุที่ถูกเลือก
 	if userUpdate.IsCaregiver && len(validElderIds) > 0 {
-		// ใช้ $addToSet ยัด user_id เข้าไป (ป้องกันการใส่ค่าซ้ำ)
 		_, err = getCollection("elders").UpdateMany(
 			ctx,
 			bson.M{"elder_id": bson.M{"$in": validElderIds}},
@@ -414,19 +398,17 @@ func getMyZone(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{"error": "User not found"})
 	}
 
-	// 1. แกะรหัสโซนออกมา
 	var zoneIDs []string
 	if rawZone, ok := currentUser["zone_id"]; ok {
 		switch v := rawZone.(type) {
 		case string:
 			if v != "" {
-				// ✅ อัปเกรด: ถ้า Database เก็บมาเป็น "Z001,Z002" ให้หั่นแบ่งด้วยลูกน้ำ
 				parts := strings.Split(v, ",")
 				for _, p := range parts {
 					zoneIDs = append(zoneIDs, strings.TrimSpace(p))
 				}
 			}
-		case bson.A: // กรณีเป็น Array ใน MongoDB
+		case bson.A:
 			for _, val := range v {
 				if strVal, ok := val.(string); ok {
 					zoneIDs = append(zoneIDs, strVal)
@@ -435,18 +417,16 @@ func getMyZone(c *fiber.Ctx) error {
 		}
 	}
 
-	// 🔍 2. ปริ้นท์เช็คใน Terminal (สำคัญมาก! เอาไว้ดูว่ามันดึงโซนอะไรมาได้บ้าง)
 	fmt.Println("=====================================")
 	fmt.Printf("🧐 Debug User: %s\n", userID)
 	fmt.Printf("🧐 Zone IDs extracted: %v\n", zoneIDs)
 	fmt.Println("=====================================")
 
 	if len(zoneIDs) == 0 {
-		return c.JSON([]fiber.Map{}) // คืนค่า Array ว่างถ้าไม่มีโซน
+		return c.JSON([]fiber.Map{})
 	}
 
-	// 3. ไปดึงข้อมูลโซนจาก Collection zones
-	var myZones []bson.M // ใช้ bson.M เพื่อความเหนียวแน่น ไม่ต้องกลัว Struct พัง
+	var myZones []bson.M
 	cursor, err := getCollection("zones").Find(ctx, bson.M{"zone_id": bson.M{"$in": zoneIDs}})
 	if err == nil {
 		defer cursor.Close(ctx)
@@ -551,26 +531,21 @@ func getAllElderly(c *fiber.Ctx) error {
 	return c.JSON(elders)
 }
 func getElderDetail(c *fiber.Ctx) error {
-	// 1. รับ ID จาก URL (เช่น /elders/E001)
 	id := c.Params("id")
 	if id == "" {
 		return c.Status(400).JSON(fiber.Map{"error": "ID is required"})
 	}
 
-	// 2. ดึงคอลเลกชัน (ตรวจสอบชื่อ collection ให้ตรงกับที่พี่ใช้นะครับ)
 	collection := getCollection("elders")
 
 	var elder bson.M
 
-	// 3. ค้นหาด้วยฟิลด์ "elder_id" โดยตรง (ใช้ id ที่เป็น string ได้เลย)
 	err := collection.FindOne(context.Background(), bson.M{"elder_id": id}).Decode(&elder)
 
 	if err != nil {
-		// กรณีหาไม่เจอในระบบ
 		return c.Status(404).JSON(fiber.Map{"error": "ไม่พบข้อมูลผู้สูงอายุรหัสนี้"})
 	}
 
-	// 4. ส่งข้อมูลกลับไปให้ React
 	return c.Status(200).JSON(elder)
 }
 func getElderinZone(c *fiber.Ctx) error {
@@ -647,8 +622,6 @@ func updateElder(c *fiber.Ctx) error {
 
 	updateFields := bson.M{}
 
-	// ... (โค้ดเช็คตัวแปรอื่นๆ เหมือนเดิม) ...
-
 	if elderUpdate.PersonalMedicine != "" {
 		updateFields["personal_medicine"] = elderUpdate.PersonalMedicine
 	}
@@ -705,7 +678,6 @@ func getAllDevice(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	// 1. ดึงรายชื่ออุปกรณ์ทั้งหมดจากตาราง devices
 	cursor, err := getCollection("devices").Find(ctx, bson.M{})
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "ดึงข้อมูลอุปกรณ์ไม่สำเร็จ"})
@@ -716,12 +688,10 @@ func getAllDevice(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "ถอดรหัสข้อมูลไม่สำเร็จ"})
 	}
 
-	// 2. วนลูปเพื่อเอา "สถานะล่าสุด" มาแปะใส่แต่ละ Card
 	for i, device := range devices {
 		currentStatus, _ := device["status"].(string)
 		assignedTo, _ := device["assigned_to"].(string)
 
-		// ถ้ายังไม่ได้มอบหมาย (unassigned) ให้ข้ามการคำนวณ Online/Offline
 		if currentStatus == "unassigned" || assignedTo == "" || assignedTo == "None" {
 			devices[i]["status"] = "unassigned"
 			devices[i]["battery"] = 0
@@ -734,16 +704,13 @@ func getAllDevice(c *fiber.Ctx) error {
 		filter := bson.M{"device.device_name": targetName}
 		opts := options.FindOne().SetSort(bson.D{{Key: "timestamp", Value: -1}})
 
-		// แอบไปดูในสมุดบันทึก (device_data) ว่ามีข้อมูลล่าสุดไหม
 		err := MI.DB.Collection("device_data").FindOne(ctx, filter, opts).Decode(&latestData)
 
 		if err == nil {
-			// 1. ดึงแบตเตอรี่
 			if swData, ok := latestData["smartwatch_data"].(bson.M); ok {
 				devices[i]["battery"] = swData["device_battery"]
 			}
 
-			// 2. คำนวณสถานะ Online/Offline
 			lastUpdateStr, _ := latestData["timestamp"].(string)
 			lastUpdateTime, _ := time.Parse(time.RFC3339, lastUpdateStr)
 
@@ -760,7 +727,6 @@ func getAllDevice(c *fiber.Ctx) error {
 				newStatus = "online"
 			}
 
-			// 3. ยัดค่าใส่ตัวแปรที่จะส่งไปหน้าบ้าน
 			devices[i]["status"] = newStatus
 			devices[i]["last_update"] = lastUpdateStr
 
@@ -834,7 +800,6 @@ func getDeviceOwnerbyID(c *fiber.Ctx) error {
 
 	var elder bson.M
 
-	// 2. ไปที่ collection "elders" เพื่อหาคนที่มี device_id ตรงกับเครื่องนี้
 	err := getCollection("elders").FindOne(ctx, bson.M{"device_id": deviceID}).Decode(&elder)
 
 	if err != nil {
@@ -888,14 +853,11 @@ func updateDevice(c *fiber.Ctx) error {
 	}
 
 	if deviceUpdate.AssignedTo != "" {
-		// ขั้นตอนที่ A: ล้าง device_id ออกจาก Elder คนเก่าที่เคยถือเครื่องนี้
-		// (คนไหนเคยมี device_id นี้ ให้กลายเป็นค่าว่าง)
 		getCollection("elders").UpdateMany(ctx,
 			bson.M{"device_id": id},
 			bson.M{"$set": bson.M{"device_id": ""}},
 		)
 
-		// ขั้นตอนที่ B: อัปเดต device_id ให้คนใหม่
 		fullName := deviceUpdate.AssignedTo
 		nameParts := strings.Split(fullName, " ")
 
@@ -949,17 +911,14 @@ func getDeviceDataByDeviceName(c *fiber.Ctx) error {
 
 	targetName := deviceProfile["device_name"]
 
-	// 2. หาข้อมูลล่าสุดชุดเดียวจาก device_data โดยเทียบกับ device_name
 	var latestData bson.M
 	filter := bson.M{
 		"device.device_name": targetName,
 		"data_type":          "Data",
 	}
-	// Sort ตาม timestamp จากใหม่ไปเก่า (-1) และเอาแค่อันเดียว
 	opts := options.FindOne().SetSort(bson.D{{Key: "timestamp", Value: -1}})
 
 	err = MI.DB.Collection("device_data").FindOne(c.Context(), filter, opts).Decode(&latestData)
-	// กรณีหาชื่อเจอแต่ใน device_data ยังไม่มีข้อมูล
 	if err != nil {
 		return c.JSON(fiber.Map{
 			"info": deviceProfile,
@@ -967,10 +926,9 @@ func getDeviceDataByDeviceName(c *fiber.Ctx) error {
 		})
 	}
 
-	// 3. ส่งข้อมูลรวมร่างกลับไป
 	return c.JSON(fiber.Map{
-		"info": deviceProfile, // ข้อมูลจากตาราง devices
-		"data": latestData,    // ข้อมูลล่าสุดจากตาราง device_data
+		"info": deviceProfile,
+		"data": latestData,
 	})
 
 }
@@ -980,7 +938,6 @@ func getZoneDashboard(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	// 1. ดึงรายชื่อผู้สูงอายุใน Zone นี้ (ได้ zoneElders)
 	var zoneElders []Elder
 	cursor, err := getCollection("elders").Find(ctx, bson.M{"zone_id": zoneID})
 	if err != nil {
@@ -988,15 +945,12 @@ func getZoneDashboard(c *fiber.Ctx) error {
 	}
 	cursor.All(ctx, &zoneElders)
 
-	// 2. ดึง Devices ทั้งหมดมาทำ Map (Key คือ assigned_to) เพื่อให้ Match เร็วๆ
 	var allDevices []bson.M
 	deviceCursor, _ := getCollection("devices").Find(ctx, bson.M{})
 	deviceCursor.All(ctx, &allDevices)
 
-	// สร้างตัวช่วยค้นหา: [ชื่อ-นามสกุล] -> "online"/"offline"
 	deviceStatusMap := make(map[string]string)
 	for _, d := range allDevices {
-		// ดึงค่าจากฟิลด์ assigned_to และ status ตามรูปที่พี่ส่งมา
 		assignedTo, _ := d["assigned_to"].(string)
 		status, _ := d["status"].(string)
 
@@ -1006,18 +960,15 @@ func getZoneDashboard(c *fiber.Ctx) error {
 		}
 	}
 
-	// 3. เตรียมตัวนับสรุปผล
 	summary := map[string]int{
 		"online":  0,
 		"offline": 0,
 		"total":   0,
 	}
 
-	// 4. วนลูป zoneElders เพื่อ Match กับ deviceStatusMap
 	for _, e := range zoneElders {
 		summary["total"]++
 
-		// ประกอบชื่อให้ตรงกับ format ใน assigned_to (สมมติว่าใน DB เก็บ "ชื่อ นามสกุล")
 		fullName := e.FirstName + " " + e.LastName
 
 		status, found := deviceStatusMap[fullName]
@@ -1028,11 +979,10 @@ func getZoneDashboard(c *fiber.Ctx) error {
 		}
 	}
 
-	// 5. ส่งผลลัพธ์กลับไปให้ ZoneDashboardDetail.js
 	return c.JSON(fiber.Map{
 		"deviceStatus": summary,
 		"elders":       zoneElders,
-		"alerts":       []string{}, // เว้นไว้ก่อนหรือใส่แจ้งเตือนตามเดิม
+		"alerts":       []string{},
 	})
 }
 
@@ -1072,7 +1022,7 @@ func sendEmail(to, subject, body string) error {
 }
 
 func getZoneStaff(c *fiber.Ctx) error {
-	zoneID := c.Params("id") // รับรหัสโซนจาก URL เช่น Z001
+	zoneID := c.Params("id")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -1090,7 +1040,7 @@ func getZoneStaff(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch staff"})
 	}
-	defer cursor.Close(ctx) // ป้องกัน Memory Leak
+	defer cursor.Close(ctx)
 
 	if err = cursor.All(ctx, &users); err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Error decoding data"})
@@ -1103,21 +1053,18 @@ func CreateAlert(elderID, zoneID, title, desc, severity, alertType string) error
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// ดึง Alert ตัวล่าสุด 1 ตัว เพื่อดู ID ล่าสุด
 	opts := options.FindOne().SetSort(bson.D{{Key: "created_at", Value: -1}})
 	var lastAlert bson.M
 	err := MI.DB.Collection("alerts").FindOne(ctx, bson.M{}, opts).Decode(&lastAlert)
 
 	nextNumber := 1
 	if err == nil {
-		// ถ้าเจอตัวล่าสุด ให้แงะเลขออกมาบวก 1 (เช่น จาก A005 เป็น 6)
 		lastIDStr, _ := lastAlert["alert_id"].(string)
 		fmt.Sscanf(lastIDStr, "A%03d", &nextNumber)
 		nextNumber++
 	}
 	nextAlertID := fmt.Sprintf("A%03d", nextNumber)
 
-	// 2. เตรียมข้อมูล
 	newEntry := bson.M{
 		"alert_id":    nextAlertID,
 		"zone_id":     zoneID,
@@ -1130,7 +1077,6 @@ func CreateAlert(elderID, zoneID, title, desc, severity, alertType string) error
 		"created_at":  time.Now().Format(time.RFC3339),
 	}
 
-	// 3. Insert ลง DB
 	_, err = MI.DB.Collection("alerts").InsertOne(ctx, newEntry)
 	if err != nil {
 		fmt.Printf("Error inserting alert: %v\n", err)
@@ -1140,17 +1086,14 @@ func CreateAlert(elderID, zoneID, title, desc, severity, alertType string) error
 	return nil
 }
 func GetMyAlerts(c *fiber.Ctx) error {
-	// 1. ดึง Token ออกมา (ปกติ JWT Middleware ของ Fiber จะเก็บไว้ใน "user")
 	userToken := c.Locals("user").(*jwt.Token)
 	claims := userToken.Claims.(jwt.MapClaims)
 
-	// 2. ดึง user_id ออกมาจาก Claims (ต้องชื่อเดียวกับตอนพี่ Generate Token นะ)
 	userID, ok := claims["user_id"].(string)
 	if !ok {
 		return c.Status(401).JSON(fiber.Map{"error": "ไม่พบข้อมูลผู้ใช้ใน Token"})
 	}
 
-	// --- ส่วน Query เหมือนเดิม ---
 	var user bson.M
 	err := MI.DB.Collection("users").FindOne(context.Background(), bson.M{"user_id": userID}).Decode(&user)
 	if err != nil {
@@ -1179,7 +1122,6 @@ func GetAlerts(c *fiber.Ctx) error {
 	defer cancel()
 
 	var alerts []Alert
-	// ดึง 20 อันล่าสุด และเรียงจากใหม่ไปเก่า
 	opts := options.Find().SetSort(bson.D{{"created_at", -1}}).SetLimit(20)
 
 	cursor, err := getCollection("alerts").Find(ctx, bson.D{}, opts)
@@ -1235,10 +1177,8 @@ func GetUnreadCount(c *fiber.Ctx) error {
 }
 
 func DeleteAlert(c *fiber.Ctx) error {
-	// 1. รับ ID จาก URL Parameter (เช่น /api/alerts/65f123...)
 	id := c.Params("id")
 
-	// 2. แปลง string ID เป็น ObjectID ของ MongoDB
 	objID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "ID ไม่ถูกต้อง"})
@@ -1247,13 +1187,11 @@ func DeleteAlert(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// 3. สั่งลบจาก Collection "alerts"
 	result, err := MI.DB.Collection("alerts").DeleteOne(ctx, bson.M{"_id": objID})
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "ลบการแจ้งเตือนไม่สำเร็จ"})
 	}
 
-	// 4. เช็คว่ามีข้อมูลให้ลบไหม
 	if result.DeletedCount == 0 {
 		return c.Status(404).JSON(fiber.Map{"error": "ไม่พบการแจ้งเตือนที่ต้องการลบ"})
 	}
@@ -1312,12 +1250,10 @@ func checkDeviceAndCreateAlert(device bson.M) {
 
 	if err == nil {
 		if swData, ok := latestData["smartwatch_data"].(bson.M); ok {
-
-			// --- 🚨 1. เช็คการล้ม (Boolean) ---
 			if fall, ok := swData["is_fallen"].(bool); ok && fall {
 				CreateAlertWithCheck(elderID, "🔴 ตรวจพบการล้ม!", "คุณ "+assignedName+" อาจเกิดอุบัติเหตุล้มลง", "high", "FALL")
 			}
-			// --- 💓 2. เช็คอัตราการเต้นหัวใจ ---
+
 			var hr int
 			if val, ok := swData["heart_rate"]; ok {
 				switch v := val.(type) {
@@ -1327,11 +1263,9 @@ func checkDeviceAndCreateAlert(device bson.M) {
 				}
 			}
 			if hr > 0 {
-				// เรียกใช้ checkHR ที่พี่เขียนไว้ (มันมีตัวนับ 3 ครั้งอยู่แล้ว แจ่มมากครับ)
 				checkHR(elderID, int(hr), assignedName)
 			}
 
-			// --- 🪫 3. เช็คแบตเตอรี่ ---
 			var batt float64
 			if val, ok := swData["device_battery"]; ok {
 				switch v := val.(type) {
@@ -1348,12 +1282,10 @@ func checkDeviceAndCreateAlert(device bson.M) {
 	}
 }
 
-// ฟังก์ชันใหม่: เช็คก่อนสร้าง เพื่อไม่ให้ Alert ขยะเต็ม DB
 func CreateAlertWithCheck(elderID, title, desc, severity, alertType string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// 1. เช็คว่ามี Alert ประเภทนี้ ของผู้สูงอายุคนนี้ ที่ "ยังไม่อ่าน" ค้างอยู่ไหม
 	filter := bson.M{
 		"elder_id": elderID,
 		"type":     alertType,
@@ -1362,7 +1294,6 @@ func CreateAlertWithCheck(elderID, title, desc, severity, alertType string) {
 
 	count, _ := MI.DB.Collection("alerts").CountDocuments(ctx, filter)
 
-	// 2. ถ้าไม่มีอันเดิมค้างอยู่ ถึงจะสร้างอันใหม่
 	if count == 0 {
 		var elder bson.M
 		err := MI.DB.Collection("elders").FindOne(ctx, bson.M{"elder_id": elderID}).Decode(&elder)
@@ -1372,12 +1303,10 @@ func CreateAlertWithCheck(elderID, title, desc, severity, alertType string) {
 			zoneID, _ = elder["zone_id"].(string)
 		}
 
-		// 3. ส่ง zoneID เข้าไปในฟังก์ชัน CreateAlert ด้วย
 		CreateAlert(elderID, zoneID, title, desc, severity, alertType)
 	}
 }
 
-// GetZoneSummaryReport API สรุปข้อมูลสำหรับทำหน้า Report Dashboard
 func GetZoneSummaryReport(c *fiber.Ctx) error {
 	zoneID := c.Params("id")
 	timeFilter := c.Query("filter", "all")
@@ -1385,9 +1314,6 @@ func GetZoneSummaryReport(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	// ==========================================
-	// 1. ดึงข้อมูล Elders และเตรียม Device IDs, Elder IDs
-	// ==========================================
 	var elders []bson.M
 	cursor, err := getCollection("elders").Find(ctx, bson.M{"zone_id": zoneID})
 	if err != nil {
@@ -1406,17 +1332,11 @@ func GetZoneSummaryReport(c *fiber.Ctx) error {
 		}
 	}
 
-	// ==========================================
-	// 2. นับจำนวน Staff ในโซนนี้
-	// ==========================================
 	staffCount, _ := getCollection("users").CountDocuments(ctx, bson.M{
 		"zone_id": bson.M{"$regex": zoneID},
 		"role":    "Zone Staff",
 	})
 
-	// ==========================================
-	// 3. เช็คสถานะ Devices (Online / Offline)
-	// ==========================================
 	onlineCount, _ := getCollection("devices").CountDocuments(ctx, bson.M{
 		"device_id": bson.M{"$in": deviceIDs},
 		"status":    "online",
@@ -1427,9 +1347,6 @@ func GetZoneSummaryReport(c *fiber.Ctx) error {
 		"status":    "offline",
 	})
 
-	// ==========================================
-	// 4. สรุป Alerts (เปลี่ยนเป็น Critical, Warning, Normal)
-	// ==========================================
 	alertMatch := bson.M{"elder_id": bson.M{"$in": elderIDs}}
 
 	if timeFilter != "all" {
@@ -1450,7 +1367,6 @@ func GetZoneSummaryReport(c *fiber.Ctx) error {
 		}
 	}
 
-	// ✅ เปลี่ยนชื่อตัวแปรให้ตรงกับสถานะใหม่
 	criticalCount, warningCount, normalCount := 0, 0, 0
 
 	if len(elderIDs) > 0 {
@@ -1469,7 +1385,6 @@ func GetZoneSummaryReport(c *fiber.Ctx) error {
 		for _, res := range alertResults {
 			sev, _ := res["_id"].(string)
 
-			// เซฟตี้ไว้เผื่อ MongoDB คืนค่า count มาเป็น int32 หรือ int64
 			var count int
 			if v, ok := res["count"].(int32); ok {
 				count = int(v)
@@ -1477,7 +1392,6 @@ func GetZoneSummaryReport(c *fiber.Ctx) error {
 				count = int(v)
 			}
 
-			// ✅ เทียบกับสถานะใหม่
 			switch sev {
 			case "critical":
 				criticalCount = count
@@ -1489,9 +1403,6 @@ func GetZoneSummaryReport(c *fiber.Ctx) error {
 		}
 	}
 
-	// ==========================================
-	// 🎯 ส่งข้อมูลกลับไปให้หน้าบ้าน
-	// ==========================================
 	return c.JSON(fiber.Map{
 		"total_elders": len(elderIDs),
 		"total_staff":  staffCount,
@@ -1534,7 +1445,6 @@ func getElderIDByName(name string) string {
 }
 
 func heartbeat(c *fiber.Ctx) error {
-	// 1. ดึง ID ว่าใครส่งชีพจรมา
 	userToken := c.Locals("user").(*jwt.Token)
 	claims := userToken.Claims.(jwt.MapClaims)
 	userID := claims["user_id"].(string)
@@ -1542,7 +1452,6 @@ func heartbeat(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	// 2. อัปเดตเวลาล่าสุด (last_active) และย้ำว่ายัง Online อยู่
 	_, err := getCollection("users").UpdateOne(ctx,
 		bson.M{"user_id": userID},
 		bson.M{"$set": bson.M{
@@ -1560,20 +1469,18 @@ func heartbeat(c *fiber.Ctx) error {
 }
 
 func StartOnlineStatusMonitor() {
-	ticker := time.NewTicker(1 * time.Minute) // ยามเดินตรวจทุกๆ 1 นาที
+	ticker := time.NewTicker(1 * time.Minute)
 
 	go func() {
 		for range ticker.C {
 			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 
-			// กำหนดเส้นตาย: เวลาปัจจุบัน ถอยหลังไป 2 นาที
 			deadline := time.Now().Add(-2 * time.Minute)
 
-			// ค้นหาคนที่ Online อยู่ แต่ last_active เก่ากว่า 2 นาที แล้วจับเปลี่ยนเป็น false ให้หมด
 			_, err := getCollection("users").UpdateMany(ctx,
 				bson.M{
 					"is_online":   true,
-					"last_active": bson.M{"$lt": deadline}, // $lt = less than (เก่ากว่า)
+					"last_active": bson.M{"$lt": deadline},
 				},
 				bson.M{"$set": bson.M{"is_online": false}},
 			)
@@ -1584,4 +1491,41 @@ func StartOnlineStatusMonitor() {
 			cancel()
 		}
 	}()
+}
+
+func GetEmergencyAlerts(c *fiber.Ctx) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	severity := c.Query("severity")
+	status := c.Query("status")
+	zoneID := c.Query("zone_id")
+
+	if severity == "" || status == "" || zoneID == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "Missing required query parameters"})
+	}
+
+	filter := bson.M{
+		"severity": strings.ToLower(severity),
+		"status":   status,
+		"zone_id":  zoneID,
+	}
+
+	var alerts []bson.M
+	opts := options.Find().SetSort(bson.D{{"created_at", -1}})
+
+	cursor, err := MI.DB.Collection("alerts").Find(ctx, filter, opts)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch alerts"})
+	}
+
+	if err = cursor.All(ctx, &alerts); err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to decode alerts"})
+	}
+
+	if len(alerts) == 0 {
+		return c.JSON([]interface{}{})
+	}
+
+	return c.JSON(alerts)
 }

@@ -30,7 +30,7 @@ type Zone struct {
 	ZoneID      string             `bson:"zone_id" json:"zone_id"`
 	ZoneName    string             `bson:"zone_name" json:"zone_name"`
 	ZoneAddress string             `bson:"zone_address" json:"zone_address"`
-	Description string             `bson:"description" json:"description"` // 👈 เพิ่มบรรทัดนี้
+	Description string             `bson:"description" json:"description"`
 	ActiveUser  int                `bson:"active_user" json:"active_user"`
 	Status      string             `bson:"status" json:"status"`
 }
@@ -40,7 +40,7 @@ type Elder struct {
 	ElderID              string             `bson:"elder_id" json:"elder_id"`
 	ZoneID               string             `bson:"zone_id" json:"zone_id"`
 	DeviceID             string             `bson:"device_id" json:"device_id"`
-	CaregiverUserIDs     []string           `bson:"caregiver_user_id" json:"caregiver_user_id"` // Array
+	CaregiverUserIDs     []string           `bson:"caregiver_user_id" json:"caregiver_user_id"`
 	FirstName            string             `bson:"first_name" json:"first_name"`
 	LastName             string             `bson:"last_name" json:"last_name"`
 	Sex                  string             `bson:"sex" json:"sex"`
@@ -108,11 +108,11 @@ type Alert struct {
 	AlertID     string             `json:"alert_id" bson:"alert_id"`
 	ZoneID      string             `json:"zone_id" bson:"zone_id"`
 	ElderID     string             `json:"elder_id" bson:"elder_id"`
-	Title       string             `json:"title" bson:"title"`             // เช่น "ตรวจพบการล้ม"
-	Description string             `json:"description" bson:"description"` // เช่น "คุณสมชาย ล้มที่โซน A"
-	Severity    string             `json:"severity" bson:"severity"`       // "high", "medium", "low"
-	Type        string             `json:"type" bson:"type"`               // "FALL", "HR", "BATT"
-	Status      string             `json:"status" bson:"status"`           // "unread", "read"
+	Title       string             `json:"title" bson:"title"`
+	Description string             `json:"description" bson:"description"`
+	Severity    string             `json:"severity" bson:"severity"`
+	Type        string             `json:"type" bson:"type"`
+	Status      string             `json:"status" bson:"status"`
 	CreatedAt   string             `json:"created_at" bson:"created_at"`
 }
 
@@ -158,7 +158,7 @@ var servers = []Server{
 	},
 }
 
-var usageTrends = []UsageTrend{ //mock up ไปก่อน จริงๆ ต้องมีการบันทึก date เก็บลงฐานข้อมูล ว่ามี user เข้าใช้งานกี่คนในเว็บ แต่ละวัน
+var usageTrends = []UsageTrend{
 	{Date: "2025-07-20", ActiveUsers: 120},
 	{Date: "2025-07-21", ActiveUsers: 134},
 	{Date: "2025-07-22", ActiveUsers: 140},

@@ -10,7 +10,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// MongoInstance struct เก็บทั้ง Client และ Database
 type MongoInstance struct {
 	Client *mongo.Client
 	DB     *mongo.Database
@@ -19,7 +18,6 @@ type MongoInstance struct {
 var MI MongoInstance
 
 func ConnectMongo() {
-	// ⚠️ แก้ authSource=LoRa ตามที่คุณตั้งไว้ตอนสร้าง User
 	uri := "mongodb://admin_kmitl:kmitl123@100.118.210.62:27017/LoRa?authSource=LoRa"
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -42,6 +40,6 @@ func ConnectMongo() {
 	// เก็บลงตัวแปร Global
 	MI = MongoInstance{
 		Client: client,
-		DB:     client.Database("LoRa"), // เลือก Database ชื่อ "LoRa"
+		DB:     client.Database("LoRa"),
 	}
 }

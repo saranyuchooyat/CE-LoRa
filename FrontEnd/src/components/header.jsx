@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
 import api from "./api";
+import EmergencyPopup from "./modalForm/EmergencyPopup";
 
 function Header() {
 
@@ -115,6 +116,9 @@ function Header() {
                     </div>
                 </div>
             </div>
+
+            {/* 🚨 2. ฝังระเบิด (Popup แจ้งเตือนฉุกเฉิน) ไว้ตรงนี้! มันจะลอยอยู่เหนือทุกสิ่งเมื่อเกิดเหตุ 🚨 */}
+            <EmergencyPopup />
         </>
     )
 }
