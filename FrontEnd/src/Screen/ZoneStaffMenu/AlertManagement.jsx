@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../../components/api";
 import SummaryCard from "../../components/card/summaryCard";
-import MenuNameCard from "../../components/mainCardOption/menuNameCard";
+import MenuNameCard from "../../components/card/menuNameCard";
 
 function AlertManagement() {
   const navigate = useNavigate();

@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import api from "../../components/api";
 import DataTableCard from "../../components/card/dataTableCard";
 import ElderlyProfileView from "../elderlyProfileView";
-import MenuNameCard from "../../components/mainCardOption/menuNameCard";
+import MenuNameCard from "../../components/card/menuNameCard";
 
 function CareGiver() {
     const location = useLocation();

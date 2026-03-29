@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
 import api from "../../components/api";
-import MenuNameCard from "../../components/mainCardOption/menuNameCard";
+import MenuNameCard from "../../components/card/menuNameCard";
 import SummaryCard from "../../components/card/summaryCard";
 import CardFilter from "../../components/card/cardFilter";
 import DataTableCard from "../../components/card/dataTableCard";

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import api from "../components/api"; 
-import MenuNameCard from "../components/mainCardOption/menuNameCard";
+import MenuNameCard from "../components/card/menuNameCard";
 import SummaryCard from "../components/card/summaryCard";
 
 // ✅ 1. อย่าลืมรับ props `eldersData` ที่ส่งมาจากหน้าหลักด้วยนะครับ
