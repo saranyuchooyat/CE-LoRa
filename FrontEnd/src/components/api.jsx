@@ -1,45 +1,28 @@
 import axios from 'axios';
 
-console.log(sessionStorage)
+// 1. สร้างตัวแทน (Instance) โดยกำหนดแค่ Base URL 
 const api = axios.create({
-  // กำหนด Base URL
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080', 
-  timeout: 50000, // กำหนด Timeout
+  // ถ้ามี .env ให้ใช้ ถ้าไม่มีให้ชี้ไปหา Server มหาลัยโดยตรง
+  baseURL: import.meta.env.VITE_API_URL || 'http://100.118.210.62:8081', 
 });
 
-// 💡 Interceptor: จะทำงานก่อนที่ Request จะถูกส่งออกไป
+// 2. 🌟 ใส่เกราะ Interceptor (หัวใจสำคัญ!)
+// โค้ดส่วนนี้จะทำงาน "ทุกครั้ง" ก่อนที่คำสั่ง api.get หรือ api.post จะถูกยิงออกไป
 api.interceptors.request.use(
   (config) => {
-    // 💡 แก้ไข: ดึง Token จาก sessionStorage แทน location.state
+    // ล้วงกระเป๋าหยิบ Token ใหม่ล่าสุดเสมอ!
     const token = sessionStorage.getItem('token'); 
-    console.log("token",token)
     
-    // ถ้ามี Token อยู่ใน Local Storage ให้แนบ Header Authorization
+    // ถ้ามี Token ให้แปะหน้าผาก (Headers) ไปด้วย
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers['Authorization'] = `Bearer ${token}`;
     }
-    if (config.method === 'get') {
-      delete config.headers['Content-Type'];
-    }
+    
     return config;
   },
   (error) => {
-    // จัดการ Error ก่อนส่ง Request
     return Promise.reject(error);
   }
 );
 
-// 💡 Interceptor สำหรับ Response: จัดการ Error 401/403 (โค้ดนี้ใช้ได้แล้ว)
-api.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        if (error.response && error.response.status === 401) {
-            console.error("Authentication failed or token expired. Redirecting...");
-            // ... (โค้ดจัดการ Redirect)
-        }
-        return Promise.reject(error);
-    }
-);
-
-
-export default api; // ส่งออก Instance ที่กำหนดค่าแล้ว
+export default api;
