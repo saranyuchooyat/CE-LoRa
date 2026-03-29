@@ -17,7 +17,7 @@ services:
       context: ./FrontEnd
       dockerfile: Dockerfile
       args:
-        - VITE_API_URL=http://100.118.210.62:8081
+        - VITE_API_URL=https://ana02.tailf85900.ts.net:8443
     ports:
       - "3000:80"
     restart: always
