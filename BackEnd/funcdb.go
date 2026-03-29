@@ -953,6 +953,7 @@ func getDeviceDataByDeviceName(c *fiber.Ctx) error {
 	var latestData bson.M
 	filter := bson.M{
 		"device.device_name": targetName,
+		"data_type":          "Data",
 	}
 	// Sort ตาม timestamp จากใหม่ไปเก่า (-1) และเอาแค่อันเดียว
 	opts := options.FindOne().SetSort(bson.D{{Key: "timestamp", Value: -1}})

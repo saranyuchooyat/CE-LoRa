@@ -4,7 +4,6 @@ import ApiDelete from "../apiDelete";
 import { showConfirm, showPopup } from "../modalForm/popup";
 
 function DeviceCard({ data, onSetting, onEdit }) {
-  console.log("device", data);
   const navigate = useNavigate();
 
   const handleRowClick = (deviceId) => {
@@ -52,11 +51,14 @@ function DeviceCard({ data, onSetting, onEdit }) {
 
   const handleDeleteClick = (deviceId, event) => {
     event.stopPropagation();
-    showConfirm("ยืนยันลบข้อมูล", `คุณแน่ใจหรือไม่ว่าต้องการลบ Device ID: ${deviceId}?`).then(isConfirmed => {
-        if (isConfirmed) {
-            deleteDevice(deviceId);
-            showPopup("สำเร็จ", "ลบข้อมูลอุปกรณ์เรียบร้อยแล้ว", "success");
-        }
+    showConfirm(
+      "ยืนยันลบข้อมูล",
+      `คุณแน่ใจหรือไม่ว่าต้องการลบ Device ID: ${deviceId}?`,
+    ).then((isConfirmed) => {
+      if (isConfirmed) {
+        deleteDevice(deviceId);
+        showPopup("สำเร็จ", "ลบข้อมูลอุปกรณ์เรียบร้อยแล้ว", "success");
+      }
     });
   };
   // Delete Button
