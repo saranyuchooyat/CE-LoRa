@@ -3,7 +3,7 @@ import axios from 'axios';
 console.log(sessionStorage)
 const api = axios.create({
   // กำหนด Base URL
-  baseURL: import.meta.env.VITE_API_URL || '${import.meta.env.VITE_API_URL || 'http://localhost:8080'}', 
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080', 
   timeout: 50000, // กำหนด Timeout
 });
 
