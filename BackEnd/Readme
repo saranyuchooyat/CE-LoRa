@@ -14,7 +14,7 @@ setup
 เข้า swagger
 1.พิม swagger init
 2.go run .
-3.http://localhost:8080/swagger/index.html เข้าเว็บ
+3.${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/swagger/index.html เข้าเว็บ
 
 ยศ
 

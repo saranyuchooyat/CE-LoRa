@@ -56,7 +56,7 @@ function AddZoneStaffForm({ onClose, onSaveSuccess, zones }) {
         console.log("Data to send:", dataToSend);
         try {
             // ส่ง request ไปยัง Endpoint สำหรับ        try {
-            await axios.post("http://localhost:8080/users", dataToSend, {
+            await axios.post("${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/users", dataToSend, {
                 headers: {
                     'Authorization': `Bearer ${token}` 
                 }

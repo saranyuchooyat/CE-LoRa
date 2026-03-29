@@ -10,7 +10,7 @@ function DeviceDetail() {
     try {
       const token = sessionStorage.getItem("token");
       const res = await axios.get(
-        `http://localhost:8080/device_data/${device_id}`,
+        `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/device_data/${device_id}`,
         {
           headers: { Authorization: `Bearer ${token}` }, // แนบไปด้วย!
         },

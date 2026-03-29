@@ -59,7 +59,7 @@ function AddUserForm({ onClose, onSaveSuccess }){
 
         try {
             // ส่ง request ไปยัง Endpoint สำหรับ User (ปกติจะเป็น /users หรือ /create-user)
-            await axios.post("http://localhost:8080/users", dataToSend, {
+            await axios.post("${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/users", dataToSend, {
                 headers: {
                     'Authorization': `Bearer ${token}` 
                 }

@@ -21,7 +21,7 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
           setIsLoading(true);
           const token = sessionStorage.getItem("token");
           // 🟢 เปลี่ยน path ให้ตรงกับที่พี่แก้ใน Go (คือ /elders/:id)
-          const res = await axios.get(`http://localhost:8080/elders/${id}`, {
+          const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/elders/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
 
@@ -45,7 +45,7 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
     try {
       const token = sessionStorage.getItem("token");
       const res = await axios.get(
-        `http://localhost:8080/device_data/${elderData.device_id}`,
+        `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/device_data/${elderData.device_id}`,
         { headers: { Authorization: `Bearer ${token}` } },
       );
       const vitals = res.data.data?.smartwatch_data;

@@ -38,7 +38,7 @@ function AddZoneForm({ onClose, onSaveSuccess }){
 
         try {
             // 2. ส่ง request พร้อมแนบ Header Authorization
-            await axios.post("http://localhost:8080/zones", dataToSend, {
+            await axios.post("${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/zones", dataToSend, {
                 headers: {
                     // รูปแบบมาตรฐานคือ 'Bearer [TOKEN]'
                     'Authorization': `Bearer ${token}` 
