@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -18,7 +19,10 @@ type MongoInstance struct {
 var MI MongoInstance
 
 func ConnectMongo() {
-	uri := "mongodb://admin_kmitl:kmitl123@100.118.210.62:27017/LoRa?authSource=LoRa"
+	uri := os.Getenv("MONGO_URI")
+	if uri == "" {
+		log.Fatal("❌ MONGO_URI is not set")
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -29,7 +33,6 @@ func ConnectMongo() {
 		log.Fatal("❌ Connect Error: ", err)
 	}
 
-	// Ping Check
 	err = client.Ping(ctx, nil)
 	if err != nil {
 		log.Fatal("❌ Ping Failed: ", err)
@@ -37,7 +40,6 @@ func ConnectMongo() {
 
 	fmt.Println("✅ Connected to MongoDB!")
 
-	// เก็บลงตัวแปร Global
 	MI = MongoInstance{
 		Client: client,
 		DB:     client.Database("LoRa"),
