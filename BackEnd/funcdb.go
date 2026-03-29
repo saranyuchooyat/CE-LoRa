@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/smtp"
+	"os"
 	"strings"
 	"time"
 
@@ -69,8 +70,16 @@ func login(c *fiber.Ctx) error {
 		"exp":      time.Now().Add(time.Hour * 24).Unix(),
 	}
 
+	// 🚨 [ส่วนที่แก้ใหม่: ซิงก์กุญแจให้ตรงกับ main.go เป๊ะๆ] 🚨
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		secret = "secret_lora_key_1234"
+	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	t, err := token.SignedString(jwtSecret)
+	t, err := token.SignedString([]byte(secret))
+	// 🚨 [สิ้นสุดส่วนที่แก้] 🚨
+
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not generate token"})
 	}
