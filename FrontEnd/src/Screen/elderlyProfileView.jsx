@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import api from "../api.jsx";
+import api from "../components/api.jsx";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 
