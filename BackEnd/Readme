@@ -5,13 +5,31 @@ setup
 3.go run .
 
 ติดตั้ง swagger
-1.
-go get github.com/gofiber/swagger
-go get github.com/swaggo/swag
-go install github.com/swaggo/swag/cmd/swag@latest
-swag --version
+
+1.  go get github.com/gofiber/swagger
+    go get github.com/swaggo/swag
+    go install github.com/swaggo/swag/cmd/swag@latest
+    swag --version
 
 เข้า swagger
 1.พิม swagger init
 2.go run .
 3.http://localhost:8080/swagger/index.html เข้าเว็บ
+
+ยศ
+
+1.  eak
+    1234
+    System Admin
+
+2.  min
+    0000
+    Zone Staff
+
+3.  YU
+    0000
+    Zone Staff
+
+4.  mimi
+    0000
+    Zone Admin

@@ -25,9 +25,9 @@ services:
   # 2. Frontend Service (React/Vite/Nginx)
   # ------------------
   frontend:
-    # บอกให้ Compose ไป build image จาก Dockerfile ในโฟลเดอร์ Front
+    # บอกให้ Compose ไป build image จาก Dockerfile ในโฟลเดอร์ FrontEnd
     build: 
-      context: ./Front
+      context: ./FrontEnd
       dockerfile: Dockerfile
       
     # แมพพอร์ตของ Frontend (เสิร์ฟด้วย Nginx ที่พอร์ต 80, แมพไปที่พอร์ต 3000 ของ Host)
