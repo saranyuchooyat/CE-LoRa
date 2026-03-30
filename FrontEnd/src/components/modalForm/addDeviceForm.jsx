@@ -4,8 +4,8 @@ import api from "../api";
 function AddDeviceForm({ onClose, onSaveSuccess }) {
   const [formData, setFormData] = useState({
     deviceName: "",
-    deviceModel: "เลือก Model",
-    features: "เลือก Feature",
+    model: "", // 💡 แอบแก้ให้ตรงกับ name="model" ใน select
+    features: [], // 💡 แอบแก้จาก String เป็น Array ป้องกันบั๊ก
   });
   const [nextId, setNextId] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -15,12 +15,33 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
     X7: ["GPS", "Heart Rate", "Temperature", "SpO2"],
     ED20W: ["Heart Rate", "SOS Button"],
   };
+
   useEffect(() => {
     const fetchNextId = async () => {
       try {
         const res = await api.get("/devices");
-        const count = res.data.length;
-        const nextIdStr = `D${String(count + 1).padStart(3, "0")}`;
+        const devices = res.data;
+
+        let maxIdNum = 0;
+
+        // 🚨 ลอจิกใหม่: วนลูปหาเลข ID ที่มากที่สุด
+        if (devices && devices.length > 0) {
+          devices.forEach((device) => {
+            // ดึงฟิลด์ device_id มา (เช่น "D010")
+            const currentIdStr = device.device_id || device.Device_id || ""; 
+            
+            // ตัดเอาเฉพาะตัวเลข (ลบตัวอักษรทิ้ง) แล้วแปลงเป็นตัวเลขทางคณิตศาสตร์
+            const numericPart = parseInt(currentIdStr.replace(/\D/g, ""), 10);
+            
+            // ถ้าเป็นตัวเลข และมากกว่าค่า max ปัจจุบัน ให้จำค่าใหม่ไว้
+            if (!isNaN(numericPart) && numericPart > maxIdNum) {
+              maxIdNum = numericPart;
+            }
+          });
+        }
+
+        // 💡 เอาค่า Max ที่เจอมาบวก 1 แล้วเติม 0 ให้ครบ 3 หลัก
+        const nextIdStr = `D${String(maxIdNum + 1).padStart(3, "0")}`;
         setNextId(nextIdStr);
       } catch (err) {
         console.error("Failed to fetch device count", err);
@@ -28,6 +49,7 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
     };
     fetchNextId();
   }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -36,6 +58,8 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
 
       if (name === "model" && MODEL_DEFAULTS[value]) {
         newData.features = MODEL_DEFAULTS[value];
+      } else if (name === "model" && !value) {
+        newData.features = []; // เคลียร์ฟีเจอร์ถ้าเลือกกลับมาเป็นค่าว่าง
       }
 
       return newData;
@@ -47,13 +71,11 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
     const { features } = formData;
 
     if (checked) {
-      // ถ้าติ๊กถูก ให้เพิ่ม value เข้าไปใน Array
       setFormData((prev) => ({
         ...prev,
         features: [...prev.features, value],
       }));
     } else {
-      // ถ้าเอาติ๊กออก ให้กรองเอา value นั้นออก
       setFormData((prev) => ({
         ...prev,
         features: features.filter((item) => item !== value),
@@ -72,12 +94,11 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
       model: formData.model,
       last_update: new Date().toISOString(),
       status: "unassigned",
-      type: formData.type,
+      type: formData.type || "Unknown",
       assigned_to: "",
     };
 
     try {
-      // 2. ส่ง request พร้อมแนบ Header Authorization
       await api.post("/devices", dataToSend);
 
       if (typeof onSaveSuccess === "function") {
@@ -88,7 +109,6 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
       }
     } catch (error) {
       if (error.response) {
-        // จะเห็น Error "Missing or malformed JWT" ที่นี่ถ้า Token ไม่ถูกต้อง
         console.error("Server Error Detail:", error.response.data);
       }
       console.error("Error adding device:", error);
@@ -108,10 +128,9 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
             type="text"
             value={nextId}
             readOnly
-            className="border rounded w-full p-2 bg-blue-50 font"
+            className="border rounded w-full p-2 bg-blue-50 font-bold"
           />
         </div>
-        {/*Device ID*/}
         <div className="mb-2">
           <label className="block text-gray-700 text-sm">Device Name:</label>
           <input
@@ -124,7 +143,6 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
           />
         </div>
 
-        {/* deviceName */}
         <div className="mb-2">
           <label className="block text-gray-700 text-sm">Model:</label>
           <select
@@ -140,9 +158,8 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
             <option value="ED20W">ED20W</option>
           </select>
         </div>
-        {/* Dropdown Feature*/}
       </div>
-      <div className="col-span-2 mb-4">
+      <div className="col-span-2 mb-4 mt-2">
         <label className="block text-gray-700 text-sm mb-2">Features:</label>
         <div className="grid grid-cols-2 gap-2 p-3 border rounded bg-gray-50">
           {[
@@ -172,19 +189,18 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
         </div>
       </div>
 
-      {/* ปุ่มกด (Footer) */}
       <div className="pt-4 border-t flex justify-end gap-3">
         <button
           type="submit"
           disabled={isSubmitting}
-          className="submit-btn"
+          className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors font-semibold shadow-sm"
         >
           {isSubmitting ? "กำลังบันทึก..." : "บันทึก"}
         </button>
         <button
           type="button"
           onClick={onClose}
-          className="cancel-btn"
+          className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors font-semibold shadow-sm"
         >
           ยกเลิก
         </button>
