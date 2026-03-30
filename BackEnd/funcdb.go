@@ -652,6 +652,13 @@ func updateElder(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	var oldElder bson.M
+	err := getCollection("elders").FindOne(ctx, bson.M{"elder_id": id}).Decode(&oldElder)
+	if err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "ไม่พบผู้สูงอายุ"})
+	}
+	oldFullName := fmt.Sprintf("%v %v", oldElder["first_name"], oldElder["last_name"])
+
 	updateFields := bson.M{}
 
 	if elderUpdate.FirstName != "" {
@@ -688,9 +695,6 @@ func updateElder(c *fiber.Ctx) error {
 		updateFields["address"] = elderUpdate.Address
 	}
 
-	fmt.Printf("📦 [DEBUG] ID ที่จะแก้: %s\n", id)
-	fmt.Printf("🛠️ [DEBUG] ฟิลด์ที่จะอัปเดต: %v\n", updateFields)
-
 	if len(updateFields) == 0 {
 		return c.Status(400).JSON(fiber.Map{"error": "กรุณาระบุข้อมูลที่ต้องการแก้ไข"})
 	}
@@ -704,6 +708,30 @@ func updateElder(c *fiber.Ctx) error {
 
 	if result.MatchedCount == 0 {
 		return c.Status(404).JSON(fiber.Map{"error": "ไม่พบผู้สูงอายุรหัส " + id})
+	}
+
+	if elderUpdate.FirstName != "" || elderUpdate.LastName != "" {
+		// สร้างชื่อใหม่จากข้อมูลที่ส่งมา (ถ้าฟิลด์ไหนไม่ส่งมา ให้ใช้ค่าเดิมจาก oldElder)
+		fName := elderUpdate.FirstName
+		if fName == "" {
+			fName = oldElder["first_name"].(string)
+		}
+		lName := elderUpdate.LastName
+		if lName == "" {
+			lName = oldElder["last_name"].(string)
+		}
+
+		newFullName := fmt.Sprintf("%s %s", fName, lName)
+
+		_, devErr := getCollection("devices").UpdateMany(
+			ctx,
+			bson.M{"assigned_to": oldFullName},
+			bson.M{"$set": bson.M{"assigned_to": newFullName}},
+		)
+
+		if devErr != nil {
+			fmt.Printf("⚠️ Update device error: %v\n", devErr)
+		}
 	}
 
 	return c.JSON(fiber.Map{
