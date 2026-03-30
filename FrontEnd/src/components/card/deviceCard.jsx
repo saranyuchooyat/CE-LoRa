@@ -38,7 +38,7 @@ function DeviceCard({ data, onSetting, onEdit }) {
 
   const handleSettingClick = (deviceId, event) => {
     event.stopPropagation();
-    onSetting(deviceId); // 💡 ส่ง ID กลับไปที่ Component แม่
+    onSetting(deviceId);
   };
 
   const handleEditClick = (cardData, event) => {
@@ -77,7 +77,7 @@ function DeviceCard({ data, onSetting, onEdit }) {
 
         let batteryDisplay;
         let batteryColor;
-        if (status === "unassigned") {
+        if (status === "unassigned" || status === "offline") {
           batteryDisplay = "-";
           batteryColor = "text-gray-400";
         } else {
