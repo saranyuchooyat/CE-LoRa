@@ -145,7 +145,7 @@ function ZoneDashboardDetail() {
     { name: "Offline", value: deviceStatus?.offline || 0 },
   ];
 
-  const allEldery = elders;
+  const allEldery = elders || [];
   const zoneDetail = zone;
 
   // ✅ 3. สลับหน้าจอมาที่ Report ถ้า State เป็น true
@@ -205,7 +205,7 @@ function ZoneDashboardDetail() {
         <SummaryCard data={allDeviceStatus} />
 
         <MenuNameCard
-          title={"จำนวนผู้สูงอายุทั้งหมด" + " " + allEldery.length + " คน"}
+          title={"จำนวนผู้สูงอายุทั้งหมด " + (allEldery?.length || 0) + " คน"}
           description={false}
           onButtonClick={handleOpenModal}
           detail={false}
