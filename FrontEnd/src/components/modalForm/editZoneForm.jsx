@@ -37,8 +37,8 @@ function EditZoneForm({ zoneId, zoneData, onClose, onSaveSuccess }) {
         const token = sessionStorage.getItem('token');
 
         const dataToSend = {
-            zoneName: formData.zonename,
-            address: formData.address,
+            zone_name: formData.zonename,
+            zone_address: formData.address,
             description: formData.description,
         };
         try {

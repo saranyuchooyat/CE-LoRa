@@ -3,7 +3,7 @@ import axios from 'axios';
 // 1. สร้างตัวแทน (Instance) โดยกำหนดแค่ Base URL 
 const api = axios.create({
   // ถ้ามี .env ให้ใช้ ถ้าไม่มีให้ชี้ไปหา Server มหาลัยโดยตรง
-  baseURL: import.meta.env.VITE_API_URL || 'http://100.118.210.62:8081', 
+  baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8080', 
 });
 
 // 2. 🌟 ใส่เกราะ Interceptor (หัวใจสำคัญ!)

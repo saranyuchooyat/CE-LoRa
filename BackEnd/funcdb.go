@@ -496,9 +496,14 @@ func updateZone(c *fiber.Ctx) error {
 	if err := c.BodyParser(zoneUpdate); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
 	}
+	fmt.Printf("🎯 [DEBUG] ID ที่จะแก้: %s\n", id)
+	fmt.Printf("📦 [DEBUG] ข้อมูลที่รับมาจากหน้าบ้าน (ก่อนแกะ): %+v\n", zoneUpdate)
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
+
 	updateFields := bson.M{}
+
 	if zoneUpdate.ZoneName != "" {
 		updateFields["zone_name"] = zoneUpdate.ZoneName
 	}
@@ -508,7 +513,25 @@ func updateZone(c *fiber.Ctx) error {
 	if zoneUpdate.Status != "" {
 		updateFields["status"] = zoneUpdate.Status
 	}
-	getCollection("zones").UpdateOne(ctx, bson.M{"zone_id": id}, bson.M{"$set": updateFields})
+	if zoneUpdate.Description != "" {
+		updateFields["description"] = zoneUpdate.Description
+	}
+	fmt.Printf("🛠️ [DEBUG] ฟิลด์ที่จะอัปเดต (หลังแกะ): %+v\n", updateFields)
+
+	if len(updateFields) == 0 {
+		return c.Status(400).JSON(fiber.Map{"error": "ไม่มีข้อมูลให้แก้ไข (ชื่อตัวแปรอาจจะไม่ตรงกัน)"})
+	}
+	result, err := getCollection("zones").UpdateOne(ctx, bson.M{"zone_id": id}, bson.M{"$set": updateFields})
+
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+	if result.MatchedCount == 0 {
+		fmt.Println("❌ [DEBUG] หา Zone ID ไม่เจอใน Database!")
+		return c.Status(404).JSON(fiber.Map{"error": "หา Zone ไม่เจอในระบบ"})
+	}
+
+	fmt.Printf("✅ [DEBUG] อัปเดตสำเร็จ! เปลี่ยนแปลงข้อมูลไป %d แถว\n", result.ModifiedCount)
 	return c.JSON(fiber.Map{"message": "Zone updated"})
 }
 
