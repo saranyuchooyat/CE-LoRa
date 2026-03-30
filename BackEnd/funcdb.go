@@ -777,7 +777,10 @@ func getAllDevice(c *fiber.Ctx) error {
 				newStatus = "offline"
 				elderID := getElderIDByName(assignedTo)
 				if elderID != "" {
-					CreateAlertWithCheck(elderID, "🔌 นาฬิกาขาดการติดต่อ!", "นาฬิกาของ "+assignedTo+" ออฟไลน์ (เกิน 5 นาที)", "medium", "OFFLINE")
+
+					title := "⚠️ ข้อมูลขาดหายไป 2 นาที.."
+					description := "นาฬิกาของ " + assignedTo + " ขาดการติดต่อเกิน 2 นาที กรุณาตรวจสอบ"
+					CreateAlertWithCheck(elderID, title, description, "medium", "WATCH_OFFLINE")
 				}
 			} else {
 				newStatus = "online"
@@ -1194,7 +1197,7 @@ func GetAlerts(c *fiber.Ctx) error {
 var hrCounters = make(map[string]int)
 
 func checkHR(elderID string, currentHR int, elderName string) {
-	if currentHR > 120 {
+	if currentHR > 100 {
 		hrCounters[elderID]++
 		if hrCounters[elderID] >= 3 {
 
@@ -1306,8 +1309,17 @@ func checkDeviceAndCreateAlert(device bson.M) {
 
 	if err == nil {
 		if swData, ok := latestData["smartwatch_data"].(bson.M); ok {
-			if fall, ok := swData["is_fallen"].(bool); ok && fall {
-				CreateAlertWithCheck(elderID, "🔴 ตรวจพบการล้ม!", "คุณ "+assignedName+" อาจเกิดอุบัติเหตุล้มลง", "high", "FALL")
+			fall, okFall := swData["is_fallen"].(bool)
+			wearing, okWear := swData["is_wearing"].(bool)
+
+			if okFall && fall && okWear && wearing {
+				CreateAlertWithCheck(
+					elderID,
+					"🔴 ตรวจพบการล้ม!",
+					"คุณ "+assignedName+" อาจเกิดอุบัติเหตุล้มลง (ตรวจพบขณะสวมใส่)",
+					"high",
+					"FALL",
+				)
 			}
 
 			var hr int
@@ -1324,7 +1336,6 @@ func checkDeviceAndCreateAlert(device bson.M) {
 				if val, ok := swData["heart_rate"]; ok {
 					switch v := val.(type) {
 					case int32:
-
 						hr = int(v)
 					}
 				}
