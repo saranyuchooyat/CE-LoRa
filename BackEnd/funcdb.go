@@ -773,7 +773,7 @@ func getAllDevice(c *fiber.Ctx) error {
 			var newStatus string
 			duration := time.Since(lastUpdateTime)
 
-			if duration.Minutes() > 5 {
+			if duration.Minutes() > 2 {
 				newStatus = "offline"
 				elderID := getElderIDByName(assignedTo)
 				if elderID != "" {
