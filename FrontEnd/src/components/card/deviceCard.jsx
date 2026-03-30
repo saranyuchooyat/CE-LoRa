@@ -1,4 +1,6 @@
 import J3 from "../../assets/picture/J3-Smartwatch.png";
+import X7 from "../../assets/picture/X7-Smartwatch.png";
+import ED20W from "../../assets/picture/ED20W-Smartwatch.png";
 import { Link, useNavigate } from "react-router-dom";
 import ApiDelete from "../apiDelete";
 import { showConfirm, showPopup } from "../modalForm/popup";
@@ -8,6 +10,21 @@ function DeviceCard({ data, onSetting, onEdit }) {
 
   const handleRowClick = (deviceId) => {
     navigate(`/deivce-details/${deviceId}`);
+  };
+
+  console.log("device", data)
+
+  const getDeviceImage = (model) => {
+    switch (model) {
+      case "J3":
+        return J3;
+      case "X7":
+        return X7;
+      case "ED20W":
+        return ED20W;
+      default:
+        return "";
+    }
   };
 
   const statusCheck = (status) => {
@@ -104,7 +121,7 @@ function DeviceCard({ data, onSetting, onEdit }) {
 
             <div className="grid grid-cols-2 text-start gap-4 w-full">
               <div className="text-start">
-                <img src={J3} alt="J3-ismarch" />
+                <img src={getDeviceImage(model)} alt={model} />
                 <div>
                   <p className="text-gray-400">ประเภท</p>
                   <p>{type}</p>
