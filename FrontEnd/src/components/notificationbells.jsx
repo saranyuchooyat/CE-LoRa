@@ -20,6 +20,12 @@ function NotificationBell() {
       ) {
         endpoint = "/alerts/my";
       }
+      if (
+        storedUser?.role === "Zone Staff" &&
+        storedUser?.is_caregiver === false
+      ) {
+        endpoint = "/alerts/zone";
+      }
 
       const res = await api.get(endpoint);
       if (Array.isArray(res.data)) {
