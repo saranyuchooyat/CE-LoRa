@@ -1,28 +1,29 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom"; // 👈 1. เพิ่มตัวจับการเปลี่ยนหน้า
 import api from "../api";
 
 function EmergencyPopup() {
   const [emergencyAlert, setEmergencyAlert] = useState(null);
   const [dismissedAlerts, setDismissedAlerts] = useState([]);
+  
+  const location = useLocation(); // 👈 2. เรียกใช้งานตัวจับการเปลี่ยนหน้า
 
   useEffect(() => {
     // 1. ดึงข้อมูล User และเช็คสิทธิ์ก่อนเริ่มงาน
     const storedUser = sessionStorage.getItem("user");
+    
+    // 💡 ถ้ายืนอยู่หน้า Login มันจะ return ออกไป แต่พอ Login สำเร็จและย้ายหน้า โค้ดชุดนี้จะถูกรันใหม่ทันที!
     if (!storedUser) return;
 
     const userData = JSON.parse(storedUser);
 
-    // 🚩 [CRITICAL FIX] ถ้าเป็น System Admin ให้ "จบการทำงาน" ทันที
-    // ยามระดับสูงไม่ต้องมานั่งเฝ้าหน้าจอ Popup ให้วุ่นวาย
     if (userData.role === "System Admin") {
       if (emergencyAlert) setEmergencyAlert(null); 
       return; 
     }
 
-    // 💡 ฟังก์ชันดึงข้อมูล Alert (ทำงานเฉพาะคนที่ไม่ใช่ System Admin)
     const fetchHighAlerts = async () => {
       try {
-        // 🚨 เลือก Endpoint ตามสิทธิ์
         let endpoint = "/alerts?status=unread";
         const isCaregiver = userData.role === "Zone Staff" && userData.is_caregiver === true;
 
@@ -34,16 +35,20 @@ function EmergencyPopup() {
 
         if (response.data && response.data.length > 0) {
           const validHighAlerts = response.data.filter((alert) => {
-            const isHighSeverity = alert.severity?.toLowerCase() === "high";
-            const isUnread = alert.status === "unread";
+            const alertSeverity = String(alert.severity || alert.Severity || "").toLowerCase();
+            const isHighSeverity = alertSeverity === "high";
+            
+            const alertStatus = String(alert.status || alert.Status || "").toLowerCase();
+            const isUnread = alertStatus === "unread";
+            
             const notDismissed = !dismissedAlerts.includes(alert._id);
 
-            // 🚨 เงื่อนไขการกรองโซน
             let isCorrectZone = true;
             if (!isCaregiver) {
-              // ถ้าไม่ใช่ Caregiver (เป็น Zone Admin หรือ Staff ทั่วไป) 
-              // ต้องดูเฉพาะ Alert ที่อยู่ในโซนตัวเองเท่านั้น
-              isCorrectZone = alert.zone === userData.zone;
+              const alertZone = alert.zone || alert.Zone;
+              if (alertZone && userData.zone) {
+                isCorrectZone = String(alertZone) === String(userData.zone);
+              }
             }
 
             return isHighSeverity && isUnread && notDismissed && isCorrectZone;
@@ -66,29 +71,27 @@ function EmergencyPopup() {
     fetchHighAlerts();
     const intervalId = setInterval(fetchHighAlerts, 5000);
 
-    // Cleanup เมื่อออกจากหน้าเว็บหรือ Role เปลี่ยน
+    // Cleanup
     return () => clearInterval(intervalId);
-  }, [dismissedAlerts]); // ทำงานใหม่เมื่อมีการกด Dismiss (ปิด) Alert
+    
+  // 👈 3. จุดสำคัญ! เพิ่ม location.pathname เข้าไปในวงเล็บนี้
+  // เพื่อสั่งว่า "ถ้า URL เปลี่ยน (ล็อกอินเสร็จ) ให้รัน useEffect นี้ใหม่นะเว้ย!"
+  }, [dismissedAlerts, location.pathname]); 
 
-  // ฟังก์ชันกดรับทราบ (Acknowledge)
-  const handleAcknowledge = async () => {
+  // 🚨 ฟังก์ชันกดรับทราบ (Snooze 5 นาที)
+  const handleAcknowledge = () => {
     if (!emergencyAlert) return;
 
     const targetMongoId = emergencyAlert._id;
 
-    // จำไว้ว่าปิดอันนี้ไปแล้ว เพื่อไม่ให้มันเด้งซ้ำใน Session นี้
     setDismissedAlerts((prev) => [...prev, targetMongoId]);
     setEmergencyAlert(null);
 
-    try {
-      // ส่งไปบอกหลังบ้านว่า "รับทราบแล้ว" (เปลี่ยน status เป็น read)
-      await api.put(`/alerts/${targetMongoId}/acknowledge`);
-    } catch (error) {
-      console.error("Failed to acknowledge alert:", error);
-    }
+    setTimeout(() => {
+      setDismissedAlerts((prev) => prev.filter(id => id !== targetMongoId));
+    }, 5 * 60 * 1000); 
   };
 
-  // ถ้าไม่มี Alert หรือเป็น System Admin ตัว Component จะคืนค่าว่าง (ไม่แสดงผล)
   if (!emergencyAlert) return null;
 
   return (
@@ -123,7 +126,7 @@ function EmergencyPopup() {
             onClick={handleAcknowledge}
             className="w-full py-3 px-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-colors shadow-lg shadow-red-600/30 text-lg cursor-pointer"
           >
-            รับทราบและดำเนินการ
+            รับทราบ (ปิดชั่วคราว)
           </button>
         </div>
       </div>
