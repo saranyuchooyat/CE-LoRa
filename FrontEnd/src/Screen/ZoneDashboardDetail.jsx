@@ -10,6 +10,7 @@ import AddElderlyform from "../components/modalForm/addElderly";
 import EditElderlyForm from "../components/modalForm/editElderlyForm";
 import ElderlyProfileView from "./elderlyProfileView";
 import SetElderlyDeviceForm from "../components/modalForm/setElderlyDeviceForm";
+import ZoneSummaryReportView from "./ZoneSummaryReportView";
 
 function ZoneDashboardDetail() {
   const { zoneid } = useParams();

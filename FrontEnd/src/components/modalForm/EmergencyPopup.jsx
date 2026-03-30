@@ -6,20 +6,25 @@ function EmergencyPopup() {
   const [dismissedAlerts, setDismissedAlerts] = useState([]);
 
   useEffect(() => {
+    // 1. ดึงข้อมูล User และเช็คสิทธิ์ก่อนเริ่มงาน
     const storedUser = sessionStorage.getItem("user");
     if (!storedUser) return;
 
     const userData = JSON.parse(storedUser);
 
-    // 💡 ฟังก์ชันดึงข้อมูล Alert
+    // 🚩 [CRITICAL FIX] ถ้าเป็น System Admin ให้ "จบการทำงาน" ทันที
+    // ยามระดับสูงไม่ต้องมานั่งเฝ้าหน้าจอ Popup ให้วุ่นวาย
+    if (userData.role === "System Admin") {
+      if (emergencyAlert) setEmergencyAlert(null); 
+      return; 
+    }
+
+    // 💡 ฟังก์ชันดึงข้อมูล Alert (ทำงานเฉพาะคนที่ไม่ใช่ System Admin)
     const fetchHighAlerts = async () => {
       try {
-        // 🚨 1. เลือก Endpoint ตามสิทธิ์ (Role)
-        // ถ้าเป็น Caregiver ใช้เส้น /my (กรองโซนมาแล้วจากหลังบ้าน)
-        // ถ้าเป็นคนอื่น (Admin/Staff) ใช้เส้นรวม /alerts
+        // 🚨 เลือก Endpoint ตามสิทธิ์
         let endpoint = "/alerts?status=unread";
-        const isCaregiver =
-          userData.role === "Zone Staff" && userData.is_caregiver === true;
+        const isCaregiver = userData.role === "Zone Staff" && userData.is_caregiver === true;
 
         if (isCaregiver) {
           endpoint = "/alerts/my?status=unread";
@@ -33,11 +38,11 @@ function EmergencyPopup() {
             const isUnread = alert.status === "unread";
             const notDismissed = !dismissedAlerts.includes(alert._id);
 
-            // 🚨 2. เงื่อนไขการกรองโซน (เฉพาะกรณีที่ไม่ได้ใช้เส้น /my)
-            // ถ้าเป็น Caregiver ไม่ต้องกรองโซนหน้าบ้านซ้ำ เพราะ /my กรองมาให้แล้ว
+            // 🚨 เงื่อนไขการกรองโซน
             let isCorrectZone = true;
-            if (!isCaregiver && userData.role !== "System Admin") {
-              // ถ้าไม่ใช่ Admin และไม่ใช่ Caregiver (เป็น Staff ทั่วไป) อาจจะต้องเช็คโซน
+            if (!isCaregiver) {
+              // ถ้าไม่ใช่ Caregiver (เป็น Zone Admin หรือ Staff ทั่วไป) 
+              // ต้องดูเฉพาะ Alert ที่อยู่ในโซนตัวเองเท่านั้น
               isCorrectZone = alert.zone === userData.zone;
             }
 
@@ -57,29 +62,33 @@ function EmergencyPopup() {
       }
     };
 
+    // เริ่มทำงานทันที และตั้งเวลาเช็คทุก 5 วินาที
     fetchHighAlerts();
-    const intervalId = setInterval(fetchHighAlerts, 5000); // เช็คทุก 5 วินาที
+    const intervalId = setInterval(fetchHighAlerts, 5000);
 
+    // Cleanup เมื่อออกจากหน้าเว็บหรือ Role เปลี่ยน
     return () => clearInterval(intervalId);
-  }, [dismissedAlerts]);
+  }, [dismissedAlerts]); // ทำงานใหม่เมื่อมีการกด Dismiss (ปิด) Alert
 
+  // ฟังก์ชันกดรับทราบ (Acknowledge)
   const handleAcknowledge = async () => {
     if (!emergencyAlert) return;
 
     const targetMongoId = emergencyAlert._id;
 
-    // จำไว้ว่าปิดอันนี้ไปแล้วใน session นี้
+    // จำไว้ว่าปิดอันนี้ไปแล้ว เพื่อไม่ให้มันเด้งซ้ำใน Session นี้
     setDismissedAlerts((prev) => [...prev, targetMongoId]);
     setEmergencyAlert(null);
 
     try {
-      // ยิงไปเปลี่ยนสถานะเป็นอ่านแล้ว/รับทราบแล้ว
+      // ส่งไปบอกหลังบ้านว่า "รับทราบแล้ว" (เปลี่ยน status เป็น read)
       await api.put(`/alerts/${targetMongoId}/acknowledge`);
     } catch (error) {
       console.error("Failed to acknowledge alert:", error);
     }
   };
 
+  // ถ้าไม่มี Alert หรือเป็น System Admin ตัว Component จะคืนค่าว่าง (ไม่แสดงผล)
   if (!emergencyAlert) return null;
 
   return (

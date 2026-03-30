@@ -654,21 +654,42 @@ func updateElder(c *fiber.Ctx) error {
 
 	updateFields := bson.M{}
 
+	if elderUpdate.FirstName != "" {
+		updateFields["first_name"] = elderUpdate.FirstName
+	}
+	if elderUpdate.LastName != "" {
+		updateFields["last_name"] = elderUpdate.LastName
+	}
+	if elderUpdate.Sex != "" {
+		updateFields["sex"] = elderUpdate.Sex
+	}
+	if elderUpdate.Age != 0 {
+		updateFields["age"] = elderUpdate.Age
+	}
+	if elderUpdate.Weight != 0 {
+		updateFields["weight"] = elderUpdate.Weight
+	}
+	if elderUpdate.Height != 0 {
+		updateFields["height"] = elderUpdate.Height
+	}
+	if elderUpdate.CongenitalDisease != "" {
+		updateFields["congenital_disease"] = elderUpdate.CongenitalDisease
+	}
 	if elderUpdate.PersonalMedicine != "" {
 		updateFields["personal_medicine"] = elderUpdate.PersonalMedicine
 	}
-
 	if elderUpdate.EmergencyContacts != "" {
 		updateFields["emergency_contacts"] = elderUpdate.EmergencyContacts
 	}
-
 	if elderUpdate.EmergencyContactName != "" {
 		updateFields["emergency_contact_name"] = elderUpdate.EmergencyContactName
 	}
-
 	if elderUpdate.Address != "" {
 		updateFields["address"] = elderUpdate.Address
 	}
+
+	fmt.Printf("📦 [DEBUG] ID ที่จะแก้: %s\n", id)
+	fmt.Printf("🛠️ [DEBUG] ฟิลด์ที่จะอัปเดต: %v\n", updateFields)
 
 	if len(updateFields) == 0 {
 		return c.Status(400).JSON(fiber.Map{"error": "กรุณาระบุข้อมูลที่ต้องการแก้ไข"})
@@ -678,6 +699,9 @@ func updateElder(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "ไม่สามารถอัปเดตข้อมูลได้"})
 	}
+
+	fmt.Printf("✅ [DEBUG] Matched: %d, Modified: %d\n", result.MatchedCount, result.ModifiedCount)
+
 	if result.MatchedCount == 0 {
 		return c.Status(404).JSON(fiber.Map{"error": "ไม่พบผู้สูงอายุรหัส " + id})
 	}
