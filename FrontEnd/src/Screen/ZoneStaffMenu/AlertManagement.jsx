@@ -20,7 +20,10 @@ function AlertManagement() {
       if (storedUser) {
         try {
           const userData = JSON.parse(storedUser);
-          if (userData.role === "Zone Staff" && userData.is_caregiver === true) {
+          if (
+            userData.role === "Zone Staff" &&
+            userData.is_caregiver === true
+          ) {
             url = "/alerts/my";
           }
         } catch (e) {
@@ -32,7 +35,7 @@ function AlertManagement() {
     },
     refetchInterval: 3000,
   });
-
+  const safeAlerts = Array.isArray(alerts) ? alerts : [];
   const handleAction = async (id, action, e) => {
     e.stopPropagation();
     try {
@@ -50,44 +53,47 @@ function AlertManagement() {
 
   const displayAlerts = useMemo(() => {
     if (!Array.isArray(alerts)) return [];
+
     let list = alerts.filter((a) => a.status === currentTab);
+
     if (severityFilter !== "all") {
       list = list.filter((a) => a.severity?.toLowerCase() === severityFilter);
     }
-    return [...list].sort(
-      (a, b) => new Date(b.created_at) - new Date(a.created_at),
-    );
+
+    return [...list].sort((a, b) => {
+      const dateA = a.created_at ? new Date(a.created_at) : 0;
+      const dateB = b.created_at ? new Date(b.created_at) : 0;
+      return dateB - dateA;
+    });
   }, [alerts, currentTab, severityFilter]);
 
   const summaryCards = [
     {
       name: "รายงานทั้งหมด",
-      value: alerts.filter(
+      value: safeAlerts.filter(
         (a) =>
-          (a.severity?.toLowerCase() === "high" ||
-            a.severity?.toLowerCase() === "medium" ||
-            a.severity?.toLowerCase() === "low") &&
+          ["high", "medium", "low"].includes(a.severity?.toLowerCase()) &&
           a.status === "unread",
       ).length,
       color: "text-red-500 font-black",
     },
     {
       name: "High",
-      value: alerts.filter(
+      value: safeAlerts.filter(
         (a) => a.severity?.toLowerCase() === "high" && a.status === "unread",
       ).length,
       color: "text-red-500 font-black",
     },
     {
       name: "Medium",
-      value: alerts.filter(
+      value: safeAlerts.filter(
         (a) => a.severity?.toLowerCase() === "medium" && a.status === "unread",
       ).length,
       color: "text-amber-500 font-bold",
     },
     {
       name: "Low",
-      value: alerts.filter(
+      value: safeAlerts.filter(
         (a) => a.severity?.toLowerCase() === "low" && a.status === "unread",
       ).length,
       color: "text-emerald-500",
@@ -97,12 +103,12 @@ function AlertManagement() {
   return (
     // <div className="mx-auto max-w-6xl px-6 py-10 antialiased">
     <div className="mx-5">
-      {/* Header Section: ล้ำๆ สะอาดๆ */}   
+      {/* Header Section: ล้ำๆ สะอาดๆ */}
       <div className="mb-6">
         <MenuNameCard
-            title="รายงานเหตุการณ์"
-            description="Real-time safety monitoring system"
-            detail={false}
+          title="รายงานเหตุการณ์"
+          description="Real-time safety monitoring system"
+          detail={false}
         >
           {/* Advanced Filter Pills */}
           <div className="flex bg-gray-100/80 p-1.5 rounded-2xl backdrop-blur-md gap-1">
@@ -115,10 +121,10 @@ function AlertManagement() {
                     ? s === "high"
                       ? "bg-red-500 text-white shadow-md scale-105"
                       : s === "medium"
-                      ? "bg-blue-500 text-white shadow-md scale-105"
-                      : s === "low"
-                      ? "bg-green-500 text-white shadow-md scale-105"
-                      : "bg-white text-gray-900 shadow-sm scale-105"
+                        ? "bg-blue-500 text-white shadow-md scale-105"
+                        : s === "low"
+                          ? "bg-green-500 text-white shadow-md scale-105"
+                          : "bg-white text-gray-900 shadow-sm scale-105"
                     : "text-gray-400 hover:text-gray-600"
                 }`}
               >
@@ -133,7 +139,6 @@ function AlertManagement() {
       <div className="mb-10">
         <SummaryCard data={summaryCards} />
       </div>
-      
 
       {/* Tab Management */}
       <div className="flex items-center justify-between mb-8 border-b border-gray-100">
@@ -142,13 +147,13 @@ function AlertManagement() {
             {
               id: "unread",
               label: "เคสใหม่",
-              count: alerts.filter((a) => a.status === "unread").length,
+              count: safeAlerts.filter((a) => a.status === "unread").length,
               color: "bg-red-500",
             },
             {
               id: "read",
               label: "ประวัติการตรวจ",
-              count: alerts.filter((a) => a.status === "read").length,
+              count: safeAlerts.filter((a) => a.status === "read").length,
               color: "bg-emerald-500",
             },
           ].map((tab) => (
@@ -242,9 +247,7 @@ function AlertManagement() {
           ))
         ) : (
           <div className="text-center py-32 bg-gray-50/50 rounded-[3rem] border border-dashed border-gray-200">
-            <p className="text-gray-400">
-              ไม่พบรายงานเหตุการณ์
-            </p>
+            <p className="text-gray-400">ไม่พบรายงานเหตุการณ์</p>
           </div>
         )}
       </div>
