@@ -96,13 +96,15 @@ func main() {
 
 	// --Alerts--
 
-	app.Get("/alerts", GetAlerts)
 	app.Get("/alerts/my", GetMyAlerts)
-	app.Put("/alerts/:id/read", MarkAlertRead)
-	app.Delete("/alerts/:id", DeleteAlert)
+	app.Get("/alerts/zone", GetMyZoneAlerts)
 	app.Get("/alerts/unread-count", GetUnreadCount)
 	app.Get("/alerts/emergency", GetEmergencyAlerts)
 
+	app.Put("/alerts/:id/read", MarkAlertRead)
+	app.Delete("/alerts/:id", DeleteAlert)
+
+	app.Get("/alerts", GetAlerts)
 	// --Zone summary report--
 
 	app.Get("/zones/:id/summary", GetZoneSummaryReport)

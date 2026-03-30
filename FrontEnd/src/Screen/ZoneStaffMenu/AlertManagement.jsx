@@ -22,19 +22,22 @@ function AlertManagement() {
           const userData = JSON.parse(storedUser);
           if (
             userData.role === "Zone Staff" &&
-            userData.is_caregiver === true
+            userData.is_caregiver === false
           ) {
-            url = "/alerts/my";
+            url = "/alerts/zone";
           }
         } catch (e) {
           console.error("Failed to parse user data:", e);
         }
       }
+      console.log(url);
       const res = await api.get(url);
+
       return res.data;
     },
     refetchInterval: 3000,
   });
+
   const safeAlerts = Array.isArray(alerts) ? alerts : [];
   const handleAction = async (id, action, e) => {
     e.stopPropagation();
