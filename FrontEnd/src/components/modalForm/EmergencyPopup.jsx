@@ -41,32 +41,38 @@ function EmergencyPopup() {
             
             const notDismissed = !dismissedAlerts.includes(alert._id);
 
-            // 🚨 [อัปเกรดใหม่!] ระบบคัดกรองโซนแยกตาม Role อย่างเด็ดขาด!
             let isCorrectZone = false;
 
             if (userData.role === "Zone Admin") {
-              // ✅ Zone Admin คุมหลายโซน ให้ผ่านไปเลย 
               isCorrectZone = true;
             } else if (isCaregiver) {
-              // ✅ Caregiver ใช้ API /my ให้ผ่านไปเลย
               isCorrectZone = true;
             } else if (userData.role === "Zone Staff") {
-              // ❌ Zone Staff ทั่วไป ต้องตรวจโซนเท่านั้น!
               const extractZoneId = (z) => {
                 if (!z) return "";
-                return typeof z === "object" ? String(z._id || z.id || "") : String(z);
+                return typeof z === "object" ? String(z._id || z.id || z.zone_name || z.name || "") : String(z);
               };
 
-              const alertZoneId = extractZoneId(alert.zone || alert.Zone);
-              const userZoneId = extractZoneId(userData.zone || userData.Zone);
+              const alertZoneRaw = alert.zone || alert.Zone;
+              const userZoneRaw = userData.zone || userData.Zone;
+
+              const alertZoneId = extractZoneId(alertZoneRaw);
+              const userZoneId = extractZoneId(userZoneRaw);
+
+              // Debug Zone Match
+              if (isHighSeverity && isUnread && notDismissed) {
+                console.log(`[ZONE CHECK] Alert ID: ${alert._id}`);
+                console.log(`- Alert Zone:`, alertZoneRaw, `-> Parsed: "${alertZoneId}"`);
+                console.log(`- User Zone:`, userZoneRaw, `-> Parsed: "${userZoneId}"`);
+                console.log(`- Match Result:`, alertZoneId === userZoneId);
+              }
 
               if (alertZoneId && userZoneId && alertZoneId === userZoneId) {
                 isCorrectZone = true;
               } else {
-                isCorrectZone = false; // โซนชาวบ้าน เตะทิ้ง!
+                isCorrectZone = false; 
               }
             } else {
-              // เผื่อ Role อื่นๆ
               isCorrectZone = true; 
             }
 
@@ -103,7 +109,7 @@ function EmergencyPopup() {
 
     setTimeout(() => {
       setDismissedAlerts((prev) => prev.filter(id => id !== targetMongoId));
-    }, 2 * 60 * 1000); 
+    }, 5 * 60 * 1000); 
   };
 
   if (!emergencyAlert) return null;
