@@ -90,9 +90,9 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
     }
   }, [elderData?.device_id]);
 
-  const handleExportPDF = async () => {
-    window.print();
-  };
+  // const handleExportPDF = async () => {
+  //   window.print();
+  // };
 
   const chartOptions = {
     chart: { type: "spline", height: 400, animation: Highcharts.svg },
