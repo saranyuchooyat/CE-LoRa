@@ -1,12 +1,36 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import api from "../api";
+import popupSound from "../../assets/sounds/popup_sound.mp3";
 
 function EmergencyPopup() {
   const [emergencyAlert, setEmergencyAlert] = useState(null);
   const [dismissedAlerts, setDismissedAlerts] = useState([]);
   
   const location = useLocation();
+
+  // 2. สร้างอ้างอิงไฟล์เสียง
+  const audioRef = useRef(new Audio(popupSound));
+
+  // 3. ระบบควบคุมการเล่นเสียง
+  useEffect(() => {
+    const audio = audioRef.current;
+
+    if (emergencyAlert) {
+      audio.loop = true; // เล่นวนซ้ำ
+      audio.play().catch((error) => {
+        console.warn("Browser blocked audio autoplay:", error);
+      });
+    } else {
+      audio.pause(); // หยุดเสียงเมื่อไม่มี Alert
+      audio.currentTime = 0; // รีเซ็ตเวลาเริ่มต้นใหม่
+    }
+
+    return () => {
+      audio.pause();
+      audio.currentTime = 0;
+    };
+  }, [emergencyAlert]);
 
   useEffect(() => {
     const storedUser = sessionStorage.getItem("user");
@@ -109,7 +133,7 @@ function EmergencyPopup() {
 
     setTimeout(() => {
       setDismissedAlerts((prev) => prev.filter(id => id !== targetMongoId));
-    }, 5 * 60 * 1000); 
+    }, 2 * 60 * 1000); 
   };
 
   if (!emergencyAlert) return null;
