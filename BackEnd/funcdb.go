@@ -1373,7 +1373,47 @@ func checkDeviceAndCreateAlert(device bson.M) {
 				if hr > 0 {
 					checkHR(elderID, int(hr), assignedName)
 				}
+				// --- 🩺 2. เช็คความดันโลหิต (Blood Pressure) ---
+				var sys, dia int
+				// ดึงค่าตัวบน (Systolic)
+				if val, ok := swData["blood_pressure_systolic"]; ok {
+					switch v := val.(type) {
+					case int32:
+						sys = int(v)
+					case float64:
+						sys = int(v)
+					}
+				}
+				// ดึงค่าตัวล่าง (Diastolic)
+				if val, ok := swData["blood_pressure_diastolic"]; ok {
+					switch v := val.(type) {
+					case int32:
+						dia = int(v)
+					case float64:
+						dia = int(v)
+					}
+				}
 
+				if sys > 0 && dia > 0 {
+					if sys >= 150 || dia >= 95 {
+						CreateAlertWithCheck(
+							elderID,
+							"📉 ความดันโลหิตสูง",
+							fmt.Sprintf("คุณ %s มีความดัน %d/%d mmHg ซึ่งสูงกว่าเกณฑ์ปกติ", assignedName, sys, dia),
+							"medium",
+							"BP",
+						)
+					} else if sys < 90 || dia < 60 {
+
+						CreateAlertWithCheck(
+							elderID,
+							"📉 ความดันโลหิตต่ำ",
+							fmt.Sprintf("คุณ %s มีความดัน %d/%d mmHg ซึ่งต่ำกว่าเกณฑ์ปกติ", assignedName, sys, dia),
+							"medium",
+							"BP",
+						)
+					}
+				}
 				var batt float64
 				if val, ok := swData["device_battery"]; ok {
 					switch v := val.(type) {
@@ -1386,6 +1426,7 @@ func checkDeviceAndCreateAlert(device bson.M) {
 				if batt < 20 && batt > 0 {
 					CreateAlertWithCheck(elderID, "🪫 แบตเตอรี่ต่ำ", "นาฬิกาของ "+assignedName+" เหลือ "+fmt.Sprintf("%.0f", batt)+"%", "low", "BATT")
 				}
+
 			}
 		}
 	}
