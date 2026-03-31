@@ -1,18 +1,16 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom"; // 👈 1. เพิ่มตัวจับการเปลี่ยนหน้า
+import { useLocation } from "react-router-dom";
 import api from "../api";
 
 function EmergencyPopup() {
   const [emergencyAlert, setEmergencyAlert] = useState(null);
   const [dismissedAlerts, setDismissedAlerts] = useState([]);
   
-  const location = useLocation(); // 👈 2. เรียกใช้งานตัวจับการเปลี่ยนหน้า
+  const location = useLocation();
 
   useEffect(() => {
-    // 1. ดึงข้อมูล User และเช็คสิทธิ์ก่อนเริ่มงาน
     const storedUser = sessionStorage.getItem("user");
     
-    // 💡 ถ้ายืนอยู่หน้า Login มันจะ return ออกไป แต่พอ Login สำเร็จและย้ายหน้า โค้ดชุดนี้จะถูกรันใหม่ทันที!
     if (!storedUser) return;
 
     const userData = JSON.parse(storedUser);
@@ -43,12 +41,33 @@ function EmergencyPopup() {
             
             const notDismissed = !dismissedAlerts.includes(alert._id);
 
-            let isCorrectZone = true;
-            if (!isCaregiver) {
-              const alertZone = alert.zone || alert.Zone;
-              if (alertZone && userData.zone) {
-                isCorrectZone = String(alertZone) === String(userData.zone);
+            // 🚨 [อัปเกรดใหม่!] ระบบคัดกรองโซนแยกตาม Role อย่างเด็ดขาด!
+            let isCorrectZone = false;
+
+            if (userData.role === "Zone Admin") {
+              // ✅ Zone Admin คุมหลายโซน ให้ผ่านไปเลย 
+              isCorrectZone = true;
+            } else if (isCaregiver) {
+              // ✅ Caregiver ใช้ API /my ให้ผ่านไปเลย
+              isCorrectZone = true;
+            } else if (userData.role === "Zone Staff") {
+              // ❌ Zone Staff ทั่วไป ต้องตรวจโซนเท่านั้น!
+              const extractZoneId = (z) => {
+                if (!z) return "";
+                return typeof z === "object" ? String(z._id || z.id || "") : String(z);
+              };
+
+              const alertZoneId = extractZoneId(alert.zone || alert.Zone);
+              const userZoneId = extractZoneId(userData.zone || userData.Zone);
+
+              if (alertZoneId && userZoneId && alertZoneId === userZoneId) {
+                isCorrectZone = true;
+              } else {
+                isCorrectZone = false; // โซนชาวบ้าน เตะทิ้ง!
               }
+            } else {
+              // เผื่อ Role อื่นๆ
+              isCorrectZone = true; 
             }
 
             return isHighSeverity && isUnread && notDismissed && isCorrectZone;
@@ -67,18 +86,13 @@ function EmergencyPopup() {
       }
     };
 
-    // เริ่มทำงานทันที และตั้งเวลาเช็คทุก 5 วินาที
     fetchHighAlerts();
     const intervalId = setInterval(fetchHighAlerts, 5000);
 
-    // Cleanup
     return () => clearInterval(intervalId);
     
-  // 👈 3. จุดสำคัญ! เพิ่ม location.pathname เข้าไปในวงเล็บนี้
-  // เพื่อสั่งว่า "ถ้า URL เปลี่ยน (ล็อกอินเสร็จ) ให้รัน useEffect นี้ใหม่นะเว้ย!"
   }, [dismissedAlerts, location.pathname]); 
 
-  // 🚨 ฟังก์ชันกดรับทราบ (Snooze 5 นาที)
   const handleAcknowledge = () => {
     if (!emergencyAlert) return;
 
@@ -89,7 +103,7 @@ function EmergencyPopup() {
 
     setTimeout(() => {
       setDismissedAlerts((prev) => prev.filter(id => id !== targetMongoId));
-    }, 5 * 60 * 1000); 
+    }, 2 * 60 * 1000); 
   };
 
   if (!emergencyAlert) return null;
