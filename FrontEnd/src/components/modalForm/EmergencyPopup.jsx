@@ -1,18 +1,16 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom"; // 👈 1. เพิ่มตัวจับการเปลี่ยนหน้า
+import { useLocation } from "react-router-dom";
 import api from "../api";
 
 function EmergencyPopup() {
   const [emergencyAlert, setEmergencyAlert] = useState(null);
   const [dismissedAlerts, setDismissedAlerts] = useState([]);
   
-  const location = useLocation(); // 👈 2. เรียกใช้งานตัวจับการเปลี่ยนหน้า
+  const location = useLocation();
 
   useEffect(() => {
-    // 1. ดึงข้อมูล User และเช็คสิทธิ์ก่อนเริ่มงาน
     const storedUser = sessionStorage.getItem("user");
     
-    // 💡 ถ้ายืนอยู่หน้า Login มันจะ return ออกไป แต่พอ Login สำเร็จและย้ายหน้า โค้ดชุดนี้จะถูกรันใหม่ทันที!
     if (!storedUser) return;
 
     const userData = JSON.parse(storedUser);
@@ -43,12 +41,39 @@ function EmergencyPopup() {
             
             const notDismissed = !dismissedAlerts.includes(alert._id);
 
-            let isCorrectZone = true;
-            if (!isCaregiver) {
-              const alertZone = alert.zone || alert.Zone;
-              if (alertZone && userData.zone) {
-                isCorrectZone = String(alertZone) === String(userData.zone);
+            let isCorrectZone = false;
+
+            if (userData.role === "Zone Admin") {
+              isCorrectZone = true;
+            } else if (isCaregiver) {
+              isCorrectZone = true;
+            } else if (userData.role === "Zone Staff") {
+              const extractZoneId = (z) => {
+                if (!z) return "";
+                return typeof z === "object" ? String(z._id || z.id || z.zone_name || z.name || "") : String(z);
+              };
+
+              const alertZoneRaw = alert.zone || alert.Zone;
+              const userZoneRaw = userData.zone || userData.Zone;
+
+              const alertZoneId = extractZoneId(alertZoneRaw);
+              const userZoneId = extractZoneId(userZoneRaw);
+
+              // Debug Zone Match
+              if (isHighSeverity && isUnread && notDismissed) {
+                console.log(`[ZONE CHECK] Alert ID: ${alert._id}`);
+                console.log(`- Alert Zone:`, alertZoneRaw, `-> Parsed: "${alertZoneId}"`);
+                console.log(`- User Zone:`, userZoneRaw, `-> Parsed: "${userZoneId}"`);
+                console.log(`- Match Result:`, alertZoneId === userZoneId);
               }
+
+              if (alertZoneId && userZoneId && alertZoneId === userZoneId) {
+                isCorrectZone = true;
+              } else {
+                isCorrectZone = false; 
+              }
+            } else {
+              isCorrectZone = true; 
             }
 
             return isHighSeverity && isUnread && notDismissed && isCorrectZone;
@@ -67,18 +92,13 @@ function EmergencyPopup() {
       }
     };
 
-    // เริ่มทำงานทันที และตั้งเวลาเช็คทุก 5 วินาที
     fetchHighAlerts();
     const intervalId = setInterval(fetchHighAlerts, 5000);
 
-    // Cleanup
     return () => clearInterval(intervalId);
     
-  // 👈 3. จุดสำคัญ! เพิ่ม location.pathname เข้าไปในวงเล็บนี้
-  // เพื่อสั่งว่า "ถ้า URL เปลี่ยน (ล็อกอินเสร็จ) ให้รัน useEffect นี้ใหม่นะเว้ย!"
   }, [dismissedAlerts, location.pathname]); 
 
-  // 🚨 ฟังก์ชันกดรับทราบ (Snooze 5 นาที)
   const handleAcknowledge = () => {
     if (!emergencyAlert) return;
 

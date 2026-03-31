@@ -12,7 +12,7 @@ function DeviceCard({ data, onSetting, onEdit }) {
     navigate(`/deivce-details/${deviceId}`);
   };
 
-  console.log("device", data)
+  console.log("device", data);
 
   const getDeviceImage = (model) => {
     switch (model) {
@@ -108,9 +108,11 @@ function DeviceCard({ data, onSetting, onEdit }) {
         }
 
         return (
-          <button
+          // 🚨 [FIX] เปลี่ยนบรรทัดนี้จาก <button> เป็น <div> 
+          // และคง cursor-pointer กับ onClick ไว้ เพื่อให้กดได้เหมือนเดิม
+          <div
             key={index}
-            className={`flex flex-col items-center  border-l-0 border-y-5 ${CardstatusCheck(status)} rounded-[15px] gap-4 p-3 drop-shadow-lg hover:bg-[#ccfccb] cursor-pointer transition-colors duration-150`}
+            className={`flex flex-col items-center border-l-0 border-y-5 ${CardstatusCheck(status)} rounded-[15px] gap-4 p-3 drop-shadow-lg hover:bg-[#ccfccb] cursor-pointer transition-colors duration-150`}
             onClick={() => handleRowClick(card.device_id)}
           >
             <div
@@ -196,7 +198,8 @@ function DeviceCard({ data, onSetting, onEdit }) {
                 {isPending ? "ลบ..." : "ลบ"}
               </button>
             </div>
-          </button>
+          {/* 🚨 [FIX] ปิดแท็กด้วย </div> */}
+          </div>
         );
       })}
     </>

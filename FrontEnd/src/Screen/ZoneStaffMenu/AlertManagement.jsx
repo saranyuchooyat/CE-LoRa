@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../../components/api";
 import SummaryCard from "../../components/card/summaryCard";
 import MenuNameCard from "../../components/card/menuNameCard";
+import { showConfirm, showPopup } from "../../components/modalForm/popup";
 
 function AlertManagement() {
   const navigate = useNavigate();
@@ -22,32 +23,40 @@ function AlertManagement() {
           const userData = JSON.parse(storedUser);
           if (
             userData.role === "Zone Staff" &&
-            userData.is_caregiver === true
+            userData.is_caregiver === false
           ) {
-            url = "/alerts/my";
+            url = "/alerts/zone";
           }
         } catch (e) {
           console.error("Failed to parse user data:", e);
         }
       }
+      console.log(url);
       const res = await api.get(url);
+
       return res.data;
     },
     refetchInterval: 3000,
   });
+
   const safeAlerts = Array.isArray(alerts) ? alerts : [];
   const handleAction = async (id, action, e) => {
     e.stopPropagation();
     try {
       if (action === "read") await api.put(`/alerts/${id}/read`);
       if (action === "delete") {
-        if (!window.confirm("คุณต้องการลบบันทึกเหตุการณ์นี้ใช่หรือไม่?"))
-          return;
+        const isConfirmed = await showConfirm(
+          "ยืนยันการลบ", 
+          "คุณต้องการลบบันทึกเหตุการณ์นี้ใช่หรือไม่?"
+        );
+        if (!isConfirmed) return;
         await api.delete(`/alerts/${id}`);
+        await showPopup("สำเร็จ", "ลบข้อมูลเรียบร้อยแล้ว", "success");
       }
       queryClient.invalidateQueries(["allAlerts"]);
     } catch (err) {
       console.error(`Error ${action}:`, err);
+      showPopup("เกิดข้อผิดพลาด", "ไม่สามารถลบข้อมูลได้", "error");
     }
   };
 
@@ -236,7 +245,10 @@ function AlertManagement() {
                   </button>
                 )}
                 <button
-                  onClick={(e) => handleAction(item._id, "delete", e)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAction(item._id, "delete", e);
+                  }}
                   // className="w-10 h-10 px-6 py-2.5 flex items-center justify-center bg-gray-50 text-gray-300 hover:bg-red-50 hover:text-red-500 rounded-2xl transition-all"
                   className="px-2 py-1 table-btn hover:bg-main-red hover:text-white transition-all"
                 >

@@ -652,6 +652,13 @@ func updateElder(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	var oldElder bson.M
+	err := getCollection("elders").FindOne(ctx, bson.M{"elder_id": id}).Decode(&oldElder)
+	if err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "ไม่พบผู้สูงอายุ"})
+	}
+	oldFullName := fmt.Sprintf("%v %v", oldElder["first_name"], oldElder["last_name"])
+
 	updateFields := bson.M{}
 
 	if elderUpdate.FirstName != "" {
@@ -688,9 +695,6 @@ func updateElder(c *fiber.Ctx) error {
 		updateFields["address"] = elderUpdate.Address
 	}
 
-	fmt.Printf("📦 [DEBUG] ID ที่จะแก้: %s\n", id)
-	fmt.Printf("🛠️ [DEBUG] ฟิลด์ที่จะอัปเดต: %v\n", updateFields)
-
 	if len(updateFields) == 0 {
 		return c.Status(400).JSON(fiber.Map{"error": "กรุณาระบุข้อมูลที่ต้องการแก้ไข"})
 	}
@@ -704,6 +708,30 @@ func updateElder(c *fiber.Ctx) error {
 
 	if result.MatchedCount == 0 {
 		return c.Status(404).JSON(fiber.Map{"error": "ไม่พบผู้สูงอายุรหัส " + id})
+	}
+
+	if elderUpdate.FirstName != "" || elderUpdate.LastName != "" {
+		// สร้างชื่อใหม่จากข้อมูลที่ส่งมา (ถ้าฟิลด์ไหนไม่ส่งมา ให้ใช้ค่าเดิมจาก oldElder)
+		fName := elderUpdate.FirstName
+		if fName == "" {
+			fName = oldElder["first_name"].(string)
+		}
+		lName := elderUpdate.LastName
+		if lName == "" {
+			lName = oldElder["last_name"].(string)
+		}
+
+		newFullName := fmt.Sprintf("%s %s", fName, lName)
+
+		_, devErr := getCollection("devices").UpdateMany(
+			ctx,
+			bson.M{"assigned_to": oldFullName},
+			bson.M{"$set": bson.M{"assigned_to": newFullName}},
+		)
+
+		if devErr != nil {
+			fmt.Printf("⚠️ Update device error: %v\n", devErr)
+		}
 	}
 
 	return c.JSON(fiber.Map{
@@ -1108,42 +1136,6 @@ func getZoneStaff(c *fiber.Ctx) error {
 	return c.JSON(users)
 }
 
-func CreateAlert(elderID, zoneID, title, desc, severity, alertType string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	opts := options.FindOne().SetSort(bson.D{{Key: "created_at", Value: -1}})
-	var lastAlert bson.M
-	err := MI.DB.Collection("alerts").FindOne(ctx, bson.M{}, opts).Decode(&lastAlert)
-
-	nextNumber := 1
-	if err == nil {
-		lastIDStr, _ := lastAlert["alert_id"].(string)
-		fmt.Sscanf(lastIDStr, "A%03d", &nextNumber)
-		nextNumber++
-	}
-	nextAlertID := fmt.Sprintf("A%03d", nextNumber)
-
-	newEntry := bson.M{
-		"alert_id":    nextAlertID,
-		"zone_id":     zoneID,
-		"elder_id":    elderID,
-		"title":       title,
-		"description": desc,
-		"severity":    severity,
-		"type":        alertType,
-		"status":      "unread",
-		"created_at":  time.Now().Format(time.RFC3339),
-	}
-
-	_, err = MI.DB.Collection("alerts").InsertOne(ctx, newEntry)
-	if err != nil {
-		fmt.Printf("Error inserting alert: %v\n", err)
-		return err
-	}
-
-	return nil
-}
 func GetMyAlerts(c *fiber.Ctx) error {
 	userToken := c.Locals("user").(*jwt.Token)
 	claims := userToken.Claims.(jwt.MapClaims)
@@ -1171,6 +1163,44 @@ func GetMyAlerts(c *fiber.Ctx) error {
 	cursor, err := MI.DB.Collection("alerts").Find(context.Background(), filter)
 	var alerts []bson.M = []bson.M{}
 	cursor.All(context.Background(), &alerts)
+
+	return c.JSON(alerts)
+}
+
+func GetMyZoneAlerts(c *fiber.Ctx) error {
+	fmt.Print("come")
+	userToken := c.Locals("user").(*jwt.Token)
+	claims := userToken.Claims.(jwt.MapClaims)
+
+	userID, ok := claims["user_id"].(string)
+	if !ok {
+		return c.Status(401).JSON(fiber.Map{"error": "ไม่พบข้อมูลผู้ใช้ใน Token"})
+	}
+
+	var user bson.M
+	err := MI.DB.Collection("users").FindOne(context.Background(), bson.M{"user_id": userID}).Decode(&user)
+	if err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "User not found"})
+	}
+
+	zoneID, ok := user["zone_id"].(string)
+	if !ok || zoneID == "" {
+		return c.JSON([]interface{}{})
+	}
+
+	filter := bson.M{
+		"zone_id": zoneID,
+	}
+
+	cursor, err := MI.DB.Collection("alerts").Find(context.Background(), filter)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "ดึงข้อมูล Alert ไม่สำเร็จ"})
+	}
+
+	var alerts []bson.M = []bson.M{}
+	if err = cursor.All(context.Background(), &alerts); err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "ถอดรหัสข้อมูลไม่สำเร็จ"})
+	}
 
 	return c.JSON(alerts)
 }
@@ -1277,6 +1307,7 @@ func StartAlertMonitor() {
 }
 
 func checkDeviceAndCreateAlert(device bson.M) {
+	// fmt.Printf("\n[DEBUG] 🕒 Time: %s | Checking Device: %v\n", time.Now().Format("15:04:05"), device["device_name"])
 	ctx := context.Background()
 	targetName := device["device_name"]
 	assignedName, _ := device["assigned_to"].(string)
@@ -1383,6 +1414,43 @@ func CreateAlertWithCheck(elderID, title, desc, severity, alertType string) {
 
 		CreateAlert(elderID, zoneID, title, desc, severity, alertType)
 	}
+}
+
+func CreateAlert(elderID, zoneID, title, desc, severity, alertType string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	opts := options.FindOne().SetSort(bson.D{{Key: "created_at", Value: -1}})
+	var lastAlert bson.M
+	err := MI.DB.Collection("alerts").FindOne(ctx, bson.M{}, opts).Decode(&lastAlert)
+
+	nextNumber := 1
+	if err == nil {
+		lastIDStr, _ := lastAlert["alert_id"].(string)
+		fmt.Sscanf(lastIDStr, "A%03d", &nextNumber)
+		nextNumber++
+	}
+	nextAlertID := fmt.Sprintf("A%03d", nextNumber)
+
+	newEntry := bson.M{
+		"alert_id":    nextAlertID,
+		"zone_id":     zoneID,
+		"elder_id":    elderID,
+		"title":       title,
+		"description": desc,
+		"severity":    severity,
+		"type":        alertType,
+		"status":      "unread",
+		"created_at":  time.Now().Format(time.RFC3339),
+	}
+
+	_, err = MI.DB.Collection("alerts").InsertOne(ctx, newEntry)
+	if err != nil {
+		fmt.Printf("Error inserting alert: %v\n", err)
+		return err
+	}
+
+	return nil
 }
 
 func GetZoneSummaryReport(c *fiber.Ctx) error {

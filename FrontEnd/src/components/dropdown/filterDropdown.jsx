@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 
 // 💡 1. กำหนด Array ของตัวเลือกทั้งหมด
-const DEFAULT_OPTIONS = ['Active', 'Inactive', 'ทั้งหมด']; 
-const ROLE_OPTIONS = ['System Admin', 'Zone Admin','Zone Staff' , 'ทั้งหมด'];
-const DEVICE_TYPE_OPTIONS = ['X7', 'J3', 'ED20W', 'ทั้งหมด'];
+const DEFAULT_OPTIONS = ['Active', 'Inactive']; 
+const ROLE_OPTIONS = ['System Admin', 'Zone Admin','Zone Staff'];
+const DEVICE_TYPE_OPTIONS = ['X7', 'J3', 'ED20W'];
 
 // FilterDropdown.jsx
 function FilterDropdown({ onSelect, currentValue, optionalKey, data }) {

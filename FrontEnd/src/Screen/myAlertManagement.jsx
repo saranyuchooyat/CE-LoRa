@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../components/api";
 import MenuNameCard from "../components/card/menuNameCard";
 import SummaryCard from "../components/card/summaryCard";
+import { showConfirm, showPopup } from "../components/modalForm/popup";
 
 function MyAlertManagement() {
   const navigate = useNavigate();
@@ -28,14 +29,19 @@ function MyAlertManagement() {
     try {
       if (action === "read") await api.put(`/alerts/${id}/read`);
       if (action === "delete") {
-        if (!window.confirm("คุณต้องการลบบันทึกเหตุการณ์นี้ใช่หรือไม่?"))
-          return;
+        const isConfirmed = await showConfirm(
+          "ยืนยันการลบ", 
+          "คุณต้องการลบบันทึกเหตุการณ์นี้ใช่หรือไม่?"
+        );
+        if (!isConfirmed) return;
         await api.delete(`/alerts/${id}`);
+        await showPopup("สำเร็จ", "ลบข้อมูลเรียบร้อยแล้ว", "success");
       }
 
       queryClient.invalidateQueries(["myAlerts"]);
     } catch (err) {
       console.error(`Error ${action}:`, err);
+      showPopup("เกิดข้อผิดพลาด", "ไม่สามารถลบข้อมูลได้", "error");
     }
   };
 
@@ -211,16 +217,19 @@ function MyAlertManagement() {
                 {item.status === "unread" && (
                   <button
                     onClick={(e) => handleAction(item._id, "read", e)}
-                    className="px-6 py-2.5 bg-gray-900 text-white text-xs font-bold rounded-2xl hover:bg-red-600 transition-all shadow-lg shadow-gray-200"
+                    className="px-2 py-1 table-btn hover:bg-green-500 hover:text-white transition-all"
                   >
-                    RESOLVE
+                    ดำเนินการเสร็จสิ้น
                   </button>
                 )}
                 <button
-                  onClick={(e) => handleAction(item._id, "delete", e)}
-                  className="w-10 h-10 flex items-center justify-center bg-gray-50 text-gray-300 hover:bg-red-50 hover:text-red-500 rounded-2xl transition-all"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAction(item._id, "delete", e);
+                  }}
+                  className="px-2 py-1 table-btn hover:bg-main-red hover:text-white transition-all"
                 >
-                  <span className="text-lg">🗑️</span>
+                  <span className="text-lg">ลบ</span>
                 </button>
               </div>
             </div>
