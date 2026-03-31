@@ -50,10 +50,13 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
           const rawTime = res.data.data?.timestamp;
           const dateObj = rawTime ? new Date(rawTime) : new Date();
           const timeStr = `${dateObj.getHours().toString().padStart(2, "0")}:${dateObj.getMinutes().toString().padStart(2, "0")}:${dateObj.getSeconds().toString().padStart(2, "0")}`;
-          
+
           // ป้องกันการแอดข้อมูลเดิมซ้ำ ถ้ารับข้อมูลที่เวลาเดิมมา
           const uniqueKey = rawTime || timeStr;
-          if (prev.length > 0 && prev[prev.length - 1].uniqueKey === uniqueKey) {
+          if (
+            prev.length > 0 &&
+            prev[prev.length - 1].uniqueKey === uniqueKey
+          ) {
             return prev;
           }
 
@@ -66,7 +69,7 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
             sys: vitals.blood_pressure_systolic || null,
             dia: vitals.blood_pressure_diastolic || null,
           };
-          
+
           const newData = [...prev, newPoint];
           return newData.length > 20
             ? newData.slice(newData.length - 20)
@@ -87,9 +90,9 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
     }
   }, [elderData?.device_id]);
 
-  const handleExportPDF = async () => {
-    window.print();
-  };
+  // const handleExportPDF = async () => {
+  //   window.print();
+  // };
 
   const chartOptions = {
     chart: { type: "spline", height: 400, animation: Highcharts.svg },
@@ -204,12 +207,6 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
         </div>
 
         {/* ✨ ปุ่ม Export PDF ✨ */}
-        <button
-          onClick={handleExportPDF}
-          className="flex items-center gap-2 bg-main-green text-white px-6 py-2 rounded-lg font-bold shadow-md hover:bg-green-600 transition-all"
-        >
-          {/* 📥 Export เป็น PDF */} Export เป็น PDF
-        </button>
       </div>
       {/* ปุ่มกดย้อนกลับ */}
       <div
@@ -309,9 +306,7 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
           {/* ข้อมูลเพิ่มเติม: แบตเตอรี่ การเดิน และการล้ม */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
             <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 flex justify-between items-center">
-              <span className="text-gray-600 font-bold">
-                แบตเตอรี่นาฬิกา
-              </span>
+              <span className="text-gray-600 font-bold">แบตเตอรี่นาฬิกา</span>
               <div className="flex items-center gap-3 w-1/2">
                 <div className="flex-1 bg-gray-200 h-2 rounded-full overflow-hidden">
                   <div
@@ -324,22 +319,26 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
                 </span>
               </div>
             </div>
-            
+
             <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 flex justify-between items-center">
-              <span className="text-gray-600 font-bold">
-                จำนวนก้าววันนี้
-              </span>
+              <span className="text-gray-600 font-bold">จำนวนก้าววันนี้</span>
               <span className="font-bold text-lg text-main-green">
                 {liveVitals?.steps?.toLocaleString() || 0} ก้าว
               </span>
             </div>
 
             {/* ตรวจจับการล้ม */}
-            <div className={`p-4 rounded-xl border flex justify-between items-center transition-colors ${liveVitals?.is_fallen ? 'bg-red-50 border-red-300 shadow-sm' : 'bg-gray-50 border-gray-200'}`}>
-              <span className={`font-bold ${liveVitals?.is_fallen ? 'text-red-700' : 'text-gray-600'}`}>
+            <div
+              className={`p-4 rounded-xl border flex justify-between items-center transition-colors ${liveVitals?.is_fallen ? "bg-red-50 border-red-300 shadow-sm" : "bg-gray-50 border-gray-200"}`}
+            >
+              <span
+                className={`font-bold ${liveVitals?.is_fallen ? "text-red-700" : "text-gray-600"}`}
+              >
                 การตรวจจับการล้ม
               </span>
-              <span className={`font-bold text-lg ${liveVitals?.is_fallen ? 'text-red-600 animate-pulse' : 'text-main-green'}`}>
+              <span
+                className={`font-bold text-lg ${liveVitals?.is_fallen ? "text-red-600 animate-pulse" : "text-main-green"}`}
+              >
                 {/* {liveVitals?.is_fallen ? "⚠️ ตรวจพบการล้ม!" : "ปกติ"} */}
                 {liveVitals?.is_fallen ? "ตรวจพบการล้ม!" : "ปกติ"}
               </span>
