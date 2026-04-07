@@ -1,0 +1,212 @@
+[{
+  "_id": {
+    "$oid": "69b93dabdacb76b6945a67ad"
+  },
+  "device_id": "D001",
+  "device_name": "J3_Smartwatch_01",
+  "battery": 0,
+  "features": [
+    "GPS",
+    "Heart Rate",
+    "Fall Detection",
+    "SpO2",
+    "SOS Button"
+  ],
+  "last_update": "2026-03-17T11:40:26.940Z",
+  "model": "J3",
+  "status": "offline",
+  "type": "Smartwatch",
+  "assigned_to": "Grandpa สมหมาย"
+},
+{
+  "_id": {
+    "$oid": "69b96ca4fb95a1027e515657"
+  },
+  "device_id": "D002",
+  "device_name": "J3_Smartwatch_02",
+  "battery": 0,
+  "features": [
+    "GPS",
+    "Heart Rate",
+    "Fall Detection",
+    "SpO2",
+    "SOS Button"
+  ],
+  "last_update": "2026-03-17T15:00:52.693Z",
+  "model": "J3",
+  "status": "offline",
+  "type": "Smartwatch",
+  "assigned_to": "มาลี มาลัย"
+},
+{
+  "_id": {
+    "$oid": "69bbcd840a32207fd52a5412"
+  },
+  "device_id": "D003",
+  "device_name": "J3_Smartwatch_03",
+  "battery": 0,
+  "features": [
+    "GPS",
+    "Heart Rate",
+    "Fall Detection",
+    "SpO2",
+    "SOS Button"
+  ],
+  "last_update": "2026-03-19T10:18:44.303Z",
+  "model": "J3",
+  "status": "offline",
+  "type": "Smartwatch",
+  "assigned_to": "John Chowlai"
+},
+{
+  "_id": {
+    "$oid": "69bbeeeb2f4924f3b81f909d"
+  },
+  "device_id": "D004",
+  "device_name": "J3_Smartwatch_04",
+  "battery": 0,
+  "features": [
+    "GPS",
+    "Heart Rate",
+    "Fall Detection",
+    "SpO2",
+    "SOS Button"
+  ],
+  "last_update": "2026-03-19T12:41:15.175Z",
+  "model": "J3",
+  "status": "offline",
+  "type": "Smartwatch",
+  "assigned_to": "ศรัณยู ชูญาติ"
+},
+{
+  "_id": {
+    "$oid": "69bd22459689dcac55ab3b4e"
+  },
+  "device_id": "D005",
+  "device_name": "J3_Smartwatch_05",
+  "battery": 0,
+  "features": [
+    "GPS",
+    "Heart Rate",
+    "Fall Detection",
+    "SpO2",
+    "SOS Button"
+  ],
+  "last_update": "2026-03-20T10:32:37.658Z",
+  "model": "J3",
+  "status": "offline",
+  "assigned_to": "Pruettinan Limlertvaree"
+},
+{
+  "_id": {
+    "$oid": "69ca81c45d520b6c066cd1f0"
+  },
+  "device_id": "D007",
+  "device_name": "JJJ",
+  "battery": 0,
+  "features": [
+    "GPS",
+    "Heart Rate",
+    "Fall Detection",
+    "SpO2",
+    "SOS Button"
+  ],
+  "last_update": "2026-03-30T13:59:32.280Z",
+  "model": "J3",
+  "status": "offline",
+  "assigned_to": "Min Indie"
+},
+{
+  "_id": {
+    "$oid": "69ca941b740998c15b6cc379"
+  },
+  "device_id": "D008",
+  "device_name": "J3_Smartwatch_07",
+  "battery": 0,
+  "features": [
+    "GPS",
+    "Heart Rate",
+    "Fall Detection",
+    "SpO2",
+    "SOS Button"
+  ],
+  "last_update": "2026-03-30T15:17:47.459Z",
+  "model": "ED20W",
+  "status": "offline",
+  "assigned_to": "นายจัน อังคาร"
+},
+{
+  "_id": {
+    "$oid": "69cac68908fbe7aa70aec14b"
+  },
+  "device_id": "D009",
+  "device_name": "J3_Smartwatch_09",
+  "battery": 0,
+  "features": [
+    "GPS",
+    "Heart Rate",
+    "Temperature",
+    "SpO2"
+  ],
+  "last_update": "2026-03-30T18:52:56.933Z",
+  "model": "X7",
+  "status": "offline",
+  "assigned_to": "Max Carter"
+},
+{
+  "_id": {
+    "$oid": "69cb4d5e1ae259f9df09829c"
+  },
+  "device_id": "D010",
+  "device_name": "J3_Smartwatch_100",
+  "battery": 0,
+  "features": [
+    "GPS",
+    "Heart Rate",
+    "Fall Detection",
+    "SpO2",
+    "SOS Button"
+  ],
+  "last_update": "2026-03-31T04:28:14.665Z",
+  "model": "J3",
+  "status": "offline",
+  "assigned_to": "นายชิด อินทอง"
+},
+{
+  "_id": {
+    "$oid": "69cb4dd41ae259f9df09829d"
+  },
+  "device_id": "D011",
+  "device_name": "Smart Watch",
+  "battery": 0,
+  "features": [
+    "GPS",
+    "Heart Rate",
+    "Fall Detection",
+    "SpO2",
+    "SOS Button"
+  ],
+  "last_update": "2026-03-31T04:30:12.047Z",
+  "model": "J3",
+  "status": "offline",
+  "assigned_to": "Quiyuan Socool"
+},
+{
+  "_id": {
+    "$oid": "69cb8e957b0f0602b42cb0cb"
+  },
+  "device_id": "D012",
+  "device_name": "oop",
+  "battery": 0,
+  "features": [
+    "GPS",
+    "Heart Rate",
+    "Fall Detection",
+    "SpO2",
+    "SOS Button"
+  ],
+  "last_update": "2026-03-31T09:06:29.039Z",
+  "model": "J3",
+  "status": "unassigned",
+  "assigned_to": ""
+}]

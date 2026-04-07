@@ -1,15 +1,30 @@
 version: '3.8'
 
 services:
+  mongodb:
+    image: mongo:latest
+    container_name: celora_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo-seed:/docker-entrypoint-initdb.d 
+    environment:
+      - TZ=Asia/Bangkok
+    restart: always
+
   backend:
     build:
       context: ./BackEnd
       dockerfile: Dockerfile
+    container_name: celora_backend
     ports:
-      - "8081:8080"
+      - "8080:8080" 
     environment:
-      - MONGO_URI=mongodb://admin_kmitl:kmitl123@100.118.210.62:27017/LoRa?authSource=LoRa
+      - MONGO_URI=mongodb://mongodb:27017/LoRa
       - JWT_SECRET=xx12345ce
+      - TZ=Asia/Bangkok
+    depends_on:
+      - mongodb
     restart: always
 
   frontend:
@@ -17,7 +32,10 @@ services:
       context: ./FrontEnd
       dockerfile: Dockerfile
       args:
-        - VITE_API_URL=https://ana02.tailf85900.ts.net:8443
+        - VITE_API_URL=http://localhost:8080
+    container_name: celora_frontend
     ports:
       - "3000:80"
+    depends_on:
+      - backend
     restart: always

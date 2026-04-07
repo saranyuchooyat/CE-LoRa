@@ -1,0 +1,20 @@
+[{
+  "_id": {
+    "$oid": "698ae2ebf986319dff4a5a6e"
+  },
+  "zone_id": "Z001",
+  "zone_name": "Zone A (ลาดกระบัง)",
+  "zone_address": "อาคารวิศวกรรมคอมพิวเตอร์",
+  "active_user": 5,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "6991cce15e4f683e65387d3b"
+  },
+  "zone_id": "Z002",
+  "zone_name": "บางนา",
+  "zone_address": "เมกาบางนา",
+  "active_user": 0,
+  "status": "active"
+}]
