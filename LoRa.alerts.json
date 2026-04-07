@@ -1,0 +1,448 @@
+[{
+  "_id": {
+    "$oid": "69cb3bd85e416e53222fac49"
+  },
+  "zone_id": "Z001",
+  "status": "read",
+  "created_at": "2026-03-31T10:13:28+07:00",
+  "alert_id": "A001",
+  "elder_id": "E002",
+  "title": "🆘 แจ้งเตือนฉุกเฉิน (SOS)!",
+  "description": "คุณ มาลี มาลัย กดปุ่มขอความช่วยเหลือจากนาฬิกา",
+  "severity": "high",
+  "type": "SOS"
+},
+{
+  "_id": {
+    "$oid": "69cb3c7cd5de63e2b25bfb2b"
+  },
+  "status": "read",
+  "zone_id": "Z001",
+  "title": "⚠️ ข้อมูลขาดหายไป 2 นาที..",
+  "type": "WATCH_OFFLINE",
+  "created_at": "2026-03-31T03:16:12Z",
+  "alert_id": "A002",
+  "elder_id": "E002",
+  "description": "นาฬิกาของ มาลี มาลัย ขาดการติดต่อเกิน 2 นาที กรุณาตรวจสอบ",
+  "severity": "medium"
+},
+{
+  "_id": {
+    "$oid": "69cb3fb2d5de63e2b25bfb2d"
+  },
+  "elder_id": "E001",
+  "title": "🆘 แจ้งเตือนฉุกเฉิน (SOS)!",
+  "type": "SOS",
+  "created_at": "2026-03-31T03:29:54Z",
+  "zone_id": "Z001",
+  "description": "คุณ Grandpa สมหมาย กดปุ่มขอความช่วยเหลือจากนาฬิกา",
+  "severity": "high",
+  "status": "read",
+  "alert_id": "A002"
+},
+{
+  "_id": {
+    "$oid": "69cb4010e10b263805f36fe4"
+  },
+  "description": "Grandpa สมหมาย มีอัตราการเต้นหัวใจสูงติดต่อกัน 3 ครั้ง (109)",
+  "alert_id": "A002",
+  "elder_id": "E001",
+  "severity": "medium",
+  "type": "HR",
+  "status": "read",
+  "created_at": "2026-03-31T10:31:28+07:00",
+  "zone_id": "Z001",
+  "title": "💓 หัวใจเต้นเร็วเกินไป"
+},
+{
+  "_id": {
+    "$oid": "69cb42971ae259f9df098295"
+  },
+  "created_at": "2026-03-31T03:42:15Z",
+  "elder_id": "E002",
+  "severity": "medium",
+  "status": "unread",
+  "alert_id": "A003",
+  "zone_id": "Z001",
+  "title": "⚠️ ข้อมูลขาดหายไป 2 นาที..",
+  "description": "นาฬิกาของ มาลี มาลัย ขาดการติดต่อเกิน 2 นาที กรุณาตรวจสอบ",
+  "type": "WATCH_OFFLINE"
+},
+{
+  "_id": {
+    "$oid": "69cb47011ae259f9df098297"
+  },
+  "alert_id": "A003",
+  "zone_id": "Z002",
+  "title": "⚠️ ข้อมูลขาดหายไป 2 นาที..",
+  "type": "WATCH_OFFLINE",
+  "created_at": "2026-03-31T04:01:05Z",
+  "elder_id": "E006",
+  "description": "นาฬิกาของ Max Carter ขาดการติดต่อเกิน 2 นาที กรุณาตรวจสอบ",
+  "severity": "medium",
+  "status": "unread"
+},
+{
+  "_id": {
+    "$oid": "69cb48961ae259f9df098298"
+  },
+  "elder_id": "E001",
+  "description": "Grandpa สมหมาย มีอัตราการเต้นหัวใจสูงติดต่อกัน 3 ครั้ง (140)",
+  "type": "HR",
+  "status": "read",
+  "created_at": "2026-03-31T04:07:50Z",
+  "alert_id": "A003",
+  "title": "💓 หัวใจเต้นเร็วเกินไป",
+  "severity": "medium",
+  "zone_id": "Z001"
+},
+{
+  "_id": {
+    "$oid": "69cb4d4d1ae259f9df09829b"
+  },
+  "alert_id": "A003",
+  "severity": "medium",
+  "type": "WATCH_OFFLINE",
+  "created_at": "2026-03-31T04:27:57Z",
+  "zone_id": "Z001",
+  "elder_id": "E001",
+  "title": "⚠️ ข้อมูลขาดหายไป 2 นาที..",
+  "description": "นาฬิกาของ Grandpa สมหมาย ขาดการติดต่อเกิน 2 นาที กรุณาตรวจสอบ",
+  "status": "unread"
+},
+{
+  "_id": {
+    "$oid": "69cb590aaf1ddaf90718aa30"
+  },
+  "title": "ความดันโลหิตสูง!",
+  "description": "คุณ มาลี มาลัย มีความดัน 160/100 mmHg ซึ่งสูงกว่าเกณฑ์ปกติ",
+  "type": "BP",
+  "status": "read",
+  "zone_id": "Z001",
+  "elder_id": "E002",
+  "severity": "medium",
+  "created_at": "2026-03-31T12:18:02+07:00",
+  "alert_id": "A003"
+},
+{
+  "_id": {
+    "$oid": "69cb5917af1ddaf90718aa31"
+  },
+  "title": "ความดันโลหิตสูง!",
+  "severity": "medium",
+  "type": "BP",
+  "alert_id": "A004",
+  "description": "คุณ มาลี มาลัย มีความดัน 160/100 mmHg ซึ่งสูงกว่าเกณฑ์ปกติ",
+  "status": "read",
+  "created_at": "2026-03-31T12:18:15+07:00",
+  "zone_id": "Z001",
+  "elder_id": "E002"
+},
+{
+  "_id": {
+    "$oid": "69cb5c30af1ddaf90718aa33"
+  },
+  "status": "read",
+  "alert_id": "A005",
+  "zone_id": "Z001",
+  "title": "ความดันโลหิตสูง!",
+  "description": "คุณ มาลี มาลัย มีความดัน 160/100 mmHg ซึ่งสูงกว่าเกณฑ์ปกติ",
+  "created_at": "2026-03-31T12:31:28+07:00",
+  "elder_id": "E002",
+  "severity": "medium",
+  "type": "BP"
+},
+{
+  "_id": {
+    "$oid": "69cb5c35af1ddaf90718aa34"
+  },
+  "created_at": "2026-03-31T12:31:33+07:00",
+  "alert_id": "A006",
+  "zone_id": "Z001",
+  "severity": "medium",
+  "elder_id": "E002",
+  "title": "ความดันโลหิตสูง!",
+  "description": "คุณ มาลี มาลัย มีความดัน 160/100 mmHg ซึ่งสูงกว่าเกณฑ์ปกติ",
+  "type": "BP",
+  "status": "read"
+},
+{
+  "_id": {
+    "$oid": "69cb5c8a06b8580bd820a603"
+  },
+  "status": "read",
+  "alert_id": "A007",
+  "title": "📉 ความดันโลหิตสูง",
+  "description": "คุณ มาลี มาลัย มีความดัน 160/100 mmHg ซึ่งสูงกว่าเกณฑ์ปกติ",
+  "created_at": "2026-03-31T12:32:58+07:00",
+  "zone_id": "Z001",
+  "elder_id": "E002",
+  "severity": "medium",
+  "type": "BP"
+},
+{
+  "_id": {
+    "$oid": "69cb61e67b0f0602b42cb0bd"
+  },
+  "type": "FALL",
+  "status": "read",
+  "created_at": "2026-03-31T05:55:50Z",
+  "zone_id": "Z001",
+  "elder_id": "E001",
+  "title": "🔴 ตรวจพบการล้ม!",
+  "description": "คุณ Grandpa สมหมาย อาจเกิดอุบัติเหตุล้มลง (ตรวจพบขณะสวมใส่)",
+  "alert_id": "A008",
+  "severity": "high"
+},
+{
+  "_id": {
+    "$oid": "69cb633d7b0f0602b42cb0be"
+  },
+  "alert_id": "A008",
+  "title": "🆘 แจ้งเตือนฉุกเฉิน (SOS)!",
+  "severity": "high",
+  "status": "read",
+  "created_at": "2026-03-31T06:01:33Z",
+  "zone_id": "Z001",
+  "elder_id": "E001",
+  "description": "คุณ Grandpa สมหมาย กดปุ่มขอความช่วยเหลือจากนาฬิกา",
+  "type": "SOS"
+},
+{
+  "_id": {
+    "$oid": "69cb6a7c7b0f0602b42cb0bf"
+  },
+  "created_at": "2026-03-31T06:32:28Z",
+  "alert_id": "A008",
+  "severity": "medium",
+  "type": "BP",
+  "status": "read",
+  "zone_id": "Z001",
+  "elder_id": "E001",
+  "title": "📉 ความดันโลหิตสูง",
+  "description": "คุณ Grandpa สมหมาย มีความดัน 146/97 mmHg ซึ่งสูงกว่าเกณฑ์ปกติ"
+},
+{
+  "_id": {
+    "$oid": "69cb76197b0f0602b42cb0c0"
+  },
+  "created_at": "2026-03-31T07:22:01Z",
+  "alert_id": "A008",
+  "description": "คุณ Grandpa สมหมาย มีความดัน 151/101 mmHg ซึ่งสูงกว่าเกณฑ์ปกติ",
+  "severity": "medium",
+  "zone_id": "Z001",
+  "elder_id": "E001",
+  "title": "📉 ความดันโลหิตสูง",
+  "type": "BP",
+  "status": "read"
+},
+{
+  "_id": {
+    "$oid": "69cb76c67b0f0602b42cb0c1"
+  },
+  "alert_id": "A008",
+  "title": "🔴 ตรวจพบการล้ม!",
+  "severity": "high",
+  "type": "FALL",
+  "status": "read",
+  "zone_id": "Z001",
+  "elder_id": "E001",
+  "description": "คุณ Grandpa สมหมาย อาจเกิดอุบัติเหตุล้มลง (ตรวจพบขณะสวมใส่)",
+  "created_at": "2026-03-31T07:24:54Z"
+},
+{
+  "_id": {
+    "$oid": "69cb76de7b0f0602b42cb0c2"
+  },
+  "alert_id": "A008",
+  "zone_id": "Z001",
+  "elder_id": "E001",
+  "description": "คุณ Grandpa สมหมาย อาจเกิดอุบัติเหตุล้มลง (ตรวจพบขณะสวมใส่)",
+  "severity": "high",
+  "type": "FALL",
+  "title": "🔴 ตรวจพบการล้ม!",
+  "status": "read",
+  "created_at": "2026-03-31T07:25:18Z"
+},
+{
+  "_id": {
+    "$oid": "69cb77657b0f0602b42cb0c3"
+  },
+  "status": "read",
+  "created_at": "2026-03-31T07:27:33Z",
+  "alert_id": "A008",
+  "zone_id": "Z001",
+  "elder_id": "E001",
+  "description": "คุณ Grandpa สมหมาย กดปุ่มขอความช่วยเหลือจากนาฬิกา",
+  "severity": "high",
+  "title": "🆘 แจ้งเตือนฉุกเฉิน (SOS)!",
+  "type": "SOS"
+},
+{
+  "_id": {
+    "$oid": "69cb77717b0f0602b42cb0c4"
+  },
+  "type": "SOS",
+  "status": "read",
+  "alert_id": "A008",
+  "description": "คุณ Grandpa สมหมาย กดปุ่มขอความช่วยเหลือจากนาฬิกา",
+  "created_at": "2026-03-31T07:27:45Z",
+  "zone_id": "Z001",
+  "elder_id": "E001",
+  "title": "🆘 แจ้งเตือนฉุกเฉิน (SOS)!",
+  "severity": "high"
+},
+{
+  "_id": {
+    "$oid": "69cb777a7b0f0602b42cb0c5"
+  },
+  "description": "คุณ Grandpa สมหมาย กดปุ่มขอความช่วยเหลือจากนาฬิกา",
+  "severity": "high",
+  "type": "SOS",
+  "alert_id": "A008",
+  "zone_id": "Z001",
+  "elder_id": "E001",
+  "title": "🆘 แจ้งเตือนฉุกเฉิน (SOS)!",
+  "status": "read",
+  "created_at": "2026-03-31T07:27:54Z"
+},
+{
+  "_id": {
+    "$oid": "69cb78507b0f0602b42cb0c7"
+  },
+  "zone_id": "Z001",
+  "elder_id": "E001",
+  "severity": "medium",
+  "type": "BP",
+  "created_at": "2026-03-31T07:31:28Z",
+  "alert_id": "A008",
+  "title": "📉 ความดันโลหิตสูง",
+  "description": "คุณ Grandpa สมหมาย มีความดัน 150/100 mmHg ซึ่งสูงกว่าเกณฑ์ปกติ",
+  "status": "unread"
+},
+{
+  "_id": {
+    "$oid": "69cb784d06b8580bd820a604"
+  },
+  "zone_id": "Z001",
+  "elder_id": "E001",
+  "severity": "medium",
+  "type": "BP",
+  "status": "unread",
+  "title": "📉 ความดันโลหิตสูง",
+  "description": "คุณ Grandpa สมหมาย มีความดัน 150/100 mmHg ซึ่งสูงกว่าเกณฑ์ปกติ",
+  "created_at": "2026-03-31T14:31:25+07:00",
+  "alert_id": "A008"
+},
+{
+  "_id": {
+    "$oid": "69cb8db87b0f0602b42cb0c9"
+  },
+  "elder_id": "E001",
+  "title": "🆘 แจ้งเตือนฉุกเฉิน (SOS)!",
+  "description": "คุณ Grandpa สมหมาย กดปุ่มขอความช่วยเหลือจากนาฬิกา",
+  "severity": "high",
+  "created_at": "2026-03-31T09:02:48Z",
+  "type": "SOS",
+  "status": "read",
+  "alert_id": "A009",
+  "zone_id": "Z001"
+},
+{
+  "_id": {
+    "$oid": "69cb8e037b0f0602b42cb0ca"
+  },
+  "zone_id": "Z001",
+  "description": "คุณ Grandpa สมหมาย อาจเกิดอุบัติเหตุล้มลง (ตรวจพบขณะสวมใส่)",
+  "type": "FALL",
+  "alert_id": "A009",
+  "elder_id": "E001",
+  "title": "🔴 ตรวจพบการล้ม!",
+  "severity": "high",
+  "status": "read",
+  "created_at": "2026-03-31T09:04:03Z"
+},
+{
+  "_id": {
+    "$oid": "69d37c1c7b0f0602b42cb0cd"
+  },
+  "type": "FALL",
+  "zone_id": "Z001",
+  "elder_id": "E001",
+  "description": "คุณ Grandpa สมหมาย อาจเกิดอุบัติเหตุล้มลง (ตรวจพบขณะสวมใส่)",
+  "severity": "high",
+  "status": "read",
+  "created_at": "2026-04-06T09:25:48Z",
+  "alert_id": "A009",
+  "title": "🔴 ตรวจพบการล้ม!"
+},
+{
+  "_id": {
+    "$oid": "69d389e87b0f0602b42cb0cf"
+  },
+  "title": "🪫 แบตเตอรี่ต่ำ",
+  "status": "unread",
+  "created_at": "2026-04-06T10:24:40Z",
+  "alert_id": "A010",
+  "description": "นาฬิกาของ Grandpa สมหมาย เหลือ 15%",
+  "severity": "low",
+  "type": "BATT",
+  "zone_id": "Z001",
+  "elder_id": "E001"
+},
+{
+  "_id": {
+    "$oid": "69d389e89acb8b751a4f4059"
+  },
+  "zone_id": "Z001",
+  "elder_id": "E001",
+  "description": "นาฬิกาของ Grandpa สมหมาย เหลือ 15%",
+  "severity": "low",
+  "status": "unread",
+  "title": "🪫 แบตเตอรี่ต่ำ",
+  "type": "BATT",
+  "created_at": "2026-04-06T10:24:40Z",
+  "alert_id": "A010"
+},
+{
+  "_id": {
+    "$oid": "69d391067b0f0602b42cb0d0"
+  },
+  "zone_id": "Z001",
+  "description": "คุณ Grandpa สมหมาย อาจเกิดอุบัติเหตุล้มลง (ตรวจพบขณะสวมใส่)",
+  "type": "FALL",
+  "created_at": "2026-04-06T10:55:02Z",
+  "elder_id": "E001",
+  "title": "🔴 ตรวจพบการล้ม!",
+  "severity": "high",
+  "status": "unread",
+  "alert_id": "A011"
+},
+{
+  "_id": {
+    "$oid": "69d3910e7b0f0602b42cb0d1"
+  },
+  "alert_id": "A012",
+  "status": "read",
+  "created_at": "2026-04-06T10:55:10Z",
+  "zone_id": "Z001",
+  "elder_id": "E001",
+  "title": "💙 หัวใจเต้นช้าผิดปกติ",
+  "description": "Grandpa สมหมาย มีอัตราการเต้นหัวใจต่ำ (45)",
+  "severity": "high",
+  "type": "HR"
+},
+{
+  "_id": {
+    "$oid": "69d3911c7b0f0602b42cb0d2"
+  },
+  "description": "Grandpa สมหมาย มีอัตราการเต้นหัวใจต่ำ (45)",
+  "type": "HR",
+  "status": "unread",
+  "created_at": "2026-04-06T10:55:24Z",
+  "alert_id": "A013",
+  "title": "💙 หัวใจเต้นช้าผิดปกติ",
+  "severity": "high",
+  "zone_id": "Z001",
+  "elder_id": "E001"
+}]

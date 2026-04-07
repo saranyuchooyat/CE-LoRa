@@ -1,0 +1,275 @@
+[{
+  "_id": {
+    "$oid": "698ae489f986319dff4a5a70"
+  },
+  "user_id": "UID001",
+  "zone_id": "Z001,Z002",
+  "role": "System Admin",
+  "username": "admin",
+  "password": "1234",
+  "first_name": "Detsukmongkol",
+  "last_name": "Bunta",
+  "age": 22,
+  "phone": "0884741146",
+  "email": "66015072@kmitl.ac.th",
+  "last_login": {
+    "$date": "2026-04-05T04:14:18.063Z"
+  },
+  "account_status": "Active",
+  "assigned_elders": [],
+  "is_caregiver": false,
+  "is_online": false,
+  "last_active": {
+    "$date": "2026-04-05T06:06:19.128Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "698ae629f986319dff4a5a71"
+  },
+  "user_id": "UID002",
+  "zone_id": "Z001",
+  "role": "Zone Staff",
+  "username": "min",
+  "password": "0000",
+  "first_name": "jimin",
+  "last_name": "unnie",
+  "age": 25,
+  "phone": "09999999999",
+  "email": "223355@kmitl.ac.th",
+  "last_login": {
+    "$date": "2026-04-04T09:04:07.060Z"
+  },
+  "account_status": "active",
+  "assigned_elders": [
+    "E001"
+  ],
+  "is_caregiver": true,
+  "is_online": false,
+  "last_active": {
+    "$date": "2026-04-04T09:05:07.237Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "698aeef7b295b35ceddea132"
+  },
+  "user_id": "UID003",
+  "zone_id": "Z001",
+  "role": "Zone Staff",
+  "username": "YU",
+  "password": "1234",
+  "first_name": "Saranyu",
+  "last_name": "Sooyat",
+  "age": 23,
+  "phone": "0888888888",
+  "email": "66015193@kmitl.ac.th",
+  "last_login": {
+    "$date": "2026-04-04T09:08:02.841Z"
+  },
+  "account_status": "active",
+  "assigned_elders": [
+    "E001",
+    "E002"
+  ],
+  "is_caregiver": true,
+  "is_online": false,
+  "last_active": {
+    "$date": "2026-04-04T15:14:22.002Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69941c8dccb5ae4acbbc761a"
+  },
+  "user_id": "UID004",
+  "zone_id": "Z001,Z002,Z003",
+  "role": "Zone Admin",
+  "username": "mimi",
+  "password": "0000",
+  "first_name": "Mimi",
+  "last_name": "Jung",
+  "age": 24,
+  "phone": "0999999999",
+  "email": "mimijung@gmail.com",
+  "last_login": {
+    "$date": "2026-04-04T07:30:55.293Z"
+  },
+  "account_status": "active",
+  "is_online": false,
+  "last_active": {
+    "$date": "2026-04-04T08:28:55.447Z"
+  },
+  "assigned_elders": null,
+  "is_caregiver": false
+},
+{
+  "_id": {
+    "$oid": "69b302e03faa87c5d63eeeca"
+  },
+  "user_id": "UID005",
+  "zone_id": "Z001",
+  "role": "Zone Staff",
+  "username": "A",
+  "password": "0000",
+  "first_name": "chanom",
+  "last_name": "Yattaa",
+  "age": 0,
+  "phone": "0973298110",
+  "email": "yaritaina55@gmail.com",
+  "last_login": {
+    "$date": "2026-04-04T08:29:04.813Z"
+  },
+  "account_status": "Inactive",
+  "assigned_elders": [],
+  "is_caregiver": false,
+  "is_online": false,
+  "last_active": {
+    "$date": "2026-04-04T09:03:22.227Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69b83d0fa8ccd578c407e5b4"
+  },
+  "user_id": "UID006",
+  "zone_id": "Z002",
+  "role": "Zone Staff",
+  "username": "lily",
+  "password": "0000",
+  "first_name": "lily",
+  "last_name": "park",
+  "age": 0,
+  "phone": "0887979797",
+  "email": "lily1234@gmail.com",
+  "last_login": {
+    "$date": {
+      "$numberLong": "-62135596800000"
+    }
+  },
+  "account_status": "Active"
+},
+{
+  "_id": {
+    "$oid": "69bbed9b0a32207fd52a5417"
+  },
+  "user_id": "UID007",
+  "zone_id": "Z003,Z002",
+  "role": "Zone Admin",
+  "username": "eak",
+  "password": "1234",
+  "first_name": "Pruettinan",
+  "last_name": "Lim",
+  "age": 0,
+  "phone": "0996291914",
+  "email": "66015134@kmitl.ac.th",
+  "last_login": {
+    "$date": "2026-04-06T11:31:39.580Z"
+  },
+  "account_status": "Active",
+  "is_caregiver": false,
+  "assigned_elders": null,
+  "is_online": false,
+  "last_active": {
+    "$date": "2026-04-06T11:58:26.990Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69c9d30b5d520b6c066cd1ed"
+  },
+  "user_id": "UID008",
+  "zone_id": "Z003",
+  "role": "Zone Admin",
+  "username": "Api",
+  "password": "1111",
+  "first_name": "Apiwit",
+  "last_name": "Somsri",
+  "age": 0,
+  "phone": "08888888888",
+  "email": "somsom@gmail.com",
+  "last_login": {
+    "$date": {
+      "$numberLong": "-62135596800000"
+    }
+  },
+  "is_online": false,
+  "account_status": "Active",
+  "is_caregiver": false,
+  "assigned_elders": null
+},
+{
+  "_id": {
+    "$oid": "69ca82005d520b6c066cd1f1"
+  },
+  "user_id": "UID009",
+  "zone_id": "Z004",
+  "role": "Zone Staff",
+  "username": "P",
+  "password": "4444",
+  "first_name": "PP",
+  "last_name": "Chow",
+  "age": 0,
+  "phone": "0973298110",
+  "email": "P@gmail.com",
+  "last_login": {
+    "$date": "2026-03-30T16:06:51.492Z"
+  },
+  "is_online": false,
+  "account_status": "Active",
+  "is_caregiver": false,
+  "assigned_elders": [],
+  "last_active": {
+    "$date": "2026-03-30T16:06:51.671Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ca9ca6ad8c5b3fa96638b4"
+  },
+  "user_id": "UID010",
+  "zone_id": "Z004",
+  "role": "Zone Admin",
+  "username": "chid",
+  "password": "8888",
+  "first_name": "ไอชิด",
+  "last_name": "เอ็กเพรซ",
+  "age": 0,
+  "phone": "0888888888",
+  "email": "chid@gmail.com",
+  "last_login": {
+    "$date": "2026-03-30T16:04:15.419Z"
+  },
+  "is_online": false,
+  "account_status": "Active",
+  "is_caregiver": false,
+  "assigned_elders": [],
+  "last_active": {
+    "$date": "2026-03-30T16:07:15.629Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ca9f44ad8c5b3fa96638b7"
+  },
+  "user_id": "UID011",
+  "zone_id": "Z004",
+  "role": "Zone Staff",
+  "username": "PO",
+  "password": "1111",
+  "first_name": "Pญ",
+  "last_name": "Chow",
+  "age": 0,
+  "phone": "0888888888",
+  "email": "P@gmail.com",
+  "last_login": {
+    "$date": "2026-03-30T16:06:23.420Z"
+  },
+  "is_online": false,
+  "account_status": "Active",
+  "is_caregiver": false,
+  "assigned_elders": [],
+  "last_active": {
+    "$date": "2026-03-30T16:06:23.496Z"
+  }
+}]
