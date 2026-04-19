@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-// 1. ลบ import axios ออก แล้วดึง api เข้ามาแทน
-import api from "../components/api"; // ⚠️ เช็ค path ให้ตรงกับที่อยู่ของไฟล์ api.jsx นะครับ
+import api from "../components/api"; 
 
 function DeviceDetail() {
   const { device_id } = useParams();
@@ -9,11 +8,9 @@ function DeviceDetail() {
   const [deviceData, setDeviceData] = useState(null);
   const fetchData = async () => {
     try {
-      // 2. ลบการดึง Token ด้วยตัวเองออก เพราะ api.jsx จัดการให้แล้ว
-      // 3. เปลี่ยนจาก axios.get เป็น api.get และใช้ URL แบบสั้น
       const res = await api.get(`/device_data/${device_id}`);
       
-      setDeviceData(res.data); // ข้อมูลประกอบด้วย { info: {...}, data: {...} }
+      setDeviceData(res.data); 
     } catch (err) {
       console.error("Error fetching data:", err);
     }
@@ -21,19 +18,17 @@ function DeviceDetail() {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 1000); // ดึงข้อมูลใหม่ทุก 3 วินาที (จริงๆ 1000 คือ 1 วินาทีนะจารย์)
-    return () => clearInterval(interval); // ล้างหน่วยความจำเมื่อออกจากหน้า
+    const interval = setInterval(fetchData, 1000); 
+    return () => clearInterval(interval); 
   }, [device_id]);
 
   if (!deviceData)
     return <div className="p-10 text-center">กำลังเชื่อมต่อฐานข้อมูล...</div>;
 
   const { info, data } = deviceData;
-  const sw = data?.smartwatch_data; // ตัวแปรย่อสำหรับเรียกง่ายๆ
-
+  const sw = data?.smartwatch_data; 
   return (
     <div className="p-6 bg-slate-50 min-h-screen">
-      {/* Header ส่วนเดิมของพี่ */}
       <div className="mb-8 flex justify-between items-end">
         <div>
           <h1 className="text-3xl font-bold text-slate-800">
@@ -58,7 +53,6 @@ function DeviceDetail() {
         </div>
       ) : (
         <div className="space-y-6">
-          {/* Row 1: ข้อมูลวิกฤต (Critical Stats) */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Heart Rate */}
             <div className="bg-white p-6 rounded-3xl shadow-sm border-t-4 border-red-500">
@@ -94,18 +88,16 @@ function DeviceDetail() {
                 สถานะความปลอดภัย
               </p>
               <div className="mt-4">
-                {/* 1. เช็คเคส SOS ก่อน (สำคัญสุด) */}
                 {sw?.is_sos_called === 1 ? (
                   <div className="flex items-center gap-2 text-red-600 animate-pulse">
                     <span className="text-3xl font-black">SOS!</span>
                   </div>
-                ) : /* 2. เช็คเคสล้ม */
+                ) : 
                 sw?.is_fallen ? (
                   <div className="flex items-center gap-2 text-red-600 animate-bounce">
                     <span className="text-3xl font-black">ล้ม!</span>
                   </div>
                 ) : (
-                  /* 3. ถ้าไม่เข้าทั้งสองอย่าง คือปกติ */
                   <div className="flex items-center gap-2 text-emerald-500">
                     <span className="text-2xl font-bold">ปกติ</span>
                   </div>
@@ -114,7 +106,6 @@ function DeviceDetail() {
             </div>
           </div>
 
-          {/* Row 2: ดัชนีสุขภาพรอง (Medical Info) */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Blood Pressure */}
             <div className="bg-white p-5 rounded-2xl shadow-sm">

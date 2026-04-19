@@ -4,8 +4,8 @@ import api from "../api";
 function AddDeviceForm({ onClose, onSaveSuccess }) {
   const [formData, setFormData] = useState({
     deviceName: "",
-    model: "", // 💡 แอบแก้ให้ตรงกับ name="model" ใน select
-    features: [], // 💡 แอบแก้จาก String เป็น Array ป้องกันบั๊ก
+    model: "",
+    features: [],
   });
   const [nextId, setNextId] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,23 +24,17 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
 
         let maxIdNum = 0;
 
-        // 🚨 ลอจิกใหม่: วนลูปหาเลข ID ที่มากที่สุด
         if (devices && devices.length > 0) {
           devices.forEach((device) => {
-            // ดึงฟิลด์ device_id มา (เช่น "D010")
             const currentIdStr = device.device_id || device.Device_id || ""; 
-            
-            // ตัดเอาเฉพาะตัวเลข (ลบตัวอักษรทิ้ง) แล้วแปลงเป็นตัวเลขทางคณิตศาสตร์
             const numericPart = parseInt(currentIdStr.replace(/\D/g, ""), 10);
             
-            // ถ้าเป็นตัวเลข และมากกว่าค่า max ปัจจุบัน ให้จำค่าใหม่ไว้
             if (!isNaN(numericPart) && numericPart > maxIdNum) {
               maxIdNum = numericPart;
             }
           });
         }
 
-        // 💡 เอาค่า Max ที่เจอมาบวก 1 แล้วเติม 0 ให้ครบ 3 หลัก
         const nextIdStr = `D${String(maxIdNum + 1).padStart(3, "0")}`;
         setNextId(nextIdStr);
       } catch (err) {
@@ -59,7 +53,7 @@ function AddDeviceForm({ onClose, onSaveSuccess }) {
       if (name === "model" && MODEL_DEFAULTS[value]) {
         newData.features = MODEL_DEFAULTS[value];
       } else if (name === "model" && !value) {
-        newData.features = []; // เคลียร์ฟีเจอร์ถ้าเลือกกลับมาเป็นค่าว่าง
+        newData.features = []; 
       }
 
       return newData;

@@ -92,7 +92,6 @@ function MyAlertManagement() {
 
   return (
     <div className="mx-5">
-      {/* Header Section: ล้ำๆ สะอาดๆ */}
       <div className="mb-6">
         <MenuNameCard
             title="รายงานเหตุการณ์"

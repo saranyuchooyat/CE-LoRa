@@ -101,18 +101,15 @@ function EditUserForm({ userId, onClose, onSaveSuccess }) {
     return (
         <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                {/* ✅ แก้ไข 4: เปลี่ยน name และ value เป็น first_name */}
                 <div className="mb-2">
                     <label className="block text-gray-700 text-sm font-bold">ชื่อ</label>
                     <input name="first_name" type="text" value={formData.first_name} onChange={handleChange} className="border rounded w-full p-2 bg-white" required />
                 </div>
-                {/* ✅ แก้ไข 5: เปลี่ยน name และ value เป็น last_name */}
                 <div className="mb-2">
                     <label className="block text-gray-700 text-sm font-bold">นามสกุล</label>
                     <input name="last_name" type="text" value={formData.last_name} onChange={handleChange} className="border rounded w-full p-2 bg-white" required />
                 </div>
 
-                {/* แถวที่ 2: อีเมล - เบอร์โทร */}
                 <div className="mb-2">
                     <label className="block text-gray-700 text-sm font-bold">อีเมล</label>
                     <input name="email" type="email" value={formData.email} onChange={handleChange} className="border rounded w-full p-2 bg-white" required />
@@ -122,7 +119,6 @@ function EditUserForm({ userId, onClose, onSaveSuccess }) {
                     <input name="phone" type="text" value={formData.phone} onChange={handleChange} className="border rounded w-full p-2 bg-white" />
                 </div>
 
-                {/* แถวที่ 3: Username - Password (Password ให้เป็นทางเลือก) */}
                 <div className="mb-2">
                     <label className="block text-gray-700 text-sm font-bold">Username</label>
                     <input name="username" type="text" value={formData.username} onChange={handleChange} className="border rounded w-full p-2 bg-white" required />
@@ -133,7 +129,6 @@ function EditUserForm({ userId, onClose, onSaveSuccess }) {
                     <input name="password" type="password" value={formData.password} onChange={handleChange} className="border rounded w-full p-2 bg-white" placeholder="รหัสผ่านใหม่" />
                 </div>
 
-                {/* แถวที่ 4: บทบาท - ตำแหน่ง */}
                 <div className="relative mb-2">
                     <label className="block text-gray-700 text-sm font-bold">บทบาท</label>
                     <button type="button" onClick={() => setOpenRole(!openRole)} className="border rounded w-full p-2 bg-white text-left flex justify-between items-center">
@@ -154,7 +149,6 @@ function EditUserForm({ userId, onClose, onSaveSuccess }) {
                 </div>
             </div>
 
-            {/* ส่วนท้าย: รายละเอียดเพิ่มเติม */}
             <div className="mb-4 mt-2">
                 <label className="block text-gray-700 text-sm font-bold">รายละเอียดเพิ่มเติม</label>
                 <textarea name="description" value={formData.description} onChange={handleChange} className="border rounded w-full h-24 p-2 bg-white resize-none" placeholder="ระบุรายละเอียด..." />

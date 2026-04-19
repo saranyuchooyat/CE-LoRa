@@ -2,7 +2,6 @@ import {useState} from "react";
 import StatusDropdown from "../dropdown/statusDropdown";
 import FilterDropdown from "../dropdown/filterDropdown";
 
-// รับ props เพิ่ม: filters, onFilterChange, onClear
 function CardFilter({name, placeholderName, option1Name, option2Name, filters, onFilterChange, onClear, data, option2Key}){
 
     const [openStatus, setOpenStatus] = useState(false);
@@ -46,7 +45,6 @@ function CardFilter({name, placeholderName, option1Name, option2Name, filters, o
                     </form>
                 </div>
 
-               {/* Dropdown 1: สถานะ */}
                 <div className="relative mr-3">
                     <p className="text-start">{option1Name}</p>
                     <button className="dropdown-btn flex justify-between items-center" onClick={() => setOpenStatus((prev) => !prev)}>
@@ -60,7 +58,6 @@ function CardFilter({name, placeholderName, option1Name, option2Name, filters, o
                     />}
                 </div>
 
-               {/* Dropdown 2: จังหวัด/บทบาท */}
                 {option2Name && (
                     <div className="relative mr-3">
                         <p className="text-start">{option2Name}</p>
@@ -78,7 +75,6 @@ function CardFilter({name, placeholderName, option1Name, option2Name, filters, o
                 )}
                 
                 <div className="relative mr-3">
-                    {/* 4. เชื่อมปุ่มเข้ากับฟังก์ชันล้างตัวกรอง */}
                     <button 
                         className="bg-gray-200 px-5 py-2 rounded-[10px] w-[200px] cursor-pointer hover:bg-gray-400 hover:text-white"
                         onClick={onClear}

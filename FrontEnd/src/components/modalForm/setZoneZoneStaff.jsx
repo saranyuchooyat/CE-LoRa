@@ -10,14 +10,9 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
     const [accountStatus, setAccountStatus] = useState("Active");
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
-    // ✅ State สำหรับระบบ Caregiver
     const [isCaregiver, setIsCaregiver] = useState('no');
     const [availableElders, setAvailableElders] = useState([]); 
-    
-    // 🎯 แก้ให้ selectedElders เก็บแค่ "รหัส (String)" เช่น ["E001", "E002"]
     const [selectedElders, setSelectedElders] = useState([]); 
-    
     const [searchElder, setSearchElder] = useState("");
 
     useEffect(() => {
@@ -55,12 +50,10 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
                     }
                 }
 
-                // ✅ โหลดค่า Caregiver
                 if (userRes.data.is_caregiver) {
                     setIsCaregiver('yes');
                 }
-                
-                // 🎯 ดึง Array ของรหัส ["E001", "E002"] มาใส่ได้เลยโดยตรง
+
                 if (userRes.data.assigned_elders && Array.isArray(userRes.data.assigned_elders)) {
                     setSelectedElders(userRes.data.assigned_elders); 
                 }
@@ -122,7 +115,6 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
                 zone_id: finalZoneIds.join(','),
                 account_status: accountStatus,
                 is_caregiver: isCaregiver === 'yes',
-                // 🎯 ส่งก้อน String Array ไปได้เลย
                 assigned_elders: isCaregiver === 'yes' ? selectedElders : []
             };
 
@@ -144,7 +136,6 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
         );
     };
 
-    // 🎯 แก้ฟังก์ชันเพิ่ม/ลบ ให้ทำงานกับ String ID
     const handleAddElder = (elderId) => {
         if (!selectedElders.includes(elderId)) {
             setSelectedElders([...selectedElders, elderId]);
@@ -245,11 +236,9 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
                                 👥 ระบุผู้สูงอายุที่ต้องดูแล <span className="font-normal text-gray-500">(เลือกได้หลายคน)</span>
                             </label>
 
-                            {/* 🎯 แสดงป้าย Tag โดยดึงชื่อจาก availableElders */}
                             <div className="flex flex-wrap gap-2 mb-3 min-h-[32px]">
                                 {selectedElders.length === 0 && <span className="text-xs text-gray-400 italic mt-1">ยังไม่ได้เลือกผู้สูงอายุ...</span>}
                                 {selectedElders.map(elderId => {
-                                    // หาข้อมูลชื่อจากตารางหลัก
                                     const elderInfo = availableElders.find(e => e.elder_id === elderId);
                                     const elderName = elderInfo ? `- ${elderInfo.first_name}` : '';
                                     
@@ -285,7 +274,6 @@ function SetZoneZoneStaff({ userId, onClose, onSaveSuccess }) {
                                     <div className="text-center text-gray-500 text-xs py-4">ไม่พบชื่อที่ค้นหา</div>
                                 ) : (
                                     filteredElders.map(elder => {
-                                        // 🎯 เช็คว่าเลือกไปหรือยังจาก Array String
                                         const isSelected = selectedElders.includes(elder.elder_id);
                                         return (
                                             <div key={elder.elder_id} className={`flex justify-between items-center p-2 border-b last:border-0 transition-colors ${isSelected ? 'bg-gray-50 opacity-60' : 'hover:bg-green-50'}`}>

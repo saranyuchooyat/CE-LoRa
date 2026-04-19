@@ -22,13 +22,11 @@ function CareGiver() {
                 
                 const userObj = JSON.parse(storedUser);
 
-                // ดึงข้อมูล User ล่าสุดจาก Backend ป้องกันการอัปเดตจาก Admin ที่ยังไม่ sync
                 const userRes = await api.get(`/users/${userObj.user_id || userObj.id}`);
                 const latestUser = userRes.data;
                 setUserData(latestUser);
 
                 if (latestUser.assigned_elders && latestUser.assigned_elders.length > 0) {
-                    // ดึง Elderly ทั้งหมด และกรองเฉพาะที่ Caregiver คนนี้ดูแล
                     const eldersRes = await api.get("/elders");
                     const allElders = eldersRes.data;
                     
@@ -55,10 +53,7 @@ function CareGiver() {
         return <div className="mx-5 mt-10 text-center text-xl text-red-500">Access Denied: You are not a Caregiver.</div>;
     }
 
-    // กรณีมีคนไข้ 1 คน จะแสดงหน้า Profile ทันที
-    // ตรวจสอบว่าไม่ได้กดกลับหรือยกเลิกการดู profile
     if (assignedEldersData.length === 1 && !viewingProfile) {
-        // สร้าง onBack ที่ไม่มีการทำอะไร (หรือปิดปุ่มกลับในอนาคต)
         return <ElderlyProfileView elderData={assignedEldersData[0]} onBack={null} />;
     }
 

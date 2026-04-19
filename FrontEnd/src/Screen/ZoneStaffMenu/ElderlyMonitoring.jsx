@@ -18,7 +18,6 @@ function ElderlyMonitoring() {
     const navigate = useNavigate();
     const [filters, setFilters] = useState(initialFilters);
 
-    // 1. ดึงข้อมูล Zone พื้นฐาน
     const zoneQueries = useQueries({
         queries: [
             { 
@@ -32,13 +31,9 @@ function ElderlyMonitoring() {
     const isZoneError = zoneQueries[0].isError;
     const zoneData = zoneQueries[0].data || [];
 
-    // 2. สกัด Zone ID (ใช้ Optional Chaining เพื่อความปลอดภัย)
     const currentZoneId = zoneData[0]?.zone_id || null;
 
-    
 
-
-    // 3. ดึงข้อมูล Elders และ Dashboard โดยใช้ Dependent Queries
     const detailQueries = useQueries({
         queries: [
             { 
@@ -60,16 +55,13 @@ function ElderlyMonitoring() {
     const zoneDashboardData = detailQueries[1].data || null;
     const isDashLoading = detailQueries[1].isLoading;
 
-    // 4. จัดการ Token
     useEffect(() => {
         const tokenInStorage = sessionStorage.getItem('token');
         if (location.state?.token && location.state.token !== tokenInStorage) {
             sessionStorage.setItem('token', location.state.token);
         }
     }, [location.state]);
-    //ดึงข้อมูลหลังบ้าน
 
-    //ระบบ Filter
     const handleFilterChange = (key, value) => {
         setFilters((prev) => ({
         ...prev,
@@ -85,7 +77,6 @@ function ElderlyMonitoring() {
         const { search, status} = filters;
         let data = eldersData;
 
-        // กรองตามช่องค้นหา
         if(search){
             const lowerSearch = search.toLowerCase();
             data = data.filter((elder) => {
@@ -109,7 +100,6 @@ function ElderlyMonitoring() {
     
     const allDeviceStatus = deviceStatus;
 
-    // นับจำนวน critical alert
     const criticalAlertCount = Array.isArray(alerts)
         ? alerts.filter(a => a.type === 'critical').length
         : 0;
@@ -144,7 +134,6 @@ function ElderlyMonitoring() {
                 
             />
 
-            {/* แสดงการ์ดสรุปข้อมูล 3 ชุด */}
             <SummaryCard data={CardNo2Data} />
 
             <CardFilter

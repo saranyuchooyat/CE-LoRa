@@ -10,7 +10,6 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
     console.log("table data", data);
     const location = useLocation();
 
-    // ดึงข้อมูลโซนจากหลังบ้านเพื่อเอามาจับคู่ชื่อ
     const userQueries = useQueries({
         queries: [
         { queryKey: ['zone'], queryFn: () => api.get('/zones').then(res => res.data) },
@@ -29,38 +28,31 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
 
     const zoneData = userQueries[0].data || [];
 
-    // ✅ ฟังก์ชันเก็ทชื่อโซนเวอร์ชันอัปเกรด (รับมือได้ทั้ง String และ Array)
     const getZoneName = (userZoneId, zoneData) => {
         if (!userZoneId) return "N/A"; 
 
         let zoneArray = [];
 
-        // 1. เช็คว่าถ้ามาเป็น Array อยู่แล้ว (เช่น ["Z001", "Z002"])
         if (Array.isArray(userZoneId)) {
             zoneArray = userZoneId;
         } 
-        // 2. เช็คว่าถ้ามาเป็น String แต่มีลูกน้ำคั่น (เช่น "Z001,Z002")
         else if (typeof userZoneId === 'string' && userZoneId.includes(',')) {
             zoneArray = userZoneId.split(',').map(z => z.trim());
         } 
-        // 3. ถ้าเป็น String เดี่ยวๆ (เช่น "Z001")
         else if (typeof userZoneId === 'string') {
             zoneArray = [userZoneId];
         } else {
             return "N/A";
         }
 
-        // เอา Array ของ ID ไปเทียบหาชื่อโซน
         const matchedZones = zoneData.filter(zone => zoneArray.includes(zone.zone_id));
         
         if(matchedZones.length > 0){
-            // เอาชื่อโซนมาต่อกันด้วยลูกน้ำพร้อมเว้นวรรคให้สวยงาม
             return matchedZones.map(zone => zone.zone_name).join(', ');
         } 
         return "N/A";
     };
 
-    // ปรับ Status ให้รองรับตัวพิมพ์เล็ก-ใหญ่ และ active/inactive
     const statusCheck = (status) => {
         if (!status) return 'text-gray-700 bg-gray-200';
         
@@ -135,12 +127,10 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
                             const isOddRow = (index % 2 === 0);
                             const rowBgClass = isOddRow ? 'bg-gray-100' : 'bg-gray-50';
                             
-                            // ✅ แก้ตรงนี้: ให้เช็คจาก is_online ว่าเป็น true หรือ false
                             const currentStatus = card.is_online ? 'online' : 'offline';
                             const statusClass = statusCheck(currentStatus);                            
                             
                             return(
-                                // ใช้ card.user_id เป็น Key เพื่อความเสถียร
                                 <tr key={card.user_id || index} className={rowBgClass}>
                                     
                                     <td className="table-data whitespace-nowrap text-center text-gray-600 font-medium">{index + 1}</td>
@@ -154,14 +144,12 @@ function UserTable({ data, onEdit, onSetting, showActions = true }) {
                                         )}
                                     </td>
                                     
-                                    {/* ✅ เผื่อฟิลด์ชื่อ zone_id, zoneids เอาไว้กันเหนียว */}
                                     <td className="table-data whitespace-wrap w-[200px]">
                                         {getZoneName(card.zone_id || card.zoneids || card.zoneIds, zoneData)}
                                     </td>
                                     
                                     <td className="table-data whitespace-nowrap">{card.phone || "-"}</td>
-                                    
-                                    {/* ✅ แสดงป้าย Online / Offline แบบหล่อๆ */}
+
                                     <td className="table-data whitespace-nowrap text-center">
                                         <span className={`table-status ${statusClass}`}>{currentStatus.toUpperCase()}</span>
                                     </td>

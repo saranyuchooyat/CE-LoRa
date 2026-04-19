@@ -8,11 +8,9 @@ function EmergencyPopup() {
   const [dismissedAlerts, setDismissedAlerts] = useState([]);
   
   const location = useLocation();
-
-  // 2. สร้างอ้างอิงไฟล์เสียง
   const audioRef = useRef(new Audio(popupSound));
 
-  // 3. ระบบควบคุมการเล่นเสียง
+  //ควบคุมการเล่นเสียง
   useEffect(() => {
     const audio = audioRef.current;
 

@@ -10,12 +10,11 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
   const [elderData, setElderData] = useState(propsElderData || null);
   const [liveVitals, setLiveVitals] = useState(null);
   const [historyData, setHistoryData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true); // 🟢 เพิ่มสถานะ Loading
+  const [isLoading, setIsLoading] = useState(true); 
   const reportRef = useRef(null);
 
   useEffect(() => {
     const fetchElderInfo = async () => {
-      // ถ้าไม่มี props หรือ id เปลี่ยน ให้โหลดใหม่
       if (id) {
         try {
           setIsLoading(true);
@@ -27,7 +26,7 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
         } catch (err) {
           console.error("Error fetching elder info:", err);
         } finally {
-          setIsLoading(false); // โหลดเสร็จแล้ว (ไม่ว่าจะเจอหรือไม่เจอ)
+          setIsLoading(false); 
         }
       } else {
         setIsLoading(false);
@@ -51,7 +50,6 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
           const dateObj = rawTime ? new Date(rawTime) : new Date();
           const timeStr = `${dateObj.getHours().toString().padStart(2, "0")}:${dateObj.getMinutes().toString().padStart(2, "0")}:${dateObj.getSeconds().toString().padStart(2, "0")}`;
 
-          // ป้องกันการแอดข้อมูลเดิมซ้ำ ถ้ารับข้อมูลที่เวลาเดิมมา
           const uniqueKey = rawTime || timeStr;
           if (
             prev.length > 0 &&
@@ -81,7 +79,6 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
     }
   };
 
-  // 2. ตั้งเวลาดึงข้อมูลทุก 1 วินาที
   useEffect(() => {
     if (elderData?.device_id) {
       fetchLiveVitals();
@@ -163,7 +160,6 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
     },
   };
 
-  // 🟢 1. เช็คสถานะ Loading ก่อน
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-gray-400">
@@ -173,7 +169,6 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
     );
   }
 
-  // 🟢 2. ถ้าโหลดเสร็จแล้วแต่ไม่เจอข้อมูล
   if (!elderData) {
     return (
       <div className="p-20 text-center">
@@ -206,7 +201,6 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
           )}
         </div>
 
-        {/* ✨ ปุ่ม Export PDF ✨ */}
       </div>
       {/* ปุ่มกดย้อนกลับ */}
       <div
@@ -246,7 +240,6 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
           )}
         </div>
 
-        {/* ข้อมูลสุขภาพล่าสุด (ดึงจาก liveVitals ถ้ามี) */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold text-gray-700">
@@ -345,7 +338,7 @@ function ElderlyProfileView({ elderData: propsElderData, onBack }) {
             </div>
           </div>
 
-          {/* ✅ ส่วนการแสดงผลกราฟแนวโน้มสุขภาพ */}
+          {/* ส่วนการแสดงผลกราฟแนวโน้มสุขภาพ */}
           <div className="mt-4 bg-white border border-gray-200 rounded-xl p-4 shadow-sm animate-fade-in">
             <div className="flex justify-between items-center mb-2">
               <h3 className="text-lg font-bold text-gray-700">

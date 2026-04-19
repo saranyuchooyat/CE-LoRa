@@ -55,7 +55,6 @@ function LoginPage() {
 
   return (
     <div className="flex h-screen w-full bg-[#f2f8f5] overflow-hidden font-kanit">
-      {/* Left Area - Image (Rectangle) */}
       <div className="hidden lg:flex w-1/2 h-full relative">
         <img 
           src={LoginPic} 

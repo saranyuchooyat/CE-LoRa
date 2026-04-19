@@ -65,7 +65,6 @@ function ZoneDashboard(){
             data = data.filter((zone) => zone.Province === province);
         }
 
-        // ✅ อัปเกรด: ป้องกันบั๊กกรณี Status ใน DB พิมพ์เล็ก-ใหญ่ไม่ตรงกัน
         if (status && status !== "ทั้งหมด") {
             data = data.filter((zone) => zone.status && zone.status.toLowerCase() === status.toLowerCase());
         }
@@ -88,7 +87,6 @@ function ZoneDashboard(){
                     title="ภาพรวม Zone (พื้นที่)"
                     description="ระบบดูข้อมูลภาพรวมพื้นที่ใช้งาน Smart Healthcare System"
                     onButtonClick={false}
-                    // ✅ แก้ไข: ดึงจำนวนมาจากข้อมูลโซนจริงๆ ไม่ใช่จากจำนวน Query
                     detail={filteredZones.length + " พื้นที่"} 
                     buttonText="จำนวนพื้นที่ที่ผู้ใช้งานดูแล "
                 />

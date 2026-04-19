@@ -11,16 +11,8 @@ import (
 	fiberSwagger "github.com/swaggo/fiber-swagger"
 )
 
-// @title LoraWan Service API
-// @version 1.0
-// @description ระบบจัดการช่วยเหลือผู้สูงอายุผ่าน LoraWan
-// @securityDefinitions.apikey BearerAuth
-// @in header
-// @name Authorization
-// @description พิมพ์ Bearer แล้วตามด้วย token
-
 func main() {
-	ConnectMongo() // เรียกใช้ฟังก์ชันเชื่อมต่อ DB
+	ConnectMongo()
 
 	app := fiber.New()
 	StartAlertMonitor()
@@ -36,11 +28,6 @@ func main() {
 	app.Get("/swagger/*", fiberSwagger.WrapHandler)
 	app.Post("/auth/login", login)
 
-	// =====================================
-	// Private Routes (ต้อง Login ก่อน)
-	// =====================================
-
-	// JWT Configuration
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
 		secret = "secret_lora_key_1234"
@@ -95,7 +82,6 @@ func main() {
 	app.Get("/system/health/servers", getSystemHealth)
 
 	// --Alerts--
-
 	app.Get("/alerts/my", GetMyAlerts)
 	app.Get("/alerts/zone", GetMyZoneAlerts)
 	app.Get("/alerts/unread-count", GetUnreadCount)

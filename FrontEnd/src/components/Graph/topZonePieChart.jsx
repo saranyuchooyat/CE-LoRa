@@ -26,14 +26,14 @@ function TopZonePieChart({piedata}){
                 },
                 zone:[{
                     value: 50,
-                    color: '#f7a35c' // Color for values up to 50
+                    color: '#f7a35c'
                     }, 
                     {
                     value: 100,
-                    color: '#7cb5ec' // Color for values between 51 and 100
+                    color: '#7cb5ec'
                     }, 
                     {
-                    color: '#90ed7d' // Color for values above 100
+                    color: '#90ed7d'
                 }]
             }
         },

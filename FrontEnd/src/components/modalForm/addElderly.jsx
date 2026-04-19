@@ -13,7 +13,7 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
         height: '',
         congenitalDisease: '',
         personalMedicine: '',
-        emergencyContactName: '', // ✅ 1. เพิ่ม State เก็บชื่อผู้ติดต่อ
+        emergencyContactName: '',
         emergencyContacts: '',
         address: '',
         device: 'เลือกอุปกรณ์'
@@ -63,7 +63,7 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
             height: Number(formData.height),
             congenital_disease: formData.congenitalDisease,
             personal_medicine: formData.personalMedicine,
-            emergency_contact_name: formData.emergencyContactName, // ✅ 2. เพิ่มฟิลด์สำหรับส่งไปหลังบ้าน
+            emergency_contact_name: formData.emergencyContactName,
             emergency_contacts: formData.emergencyContacts,
             address: formData.address,
             device_id: (formData.device === 'เลือกอุปกรณ์' || !formData.device) ? "" : formData.device,
@@ -173,8 +173,7 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
                 <label className="block text-gray-700 text-sm">ยาประจำตัว</label>
                 <textarea name="personalMedicine" type="text" value={formData.personalMedicine} onChange={handleChange} className="border rounded w-full h-14 p-2 bg-white resize-none" placeholder="ระบุประเภทของยาที่ต้องรับประทาน"/>
             </div>
-            
-            {/* ✅ 3. ปรับตรงนี้ให้แบ่ง 2 คอลัมน์ (ชื่อผู้ติดต่อ และ เบอร์โทร) */}
+
             <div className="grid grid-cols-2 gap-x-4">
                 <div className="mb-2">
                     <label className="block text-gray-700 text-sm">ชื่อผู้ติดต่อฉุกเฉิน</label>
@@ -191,7 +190,6 @@ function AddElderlyform({ zoneid, onClose, onSaveSuccess }){
                 <textarea name="address" type="text" value={formData.address} onChange={handleChange} className="border rounded w-full h-14 p-2 bg-white resize-none"/>
             </div>
 
-            {/* ปุ่มกด (Footer) */}
             <div className="pt-4 mt-2 border-t flex justify-end gap-3">
                 <button 
                     type="submit" 

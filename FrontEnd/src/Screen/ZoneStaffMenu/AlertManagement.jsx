@@ -112,7 +112,6 @@ function AlertManagement() {
   return (
     // <div className="mx-auto max-w-6xl px-6 py-10 antialiased">
     <div className="mx-5">
-      {/* Header Section: ล้ำๆ สะอาดๆ */}
       <div className="mb-6">
         <MenuNameCard
           title="รายงานเหตุการณ์"

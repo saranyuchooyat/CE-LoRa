@@ -10,13 +10,11 @@ import AddZoneForm from "../../components/modalForm/addZoneForm";
 import EditZoneForm from "../../components/modalForm/editZoneForm";
 import SetZoneForm from "../../components/modalForm/setZoneForm";
 
-//กำหนดตัวแปรแต่ละช่อง Filter
 const initialFilters = {
-  search: "", // สำหรับช่องค้นหา ชื่อ, อีเมล, เบอร์โทร
-  province: "ทั้งหมด", // สำหรับ Role (option2Name)
-  status: "ทั้งหมด", // สำหรับ Status (option1Name)
+  search: "", 
+  province: "ทั้งหมด",
+  status: "ทั้งหมด", 
 };
-//กำหนดตัวแปรแต่ละช่อง Filter
 
 function ZoneManagement() {
   
@@ -31,7 +29,6 @@ function ZoneManagement() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isSetModalOpen, setIsSetModalOpen] = useState(false);
 
-  //ดึงข้อมูลหลังบ้าน
   const zoneQueries = useQueries({
     queries: [
       { queryKey: ['zones'], queryFn: () => api.get('/zones').then(res => res.data) },
@@ -52,9 +49,7 @@ function ZoneManagement() {
         sessionStorage.setItem('token', location.state.token);
     }
   }, [location.state]);
-  //ดึงข้อมูลหลังบ้าน
 
-  // ฟังก์ชันเปิด Modal แก้ไข
   const handleOpenEditModal = (zone) => {
     setSelectedZoneData(zone);
     setIsEditModalOpen(true);
@@ -64,7 +59,6 @@ function ZoneManagement() {
     setIsEditModalOpen(false);
   }
 
-  // ฟังก์ชันเปิด Modal ตั้งค่า
   const handleOpenSetModal = (zone) => {
     setSelectedZoneData(zone);
     setIsSetModalOpen(true);
@@ -74,7 +68,6 @@ function ZoneManagement() {
     setIsSetModalOpen(false);
   }
 
-  //ระบบ filter
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({
       ...prev,
@@ -90,23 +83,19 @@ function ZoneManagement() {
     const { search, province, status } = filters;
     let data = zoneData || []; 
 
-    // กรองตามช่องค้นหา (Search)
     if (search) {
       const lowerSearch = search.toLowerCase();
       data = data.filter((zone) => {
 
-        // 1. การค้นหาด้วย ID (ต้องแปลงเป็น String ก่อน)
         const zoneIdSearch = zone.zone_id
           ? String(zone.zone_id).toLowerCase().includes(lowerSearch)
           : false;
 
-        // 2. การค้นหาด้วยชื่อและรหัส (ป้องกันค่าเป็น null/undefined ก่อนเรียก toLowerCase)
         const nameSearch =
           zone.zone_name && zone.zone_name.toLowerCase().includes(lowerSearch);
         const addressSearch =
           zone.zone_address && zone.zone_address.toLowerCase().includes(lowerSearch);
 
-        // รวมผลลัพธ์การค้นหาทั้งหมด
         return zoneIdSearch || nameSearch || addressSearch;
       });
     }
@@ -121,7 +110,6 @@ function ZoneManagement() {
 
     return data;
   }, [zoneData, filters]);
-  //ระบบ filter
 
   if (isSystemLoading) {
       return <div className="mx-5 mt-10 text-center text-xl">Loading Dashboard...</div>;

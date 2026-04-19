@@ -26,8 +26,7 @@ function EditZoneStaff({ userId, onClose, onSaveSuccess, zones }) {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const user = response.data;
-                
-                // Handle zone_id properly depending on type (it could be an array of strings or comma-separated string)
+
                 let currentZone = '';
                 if (user.zone_id) {
                     if (Array.isArray(user.zone_id)) {

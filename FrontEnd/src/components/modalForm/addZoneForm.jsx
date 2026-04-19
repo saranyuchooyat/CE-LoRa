@@ -26,15 +26,14 @@ function AddZoneForm({ onClose, onSaveSuccess }){
         setIsSubmitting(true);
 
         const dataToSend = {
-            zone_name: formData.zonename,    // แก้จาก zoneName -> zone_name
-            zone_address: formData.address,  // แก้จาก address -> zone_address
-            description: formData.description, // อันนี้ตรงแล้ว
-            active_user: 0,                  // ✅ เพิ่มอันนี้ (ส่งเลข 0 ไป)
-            status: "active"                 // ✅ เพิ่มอันนี้ (บอกสถานะ)
+            zone_name: formData.zonename, 
+            zone_address: formData.address, 
+            description: formData.description, 
+            active_user: 0,          
+            status: "active"         
         };
 
         try {
-            // 2. ส่ง request พร้อมแนบ Header Authorization
             await api.post("/zones", dataToSend); 
             
             if (typeof onSaveSuccess === 'function') {
@@ -46,7 +45,6 @@ function AddZoneForm({ onClose, onSaveSuccess }){
 
         } catch (error) {
             if (error.response) {
-                // จะเห็น Error "Missing or malformed JWT" ที่นี่ถ้า Token ไม่ถูกต้อง
                 console.error("Server Error Detail:", error.response.data);
             }
             console.error("Error adding zone:", error);
@@ -59,7 +57,6 @@ function AddZoneForm({ onClose, onSaveSuccess }){
         <form onSubmit={handleSubmit}>
             
             <div className="flex items-center gap-4 w-full">
-                {/* ชื่อ */}
                 <div className="mb-4">
                     <label className="block text-gray-700">ชื่อ zone</label>
                     <input 
@@ -84,7 +81,6 @@ function AddZoneForm({ onClose, onSaveSuccess }){
 
             </div>
 
-            {/*ที่อยู่*/}
             <div className="mb-4">
                 <label className="block text-gray-700">ที่อยู่</label>
                 <textarea
@@ -96,9 +92,6 @@ function AddZoneForm({ onClose, onSaveSuccess }){
                 />
             </div>
 
-
-
-            {/* Footer (ปุ่ม Save/Cancel) */}
             <div className="mt-6 pt-4 border-t flex justify-end gap-4">
                 <button 
                     type="submit" 

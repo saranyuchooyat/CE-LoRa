@@ -4,11 +4,9 @@ import api from "../components/api";
 import MenuNameCard from "../components/card/menuNameCard";
 import SummaryCard from "../components/card/summaryCard";
 
-// ✅ 1. อย่าลืมรับ props `eldersData` ที่ส่งมาจากหน้าหลักด้วยนะครับ
 function ZoneSummaryReportView({ zoneId, zoneName, eldersData, onBack }) {
     const [timeFilter, setTimeFilter] = useState("1m");
-    
-    // ✅ 2. State สำหรับจำว่าผู้ใช้ติ๊กเลือกแนบรายชื่อผู้สูงอายุหรือเปล่า
+
     const [includeElders, setIncludeElders] = useState(false);
 
     const { data: reportData, isLoading, isError, error } = useQuery({
@@ -30,10 +28,8 @@ function ZoneSummaryReportView({ zoneId, zoneName, eldersData, onBack }) {
     const handleExportCSV = () => {
         if (!reportData) return;
 
-        // เตรียมหัวตาราง
         const headers = ["หมวดหมู่", "รายการ", "จำนวน/รายละเอียด"];
 
-        // ข้อมูลส่วนที่ 1: สรุปตัวเลข
         const rows = [
             ["การแจ้งเตือน (Alerts)", "Critical (ฉุกเฉิน)", reportData.alerts_summary.critical],
             ["การแจ้งเตือน (Alerts)", "Warning (เตือนภัย)", reportData.alerts_summary.warning],
@@ -44,10 +40,9 @@ function ZoneSummaryReportView({ zoneId, zoneName, eldersData, onBack }) {
             ["อุปกรณ์ (Devices)", "ออฟไลน์ (Offline)", reportData.device_status.offline]
         ];
 
-        // ✅ ข้อมูลส่วนที่ 2: ถ้ายืนยันจะเอาผู้สูงอายุด้วย ให้จับยัดต่อท้ายเลย
         if (includeElders && eldersData && eldersData.length > 0) {
-            rows.push(["", "", ""]); // เว้นบรรทัดให้ดูสวยงาม
-            rows.push(["--- รายละเอียด ---", "รหัส (ID)", "ชื่อ-นามสกุล"]); // หัวตารางย่อย
+            rows.push(["", "", ""]); 
+            rows.push(["--- รายละเอียด ---", "รหัส (ID)", "ชื่อ-นามสกุล"]); 
             eldersData.forEach(elder => {
                 rows.push(["ผู้สูงอายุในพื้นที่", elder.elder_id, `${elder.first_name} ${elder.last_name}`]);
             });
@@ -58,7 +53,7 @@ function ZoneSummaryReportView({ zoneId, zoneName, eldersData, onBack }) {
             ...rows.map(e => e.join(","))
         ].join("\n");
 
-        const bom = "\uFEFF"; // กันภาษาไทยเพี้ยนใน Excel
+        const bom = "\uFEFF"; 
         const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
         
         const url = URL.createObjectURL(blob);
@@ -73,7 +68,6 @@ function ZoneSummaryReportView({ zoneId, zoneName, eldersData, onBack }) {
     return (
         <>
              <div className="mx-5">
-            {/* ปุ่ม Back แยกออกมาด้านบนสุด */}
             <div className="mt-2 mb-4">
                 <button 
                     onClick={onBack} 
@@ -83,7 +77,6 @@ function ZoneSummaryReportView({ zoneId, zoneName, eldersData, onBack }) {
                 </button>
             </div>
 
-            {/* MenuNameCard ครอบคลุม Section หัวข้อและกลุ่มปุ่มกรอง/Export */}
             <div className="mb-6">
                 <MenuNameCard
                     title="Zone Summary Report"
@@ -95,9 +88,7 @@ function ZoneSummaryReportView({ zoneId, zoneName, eldersData, onBack }) {
                     detail={false}
                 >
                     <div className="flex flex-wrap items-center gap-4">
-                        {/* กรอบรวมตัวกรองและตั้งค่ารายชื่อให้เป็นหมวดหมู่เดียวกันและเล็กลง */}
                         <div className="flex items-center bg-white px-3 py-1.5 rounded-lg shadow-sm border border-gray-200 gap-3">
-                            {/* เลือกช่วงเวลา */}
                             <div className="flex items-center">
                                 <label className="text-xs font-bold text-gray-700 mr-2">ช่วงเวลา:</label>
                                 <select 
@@ -114,7 +105,6 @@ function ZoneSummaryReportView({ zoneId, zoneName, eldersData, onBack }) {
 
                             <div className="w-px h-5 bg-gray-200"></div>
 
-                            {/* Checkbox เลือกแนบรายชื่อ */}
                             <label className="flex items-center text-xs text-gray-600 cursor-pointer hover:text-teal-700 transition-colors">
                                 <input 
                                     type="checkbox" 
@@ -126,7 +116,6 @@ function ZoneSummaryReportView({ zoneId, zoneName, eldersData, onBack }) {
                             </label>
                         </div>
 
-                        {/* ✅ ปุ่ม Export ให้เป็นปุ่มหลักเด่นๆ */}
                         <button 
                             onClick={handleExportCSV}
                             disabled={isLoading || isError || !reportData}
@@ -153,7 +142,6 @@ function ZoneSummaryReportView({ zoneId, zoneName, eldersData, onBack }) {
 
             {!isLoading && !isError && reportData && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {/* (โค้ด Card ส่วนตัวเลขสรุปเดิมยังคงอยู่ครบถ้วน) */}
                     <div className="col-span-1 md:col-span-2 lg:col-span-4">
                         <SummaryCard 
                             data={[

@@ -42,11 +42,9 @@ function NotificationBell() {
     return () => clearInterval(interval);
   }, []);
 
-  // 2. กรองเฉพาะอันที่ "ยังไม่อ่าน" เพื่อโชว์เลข Badge และใน Popover
   const unreadList = alerts.filter((a) => a.status === "unread");
   const unreadCount = unreadList.length;
 
-  // 3. ปิด Popover เมื่อคลิกที่อื่น
   useEffect(() => {
     const close = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target))
@@ -71,7 +69,6 @@ function NotificationBell() {
   };
   return (
     <div className="relative ml-4" ref={dropdownRef}>
-      {/* 🔔 ปุ่มกระดิ่ง */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2 flex items-center justify-center hover:bg-gray-100 rounded-full transition-all border-none outline-none"
@@ -91,7 +88,6 @@ function NotificationBell() {
           <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
         </svg>
 
-        {/* 🔴 ตัวเลข Badge (ถ้ามี unread จะโชว์) */}
         {unreadCount > 0 && (
           <span className="absolute top-0 right-0 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-black text-white bg-red-600 rounded-full border-2 border-white shadow-sm transform translate-x-1 -translate-y-0.5">
             {unreadCount > 99 ? "99+" : unreadCount}
@@ -99,7 +95,6 @@ function NotificationBell() {
         )}
       </button>
 
-      {/* 📋 Popover รายการด่วน (สไตล์ Facebook) */}
       {isOpen && (
         <div className="absolute right-0 mt-3 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 z-[999] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
           <div className="p-3 bg-gray-50 border-b border-gray-100 flex justify-between items-center">

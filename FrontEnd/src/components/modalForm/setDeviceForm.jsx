@@ -9,22 +9,17 @@ function SetDeviceForm({ deviceId, onClose }) {
   const [selectedElder, setSelectedElder] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [busyElders, setBusyElders] = useState([]);
-  // --- 1. เพิ่ม State ตัวนี้ไว้พัก ID คนเจ้าของเดิม ---
   const [initialElderId, setInitialElderId] = useState(null);
   const [initialElderName, setInitialElderName] = useState("");
   const [isLoadingElders, setIsLoadingElders] = useState(false);
-  // --- 2. ดึงข้อมูลเจ้าของเครื่อง (ยิงเข้าหา Elder โดยตรงตามที่พี่บอก) ---
   useEffect(() => {
     const fetchCurrentOwner = async () => {
       try {
-        // ยิงไป API ที่พี่สร้างใหม่ (ที่เอา DeviceID ไปหาใน Elder)
         const res = await api.get(`/devices/${deviceId}/owner`);
         const owner = res.data;
         console.log("name", owner);
         if (owner) {
-          // พอเจอแล้ว ก็สั่งเซ็ต Zone เลย
           setSelectedZone(owner.zone_id);
-          // พัก ID ผู้สูงอายุไว้ก่อน เพราะ Dropdown รายชื่อคนยังโหลดไม่เสร็จ
           setInitialElderId(owner.elder_id);
           setInitialElderName(`${owner.first_name} ${owner.last_name}`);
         }
@@ -36,18 +31,17 @@ function SetDeviceForm({ deviceId, onClose }) {
     if (deviceId) fetchCurrentOwner();
   }, [deviceId]);
 
-  // --- 3. รอจังหวะที่รายชื่อคน (elders) โหลดเสร็จ แล้วค่อยยัด ID ลงไป ---
   useEffect(() => {
     if (elders.length > 0 && initialElderId) {
-      setSelectedElder(initialElderId); // ยัด ID ลง Dropdown คน
-      setInitialElderId(null); // ล้างค่าทิ้ง จะได้ไม่กวนตอนเรากดเปลี่ยนคนเอง
+      setSelectedElder(initialElderId); 
+      setInitialElderId(null); 
     }
   }, [elders, initialElderId]);
 
   useEffect(() => {
     const fetchBusyElders = async () => {
       try {
-        const res = await api.get("/devices"); // ดึงอุปกรณ์ทั้งหมด
+        const res = await api.get("/devices");
         const assignedNames = res.data
           .map((d) => d.assigned_to)
           .filter((name) => name && name !== "None");
@@ -59,12 +53,10 @@ function SetDeviceForm({ deviceId, onClose }) {
     fetchBusyElders();
   }, []);
 
-  // 1. Fetch Zones on mount
+  // Fetch Zones on mount
   useEffect(() => {
     const fetchZones = async () => {
       try {
-        // สมมติว่าดึง zone ที่ตัวเองดูแล ถ้ามี role admin อาจจะ get('/zones') ก็ได้
-        // แต่โจทย์คือ "zone ที่ตัวเองดูแล" ดังนั้นลอง my-zones ก่อน
         const res = await api.get("/zones/my-zones");
         setZones(res.data);
       } catch (err) {
@@ -74,7 +66,7 @@ function SetDeviceForm({ deviceId, onClose }) {
     fetchZones();
   }, []);
 
-  // 2. Fetch Elders when selectedZone changes
+  // Fetch Elders when selectedZone changes
   useEffect(() => {
     if (!selectedZone) {
       setElders([]);
@@ -94,7 +86,6 @@ function SetDeviceForm({ deviceId, onClose }) {
     fetchElders();
   }, [selectedZone]);
 
-  //เมื่อข้อมูลคนในโซนโหลดมาแล้ว ให้เซ็ตคนปัจจุบันอัตโนมัติ
   useEffect(() => {
     if (elders.length > 0 && initialElderId) {
       setSelectedElder(initialElderId);
@@ -110,14 +101,13 @@ function SetDeviceForm({ deviceId, onClose }) {
 
     setIsSubmitting(true);
     try {
-      // หาข้อมูลผู้สูงอายุที่ถูกเลือก เพื่อจัดเป็นชื่อ AssignedTo
       const elder = elders.find((e) => e.elder_id === selectedElder);
       const assignedToName = elder
         ? `${elder.first_name} ${elder.last_name}`
         : selectedElder;
 
       const payload = {
-        status: "offline", // ให้สถานะตั้งต้นเมื่อพึ่งผูกอุปกรณ์เป็น offline รออัปเดตจากอุปกรณ์จริง
+        status: "offline", 
         assigned_to: assignedToName,
       };
 

@@ -39,17 +39,11 @@ function ZoneDashboardDetail() {
   const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
   const [selectedElderForDevice, setSelectedElderForDevice] = useState(null);
 
-  // const handleOpenDeviceModal = (elderId) => {
-  //   // ใช้ zoneDashboardQueries ตรงๆ ไม่ได้เพราะ data อยู่ใน allEldery ตัวแปรข้างล่าง
-  //   // งั้นเราหาจาก elders ใน this scope
-  // };
 
   const [viewingProfile, setViewingProfile] = useState(null);
 
-  // ✅ 2. สร้าง State ควบคุมการสลับไปหน้า Report
   const [showSummaryReport, setShowSummaryReport] = useState(false);
 
-  //ดึงข้อมูลหลังบ้าน
   const zoneDashboardQueries = useQueries({
     queries: [
       {
@@ -76,7 +70,6 @@ function ZoneDashboardDetail() {
   const zoneDashboard = zoneDashboardQueries[0].data || [];
   const zoneStaffData = zoneDashboardQueries[1].data || [];
 
-  // 🚩 เพิ่ม Log ตรงนี้ครับพี่
   console.log("--- DEBUG DASHBOARD ---");
   console.log("Raw Data from Backend:", zoneDashboardQueries[0].data);
   console.log("Device Status Object:", zoneDashboard?.deviceStatus);
@@ -149,7 +142,6 @@ function ZoneDashboardDetail() {
   const allEldery = elders || [];
   const zoneDetail = zone;
 
-  // ✅ 3. สลับหน้าจอมาที่ Report ถ้า State เป็น true
   if (showSummaryReport) {
     return (
       <ZoneSummaryReportView
@@ -170,7 +162,6 @@ function ZoneDashboardDetail() {
     );
   }
 
-  // เติมฟังก์ชันการค้นหา elder สำหรับ Modal ให้อยู่ข้างล่างที่เรามีตัวแปร allEldery แล้ว
   const executeOpenDeviceModal = (elderId) => {
     const elder = allEldery.find((e) => e.elder_id === elderId);
     if (elder) {
@@ -182,7 +173,6 @@ function ZoneDashboardDetail() {
   return (
     <>
       <div className="mx-5">
-        {/* ✅ 4. เพิ่มปุ่ม Report ไว้มุมขวาบน */}
         <div className="flex justify-end mb-3 mt-2"></div>
 
         <MenuNameCard
@@ -267,7 +257,7 @@ function ZoneDashboardDetail() {
           onClose={() => setIsDeviceModalOpen(false)}
           elderData={selectedElderForDevice}
           onSuccess={() => {
-            zoneDashboardQueries[0].refetch(); // โหลดข้อมูลใหม่
+            zoneDashboardQueries[0].refetch();
           }}
         />
       </Modal>

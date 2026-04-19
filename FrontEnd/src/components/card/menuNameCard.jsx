@@ -10,14 +10,11 @@ function MenuNameCard({
     return (
       <div className="flex items-center gap-4 mr-3">
         {children}
-        {/* 💡 เพิ่ม Container เพื่อจัดกลุ่มปุ่มและ Banner */}
-        {/* 1. ตรวจสอบและแสดง Banner ถ้ามีข้อมูล detail */}
         {detail !== false && (
           <div className="w-fit p-2 bg-gray-200 rounded-lg">
             {buttonText} {detail}
           </div>
         )}
-        {/* 2. ตรวจสอบและแสดงปุ่มเพิ่ม ถ้ามีฟังก์ชัน onButtonClick */}
         {onButtonClick && (
           <button className="add-btn" onClick={onButtonClick}>
              {`+ เพิ่ม${buttonText}ใหม่`}

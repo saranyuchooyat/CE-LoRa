@@ -3,7 +3,6 @@ import api from "../api.jsx";
 import { showPopup } from "./popup";
 
 function AddUserForm({ onClose, onSaveSuccess }){
-    // 1. กำหนดโครงสร้าง State ให้ครบตามฟิลด์ที่ต้องการ
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -20,7 +19,6 @@ function AddUserForm({ onClose, onSaveSuccess }){
     const [openRole, setOpenRole] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // 2. Handler สำหรับการพิมพ์ใน input ทั่วไป
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -29,18 +27,15 @@ function AddUserForm({ onClose, onSaveSuccess }){
         }));
     };
 
-    // 3. Handler สำหรับการเลือก Role จาก Dropdown
     const selectRole = (selectedRole) => {
         setFormData(prev => ({ ...prev, role: selectedRole }));
         setOpenRole(false);
     };
 
-    // 4. ฟังก์ชันส่งข้อมูล (ยึด Logic ตาม AddZoneForm)
     const handleSubmit = async (e) => {
         e.preventDefault(); 
         setIsSubmitting(true);
 
-        // จัดเตรียม Object สำหรับส่งไป API (รวมชื่อ-นามสกุล และ map ค่าให้ตรงกับ Backend)
         const dataToSend = {
             first_name: formData.firstName.trim(),
             last_name: formData.lastName.trim(),
@@ -55,11 +50,9 @@ function AddUserForm({ onClose, onSaveSuccess }){
         };
 
         try {
-            // ส่ง request ไปยัง Endpoint สำหรับ User (ปกติจะเป็น /users หรือ /create-user)
             await api.post("/users", dataToSend);
             
             showPopup("สำเร็จ", "เพิ่มข้อมูลผู้ใช้เรียบร้อยแล้ว", "success");
-            // หากสำเร็จ: แจ้งให้ Component แม่รีเฟรชข้อมูล (refetch) และปิด Modal
             if (typeof onSaveSuccess === 'function') {
                 onSaveSuccess(); 
             }
@@ -68,7 +61,6 @@ function AddUserForm({ onClose, onSaveSuccess }){
             }
 
         } catch (error) {
-            // จัดการ Error เหมือนใน AddZoneForm เพื่อการ Debug ที่ง่ายขึ้น
             if (error.response) {
                 console.error("Server Error Detail:", error.response.data);
             }
@@ -81,7 +73,6 @@ function AddUserForm({ onClose, onSaveSuccess }){
     
     return (
         <form onSubmit={handleSubmit}> 
-            {/* ส่วนของฟิลด์ข้อมูลจัดเรียงแบบ Grid */}
             <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                 <div className="mb-2">
                     <label className="block text-gray-700 text-sm">ชื่อ</label>
@@ -108,7 +99,6 @@ function AddUserForm({ onClose, onSaveSuccess }){
                     <input name="password" type="password" value={formData.password} onChange={handleChange} className="border rounded w-full p-2 bg-white" required />
                 </div>
                 
-                {/* Dropdown บทบาท */}
                 <div className="relative mb-2">
                     <label className="block text-gray-700 text-sm">บทบาท</label>
                     <button 
@@ -134,7 +124,6 @@ function AddUserForm({ onClose, onSaveSuccess }){
                 </div>
             </div>
 
-            {/* ช่องรายละเอียดเพิ่มเติม (ขยายเต็มกว้าง) */}
             <div className="mb-4 mt-2">
                 <label className="block text-gray-700 text-sm">รายละเอียดเพิ่มเติม</label>
                 <textarea 
@@ -146,7 +135,6 @@ function AddUserForm({ onClose, onSaveSuccess }){
                 />
             </div>
 
-            {/* ปุ่มกด (Footer) */}
             <div className="pt-4 border-t flex justify-end gap-3">
                 <button 
                     type="submit" 

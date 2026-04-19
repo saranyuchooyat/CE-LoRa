@@ -108,8 +108,6 @@ function DeviceCard({ data, onSetting, onEdit }) {
         }
 
         return (
-          // 🚨 [FIX] เปลี่ยนบรรทัดนี้จาก <button> เป็น <div> 
-          // และคง cursor-pointer กับ onClick ไว้ เพื่อให้กดได้เหมือนเดิม
           <div
             key={index}
             className={`flex flex-col items-center border-l-0 border-y-5 ${CardstatusCheck(status)} rounded-[15px] gap-4 p-3 drop-shadow-lg hover:bg-[#ccfccb] cursor-pointer transition-colors duration-150`}
@@ -198,7 +196,6 @@ function DeviceCard({ data, onSetting, onEdit }) {
                 {isPending ? "ลบ..." : "ลบ"}
               </button>
             </div>
-          {/* 🚨 [FIX] ปิดแท็กด้วย </div> */}
           </div>
         );
       })}

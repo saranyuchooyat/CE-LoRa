@@ -10,13 +10,11 @@ import EditZoneStaff from "../../components/modalForm/editZoneStaff";
 import AddZoneStaffForm from "../../components/modalForm/addZoneStaff";
 import SetZoneZoneStaff from "../../components/modalForm/setZoneZoneStaff";
 
-//กำหนดตัวแปรแต่ละช่อง Filter
 const initialFilters = {
-  search: "", // สำหรับช่องค้นหา ชื่อ, อีเมล, เบอร์โทร
-  zonestaff: "ทั้งหมด", // สำหรับ Role (option2Name)
-  status: "ทั้งหมด", // สำหรับ Status (option1Name)
+  search: "", 
+  zonestaff: "ทั้งหมด", 
+  status: "ทั้งหมด", 
 };
-//กำหนดตัวแปรแต่ละช่อง Filter
 
 function ZoneStaffManagement(){
     
@@ -52,7 +50,6 @@ function ZoneStaffManagement(){
         setIsSettingModalOpen(false);
     };
 
-    //ดึงข้อมูลหลังบ้าน
     const userQueries = useQueries({
         queries: [
         { queryKey: ['users'], queryFn: () => api.get('/users').then(res => res.data) },
@@ -70,8 +67,8 @@ function ZoneStaffManagement(){
 
     const zoneOptions = useMemo(() => {
     return zoneData.map(zone => ({ 
-        label: zone.zone_name, // ใช้ชื่อ 'label' เพื่อให้ง่ายต่อการนำไปใส่ Dropdown
-        value: zone.zone_id    // ใช้ชื่อ 'value' สำหรับค่าที่จะส่งไป API
+        label: zone.zone_name, 
+        value: zone.zone_id   
     }));
     }, [zoneData]);
 
@@ -81,11 +78,7 @@ function ZoneStaffManagement(){
             sessionStorage.setItem('token', location.state.token);
         }
     }, [location.state]);
-    //ดึงข้อมูลหลังบ้าน
-
-    // ฟังก์ชันเปิด Modal แก้ไข
     
-    // ระบบ filter
     const handleFilterChange = (key, value) => {
         setFilters(prev => ({
             ...prev,
@@ -101,7 +94,6 @@ function ZoneStaffManagement(){
         const { search, zonestaff, status } = filters;
         let data = zonestaffData;
 
-        // กรองตามช่องค้นหา (Search)
         if (search) {
             const lowerSearch = search.toLowerCase();
             data = data.filter(user => {
@@ -116,12 +108,10 @@ function ZoneStaffManagement(){
         }
 
         if (zonestaff && zonestaff !== "ทั้งหมด") {
-            // zone_id from API might be comma separated string or array or single string
             data = data.filter((user) => {
                 if (!user.zone_id) return false;
                 if (Array.isArray(user.zone_id)) return user.zone_id.includes(zonestaff);
                 if (typeof user.zone_id === 'string') {
-                    // split by comma if there are multiple zones
                     const zones = user.zone_id.split(',').map(z => z.trim());
                     return zones.includes(zonestaff);
                 }
@@ -133,9 +123,6 @@ function ZoneStaffManagement(){
         }
         return data;
     }, [userData, filters]);
-    // ระบบ filter
-
-    // ระบบกรองจำวน Role
         const roleCountsObject = (userData).reduce((acc, user) => {
         const role = user.role;
         acc[role] = (acc[role] || 0) + 1;
@@ -155,7 +142,6 @@ function ZoneStaffManagement(){
         totalStaffObjects,
         ...staffDataList
     ]
-    // ระบบกรองจำวน Role
     
     if (isSystemLoading) {
         return <div className="mx-5 mt-10 text-center text-xl">Loading Dashboard...</div>;
@@ -171,7 +157,7 @@ function ZoneStaffManagement(){
                 <MenuNameCard
                 title="จัดการผู้ใช้งาน"
                 description="ระบบจัดการบัญชีผู้ใช้และสิทธิ์การเข้าถึง"
-                onButtonClick={handleOpenModal} // ต้องเพิ่ม Prop นี้ใน MenuNameCard
+                onButtonClick={handleOpenModal} 
                 detail={false}
                 buttonText="ผู้ใช้งาน"/>
 

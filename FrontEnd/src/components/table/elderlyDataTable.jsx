@@ -9,27 +9,22 @@ import { showConfirm, showPopup } from "../../components/modalForm/popup";
 function ElderlyRow({ card, index, onRowClick, handleEditClick, handleSettingClick, handleDeleteClick, isPending, showActions, getStatusStyle, calculateStatus, userRole }) {
     const isOddRow = (index % 2 === 0);
     const rowBgClass = isOddRow ? 'bg-gray-100' : 'bg-gray-50';
-    
-    // ดึงข้อมูล Realtime 
     const { data: deviceResponse } = useQuery({
         queryKey: ['deviceData', card.device_id],
         queryFn: () => api.get(`/device_data/${card.device_id}`).then(res => res.data),
         enabled: !!card.device_id,
-        refetchInterval: 10000 // Refresh ทุกๆ 10 วิ
+        refetchInterval: 10000
     });
 
     const liveVitals = deviceResponse?.data?.smartwatch_data || card.vitals;
-    
-    // ตั้งเวลาให้คอมโพเนนต์ re-render เพื่ออัปเดตข้อความ "x นาทีที่แล้ว" แบบ Realtime
     const [now, setNow] = useState(new Date());
     useEffect(() => {
         const timer = setInterval(() => {
             setNow(new Date());
-        }, 10000); // ตรวจสอบทุก 10 วินาที
+        }, 10000); 
         return () => clearInterval(timer);
     }, []);
 
-    // คำนวณเวลาแบบ "X นาทีที่แล้ว"
     const rawTime = deviceResponse?.data?.timestamp || card.last_updated;
     let lastUpdatedTime = "-";
     if (rawTime) {
@@ -53,10 +48,7 @@ function ElderlyRow({ card, index, onRowClick, handleEditClick, handleSettingCli
         }
     }
     
-    // ✅ 1. คำนวณสถานะสดๆ จากข้อมูล Vitals ปัจจุบัน (ฉลาดกว่ารอค่าจาก DB)
     const currentStatus = calculateStatus(liveVitals, card.health_status);
-    
-    // ✅ 2. ดึงสไตล์สีมาใส่ให้ตรงกับสถานะ
     const statusClass = getStatusStyle(currentStatus);                             
     
     return(
@@ -79,7 +71,6 @@ function ElderlyRow({ card, index, onRowClick, handleEditClick, handleSettingCli
                 </div>
             </td>
             <td className="table-data whitespace-nowrap">
-                {/* ✅ 3. แสดงชื่อสถานะที่คำนวณมาแล้วแบบเป็นตัวพิมพ์ใหญ่ให้ดูสวยๆ */}
                 <span className={`table-status ${statusClass}`}>
                     {currentStatus.toUpperCase()}
                 </span>
@@ -127,30 +118,25 @@ function ElderlyDataTable({ data, onEdit, onSetting, onDeleteSuccess, onRowClick
         }
     }, []);
     
-    // ✅ 4. ฟังก์ชันหมอจำลอง: วิเคราะห์อาการจากตัวเลข
     const calculateStatus = (vitals, dbStatus) => {
-        if (!vitals) return dbStatus || 'NORMAL'; // ถ้าไม่มีข้อมูลสุขภาพ ให้ยึดจาก DB หรือเซ็ต Normal 
+        if (!vitals) return dbStatus || 'NORMAL';
 
         const hr = vitals.heart_rate || 0;
         const spo2 = vitals.spo2 || 100;
         const isFallen = vitals.is_fallen === true;
         const isSos = vitals.is_sos_called === true;
 
-        // ถ้าล้ม หรือกด SOS หรือหัวใจหยุดเต้น (แต่นาฬิกายังใส่ยู่) = CRITICAL ทันที
         if (isFallen || isSos || (hr > 0 && hr < 40)) {
             return 'CRITICAL';
         }
-        
-        // ถ้าหัวใจเต้นเร็ว/ช้าผิดปกติ หรือออกซิเจนตก = WARNING
+
         if (hr > 120 || (hr < 50 && hr > 0) || (spo2 < 95 && spo2 > 0)) {
             return 'WARNING';
         }
 
-        // ถ้าค่าปกติทั้งหมด
         return 'NORMAL';
     };
 
-    // ✅ 5. ปรับปรุงฟังก์ชันคืนค่าสี ให้รองรับทั้งตัวพิมพ์เล็ก/ใหญ่
     const getStatusStyle = (status) => {
         const safeStatus = (status || "").toLowerCase();
         
@@ -167,7 +153,6 @@ function ElderlyDataTable({ data, onEdit, onSetting, onDeleteSuccess, onRowClick
         } 
     };
 
-    // Delete Button
     const { mutate: deleteElder, isPending } = ApiDelete('elder', onDeleteSuccess); 
 
     const handleDeleteClick = (elderId, event) => {
@@ -224,8 +209,8 @@ function ElderlyDataTable({ data, onEdit, onSetting, onDeleteSuccess, onRowClick
                                 handleDeleteClick={handleDeleteClick}
                                 isPending={isPending}
                                 showActions={showActions}
-                                getStatusStyle={getStatusStyle}   // ส่งฟังก์ชันสีลงไป
-                                calculateStatus={calculateStatus} // ส่งฟังก์ชันหมอจำลองลงไป
+                                getStatusStyle={getStatusStyle}   
+                                calculateStatus={calculateStatus} 
                                 userRole={userRole}
                             />
                         ))}

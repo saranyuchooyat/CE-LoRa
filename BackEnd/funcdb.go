@@ -70,7 +70,6 @@ func login(c *fiber.Ctx) error {
 		"exp":      time.Now().Add(time.Hour * 24).Unix(),
 	}
 
-	// 🚨 [ส่วนที่แก้ใหม่: ซิงก์กุญแจให้ตรงกับ main.go เป๊ะๆ] 🚨
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
 		secret = "secret_lora_key_1234"
@@ -78,7 +77,6 @@ func login(c *fiber.Ctx) error {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	t, err := token.SignedString([]byte(secret))
-	// 🚨 [สิ้นสุดส่วนที่แก้] 🚨
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not generate token"})
@@ -711,7 +709,6 @@ func updateElder(c *fiber.Ctx) error {
 	}
 
 	if elderUpdate.FirstName != "" || elderUpdate.LastName != "" {
-		// สร้างชื่อใหม่จากข้อมูลที่ส่งมา (ถ้าฟิลด์ไหนไม่ส่งมา ให้ใช้ค่าเดิมจาก oldElder)
 		fName := elderUpdate.FirstName
 		if fName == "" {
 			fName = oldElder["first_name"].(string)
@@ -1373,9 +1370,7 @@ func checkDeviceAndCreateAlert(device bson.M) {
 				if hr > 0 {
 					checkHR(elderID, int(hr), assignedName)
 				}
-				// --- 🩺 2. เช็คความดันโลหิต (Blood Pressure) ---
 				var sys, dia int
-				// ดึงค่าตัวบน (Systolic)
 				if val, ok := swData["blood_pressure_systolic"]; ok {
 					switch v := val.(type) {
 					case int32:
@@ -1384,7 +1379,6 @@ func checkDeviceAndCreateAlert(device bson.M) {
 						sys = int(v)
 					}
 				}
-				// ดึงค่าตัวล่าง (Diastolic)
 				if val, ok := swData["blood_pressure_diastolic"]; ok {
 					switch v := val.(type) {
 					case int32:

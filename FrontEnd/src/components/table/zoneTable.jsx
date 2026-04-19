@@ -8,21 +8,18 @@ function ZoneTable({ data, onEdit, onSetting, showActions=true }) {
 
     const location = useLocation();
     const navigate = useNavigate();
-
-    // ✅ แก้ไข: ใช้ zone_id ให้ตรงกับ Backend
     const handleRowClick = (zoneId) => {
         navigate(`/zone-details/${zoneId}`); 
     };
 
     const activeUserCheck = (data) =>{
         if(data === 0 || !data){
-            return '0' // หรือ 'N/A' ตามความชอบครับ
+            return '0' 
         }
         return data
     }
 
     const statusCheck = (status) =>{
-        // ✅ ปรับให้รองรับ "active" (ตัวเล็ก) ที่ส่งมาจาก Go
         const lowerStatus = status?.toLowerCase();
         switch (lowerStatus) {
             case 'active':
@@ -36,7 +33,6 @@ function ZoneTable({ data, onEdit, onSetting, showActions=true }) {
 
     const { mutate: deleteZone, isPending } = ApiDelete('zone'); 
 
-    // ✅ แก้ไข: ใช้ zone_id สำหรับการลบ
     const handleDeleteClick = (zoneId, event) => {
         event.stopPropagation(); 
         showConfirm("ยืนยันลบข้อมูล", `คุณแน่ใจหรือไม่ว่าต้องการลบ Zone ID: ${zoneId}?`).then(isConfirmed => {
@@ -92,11 +88,9 @@ function ZoneTable({ data, onEdit, onSetting, showActions=true }) {
                                 <tr 
                                     key={card.zone_id || index} 
                                      className={`${rowBgClass} cursor-pointer hover:bg-[#ccfccb] transition-colors duration-200`}
-                                    // ✅ แก้ไข: ใช้ card.zone_id
                                     onClick={() => handleRowClick(card.zone_id)}
                                 >
                                     <td className="table-data whitespace-nowrap text-center text-gray-600 font-medium">{index + 1}</td>
-                                    {/* ✅ เปลี่ยนทุกช่องให้ใช้ Key ที่มี Underscore (_) ตาม Backend */}
                                     <td className="table-data whitespace-nowrap">{card.zone_id}</td>
                                     <td className="table-data whitespace-nowrap">{card.zone_name}</td>
                                     <td className="table-data whitespace-wrap w-[200px]">{card.zone_address}</td>
@@ -104,7 +98,6 @@ function ZoneTable({ data, onEdit, onSetting, showActions=true }) {
                                     <td className="table-data whitespace-nowrap">
                                         <span className={`table-status ${statusClass}`}>{card.status}</span>
                                     </td>
-                                    {/* ✅ แก้ไข: ใช้ active_user */}
                                     <td className="table-data whitespace-nowrap">{activeUserCheck(card.active_user)}</td>
                                     
                                     {showActions && (
@@ -116,7 +109,6 @@ function ZoneTable({ data, onEdit, onSetting, showActions=true }) {
                                                 onClick={(event) => handleSettingClick(card, event)}>
                                             ตั้งค่า</button>
                                         <button className="table-btn hover:bg-main-red hover:text-white"
-                                                // ✅ แก้ไข: ใช้ card.zone_id
                                                 onClick={(event) => handleDeleteClick(card.zone_id, event)}
                                                 disabled={isPending} >{isPending ? 'ลบ...' : 'ลบ'}</button>
                                     </td>

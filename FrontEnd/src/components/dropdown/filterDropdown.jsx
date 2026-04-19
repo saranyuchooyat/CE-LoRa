@@ -1,17 +1,14 @@
 import { useState, useEffect } from "react";
 
-// 💡 1. กำหนด Array ของตัวเลือกทั้งหมด
 const DEFAULT_OPTIONS = ['Active', 'Inactive']; 
 const ROLE_OPTIONS = ['System Admin', 'Zone Admin','Zone Staff'];
 const DEVICE_TYPE_OPTIONS = ['X7', 'J3', 'ED20W'];
 
-// FilterDropdown.jsx
 function FilterDropdown({ onSelect, currentValue, optionalKey, data }) {
     const [statusValues, setStatusValues] = useState([]);
 
     useEffect(() => {
         if (optionalKey === "zonestaff") {
-            // 💡 เก็บทั้งออบเจกต์เพื่อให้มีทั้งชื่อแสดงผลและ ID สำหรับกรอง
             const zoneOptions = data.map(item => ({ label: item.label, value: item.value }));
             setStatusValues([{ label: 'ทั้งหมด', value: 'ทั้งหมด' }, ...zoneOptions]);
         } 
@@ -20,7 +17,6 @@ function FilterDropdown({ onSelect, currentValue, optionalKey, data }) {
             setStatusValues(deviceOptions);
         }
         else {
-            // สำหรับ Role หรือ Status ทั่วไป
             const options = (optionalKey === "role" ? ROLE_OPTIONS : DEFAULT_OPTIONS)
                 .map(opt => ({ label: opt, value: opt }));
             setStatusValues(options);

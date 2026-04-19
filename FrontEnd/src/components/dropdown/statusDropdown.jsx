@@ -9,20 +9,17 @@ function StatusDropdown({ onSelect, currentValue, optionalKey }) {
     
     useEffect(() => {
         if (optionalKey === "province") {
-            // ตั้งค่าสำหรับ Zone Status
             setStatusValues({
                 value1: 'active',
                 value2: 'inactive'
             });
         } else if (optionalKey === "role" || optionalKey === "zonestaff") {
-            // ตั้งค่าสำหรับ Device Status/Role
             setStatusValues({
                 value1: 'Online',
                 value2: 'offline'
             });
         }
         else if (optionalKey === "deviceType") {
-            // ตั้งค่าสำหรับ Device Type
             setStatusValues({
                 value1: 'online',
                 value2: 'offline',
@@ -30,7 +27,6 @@ function StatusDropdown({ onSelect, currentValue, optionalKey }) {
             });
         }
         else if (optionalKey === "Elder") {
-            // ตั้งค่าสำหรับ Device Type
             setStatusValues({
                 value1: 'Normal',
                 value2: 'Warning',
@@ -38,7 +34,6 @@ function StatusDropdown({ onSelect, currentValue, optionalKey }) {
             });
         }
         else {
-             // ค่า Default หาก optionalKey ไม่ตรง
              setStatusValues({
                 value1: 'Active',
                 value2: 'Inactive'

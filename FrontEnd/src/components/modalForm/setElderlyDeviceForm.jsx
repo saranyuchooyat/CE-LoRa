@@ -6,8 +6,6 @@ import { showPopup } from "./popup";
 function SetElderlyDeviceForm({ isOpen, onClose, elderData, onSuccess }) {
   const [selectedDevice, setSelectedDevice] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // ดึงอุปกรณ์ทั้งหมดเพื่อนำมากรองอันที่ว่าง
   const { data: devices = [], isLoading: isDevicesLoading } = useQuery({
     queryKey: ["allDevices"],
     queryFn: async () => {
@@ -17,7 +15,6 @@ function SetElderlyDeviceForm({ isOpen, onClose, elderData, onSuccess }) {
     enabled: isOpen,
   });
 
-  // กรองอุปกรณ์ที่ว่าง (ยังไม่มีคนใช้ หรือ unassigned) และรวมถึงอุปกรณ์ปัจจุบันของผู้สูงอายุด้วย
   const availableDevices = devices.filter((device) => {
     return (
       !device.assigned_to ||
@@ -44,7 +41,6 @@ function SetElderlyDeviceForm({ isOpen, onClose, elderData, onSuccess }) {
       return;
     }
 
-    // ถ้ายืนยันอุปกรณ์เดิม ไม่ต้องทำอะไร
     if (selectedDevice === elderData?.device_id) {
        if (onClose) onClose();
        return;
@@ -52,7 +48,6 @@ function SetElderlyDeviceForm({ isOpen, onClose, elderData, onSuccess }) {
 
     setIsSubmitting(true);
     try {
-      // 1. ถ้ามีอุปกรณ์เดิมอยู่แล้ว ให้ปลดออกก่อน (ตั้งค่า AssignedTo เป็น None)
       if (elderData.device_id) {
         await api.put(`/devices/${elderData.device_id}`, {
           assigned_to: "None",
@@ -64,7 +59,6 @@ function SetElderlyDeviceForm({ isOpen, onClose, elderData, onSuccess }) {
         });
       }
 
-      // 2. ผูกอุปกรณ์ใหม่ (อัปเดต AssignedTo ด้วยชื่อผู้สูงอายุ และสถานะ online)
       await api.put(`/devices/${selectedDevice}`, {
         assigned_to: `${elderData.first_name} ${elderData.last_name}`,
         status: "online",
@@ -89,8 +83,6 @@ function SetElderlyDeviceForm({ isOpen, onClose, elderData, onSuccess }) {
   return (
     <form onSubmit={handleSubmit}>
       <div className="flex flex-col gap-4">
-        
-        {/* ชื่อผู้สูงอายุ (Read-only เหมือนฝั่งโน้น) */}
         <div className="flex flex-col gap-2">
           <label className="text-gray-700 text-sm">
             ชื่อผู้สูงอายุ:
@@ -103,7 +95,6 @@ function SetElderlyDeviceForm({ isOpen, onClose, elderData, onSuccess }) {
           />
         </div>
 
-        {/* Dropdown ใหม่อุปกรณ์ที่ว่าง หรือ อุปกรณ์ปัจจุบัน */}
         <div className="flex flex-col gap-2">
           <label htmlFor="device_id" className="text-gray-700 text-sm">
             เลือกอุปกรณ์ Smartwatch:

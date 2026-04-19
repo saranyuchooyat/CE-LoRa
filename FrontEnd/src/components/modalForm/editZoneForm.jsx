@@ -12,7 +12,6 @@ function EditZoneForm({ zoneId, zoneData, onClose, onSaveSuccess }) {
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // 1. ดึงข้อมูลเดิมมาแสดง
     useEffect(() => {
         if (zoneData) {
             setFormData({
@@ -24,13 +23,11 @@ function EditZoneForm({ zoneId, zoneData, onClose, onSaveSuccess }) {
         }
     }, [zoneData]);
 
-    // 2. จัดการการเปลี่ยนแปลงข้อมูลใน Input
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    // 3. ส่งข้อมูลที่แก้ไขไปยังเซิร์ฟเวอร์
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
@@ -63,7 +60,6 @@ function EditZoneForm({ zoneId, zoneData, onClose, onSaveSuccess }) {
         <form onSubmit={handleSubmit}>
             
             <div className="flex items-center gap-4 w-full">
-                {/* ชื่อ */}
                 <div className="mb-4">
                     <label className="block text-gray-700">ชื่อ zone</label>
                     <input 
@@ -88,7 +84,6 @@ function EditZoneForm({ zoneId, zoneData, onClose, onSaveSuccess }) {
 
             </div>
 
-            {/*ที่อยู่*/}
             <div className="mb-4">
                 <label className="block text-gray-700">ที่อยู่</label>
                 <textarea
@@ -100,9 +95,6 @@ function EditZoneForm({ zoneId, zoneData, onClose, onSaveSuccess }) {
                 />
             </div>
 
-
-
-            {/* ส่วนท้าย: รายละเอียดเพิ่มเติม */}
             <div className="mb-4 mt-2">
                 <label className="block text-gray-700 text-sm font-bold">รายละเอียดเพิ่มเติม</label>
                 <textarea name="description" value={formData.description} onChange={handleChange} className="border rounded w-full h-24 p-2 bg-white resize-none" placeholder="ระบุรายละเอียด..." />

@@ -11,7 +11,6 @@ function SystemOverviewDashboard(){
 
     const location = useLocation();
 
-    //ดึงข้อมูลหลังบ้าน
     const systemQueries = useQueries({
         queries: [
             { queryKey: ['summaryInfo'], queryFn:() => api.get('dashboard/summary').then(res => res.data)},
@@ -35,11 +34,8 @@ function SystemOverviewDashboard(){
         const tokenInStorage = sessionStorage.getItem('token');
         if (location.state?.token && location.state.token !== tokenInStorage) {
              sessionStorage.setItem('token', location.state.token);
-             // เมื่อบันทึก Token ใหม่แล้ว React Query จะทำการ Refetch ให้อัตโนมัติ
-             // เนื่องจากทุก Query จะถูก Trigger เมื่อ Token ถูกบันทึกและ Component Rerender
         }
     }, [location.state]);
-    //ดึงข้อมูลหลังบ้าน
 
     const systemData = 
     [

@@ -2,7 +2,6 @@ import ZoneTable from "../table/zoneTable";
 import UserTable from "../table/userTable";
 import ElderlyDataTable from "../table/elderlyDataTable";
 
-// ✅ 1. เพิ่ม onRowClick มารับค่าตรงนี้ (นอกนั้นโค้ดเดิมจารย์ทั้งหมดครับ ไม่แตะเลย)
 function DataTableCard({ data, onEdit, onSetting, onDeleteSuccess, onRowClick, showActions=true }) {
 
     console.log("dataDataTableCard",data)
@@ -39,7 +38,6 @@ function DataTableCard({ data, onEdit, onSetting, onDeleteSuccess, onRowClick, s
         if (!Array.isArray(arr) || arr.length === 0) {
             return false;
         }
-        // ตรวจสอบว่ามีฟิลด์ที่เฉพาะกับ elderly เช่น elder_id, first_name, age, device_id
         return 'elder_id' in arr[0] && 'first_name' in arr[0] && 'age' in arr[0] && 'device_id' in arr[0];
     }
 

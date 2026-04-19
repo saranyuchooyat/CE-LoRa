@@ -11,13 +11,11 @@ import AddUserForm from "../../components/modalForm/addUserForm";
 import EditUserForm from "../../components/modalForm/editUserForm";
 import SetZoneZoneStaff from "../../components/modalForm/setZoneZoneStaff";
 
-//กำหนดตัวแปรแต่ละช่อง Filter
 const initialFilters = {
-  search: "", // สำหรับช่องค้นหา ชื่อ, อีเมล, เบอร์โทร
-  role: "ทั้งหมด", // สำหรับ Role (option2Name)
-  status: "ทั้งหมด", // สำหรับ Status (option1Name)
+  search: "", 
+  role: "ทั้งหมด", 
+  status: "ทั้งหมด",
 };
-//กำหนดตัวแปรแต่ละช่อง Filter
 
 function UserManagement(){
     
@@ -43,7 +41,6 @@ function UserManagement(){
         setIsSettingModalOpen(false);
     };
 
-    //ดึงข้อมูลหลังบ้าน
     const userQueries = useQueries({
         queries: [
         { queryKey: ['users'], queryFn: () => api.get('/users').then(res => res.data) },
@@ -61,9 +58,7 @@ function UserManagement(){
             sessionStorage.setItem('token', location.state.token);
         }
     }, [location.state]);
-    //ดึงข้อมูลหลังบ้าน
 
-    // ฟังก์ชันเปิด Modal แก้ไข
     const handleOpenEditModal = (userId) => {
         setSelectedUserId(userId);
         setIsEditModalOpen(true);
@@ -74,8 +69,6 @@ function UserManagement(){
         setIsEditModalOpen(false);
     };
 
-
-    // ระบบ filter
     const handleFilterChange = (key, value) => {
         setFilters(prev => ({
             ...prev,
@@ -91,7 +84,6 @@ function UserManagement(){
         const { search, role, status } = filters;
         let data = userData; 
 
-        // กรองตามช่องค้นหา (Search)
         if (search) {
             const lowerSearch = search.toLowerCase();
             data = data.filter(user => {
@@ -105,20 +97,18 @@ function UserManagement(){
             });
         }
 
-        // กรองตามบทบาท (Role)
         if (role && role !== "ทั้งหมด") {
             data = data.filter((user) => user.role === role);
         }
 
-        // ✅ กรองตามสถานะ (Online / Offline)
         if (status && status !== 'ทั้งหมด') {
             data = data.filter((user) => {
-                const checkStatus = status.toLowerCase(); // ดักตัวพิมพ์เล็ก-ใหญ่
+                const checkStatus = status.toLowerCase();
                 
                 if (checkStatus === 'online') {
                     return user.is_online === true;
                 } else if (checkStatus === 'offline') {
-                    return user.is_online === false || user.is_online === undefined; // เผื่อย้อนหลังไม่มีฟิลด์นี้ ให้มองเป็น Offline
+                    return user.is_online === false || user.is_online === undefined;
                 }
                 
                 return true;
@@ -127,9 +117,7 @@ function UserManagement(){
         
         return data;
     }, [userData, filters]);
-    // ระบบ filter
 
-    // ระบบกรองจำวน Role
     const roleCountsObject = userData.reduce((acc, user) => {
         const role = user.role || "ไม่ระบุบทบาท";
         acc[role] = (acc[role] || 0) + 1;
@@ -152,7 +140,6 @@ function UserManagement(){
         totalStaffObjects,
         ...staffDataList
     ];
-    // ระบบกรองจำวน Role
     
     if (isSystemLoading) {
         return <div className="mx-5 mt-10 text-center text-xl">Loading Dashboard...</div>;
@@ -185,7 +172,6 @@ function UserManagement(){
                     option2Key="role"
                 />
                 
-                {/* 🎯 ตารางแสดงผลหลัก */}
                 <DataTableCard 
                     data={filteredUsers}
                     onEdit={handleOpenEditModal}

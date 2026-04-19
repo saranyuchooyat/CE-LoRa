@@ -67,7 +67,6 @@ function EditDeviceForm({ onClose, onSaveSuccess, deviceData }) {
   return (
     <form onSubmit={handleSubmit}>
       <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-        {/*Device ID (ไม่ควรให้แก้)*/}
         <div className="mb-2">
           <label className="block text-gray-700 text-sm">Device ID:</label>
           <input
@@ -78,7 +77,6 @@ function EditDeviceForm({ onClose, onSaveSuccess, deviceData }) {
           />
         </div>
 
-        {/* Device Name */}
         <div className="mb-2">
           <label className="block text-gray-700 text-sm">
             ชื่ออุปกรณ์ (Device Name):
@@ -93,7 +91,6 @@ function EditDeviceForm({ onClose, onSaveSuccess, deviceData }) {
           />
         </div>
 
-        {/* โมเดลอุปกรณ์ (Model) */}
         <div className="mb-2">
           <label className="block text-gray-700 text-sm">
             รุ่นอุปกรณ์ (Model):
@@ -112,7 +109,6 @@ function EditDeviceForm({ onClose, onSaveSuccess, deviceData }) {
         </div>
       </div>
 
-      {/* ปุ่มกด (Footer) */}
       <div className="pt-4 mt-2 border-t flex justify-end gap-3">
         <button
           type="submit"

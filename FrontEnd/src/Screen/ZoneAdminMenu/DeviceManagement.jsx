@@ -12,9 +12,9 @@ import SetDeviceForm from "../../components/modalForm/setDeviceForm";
 import EditDeviceForm from "../../components/modalForm/editDeviceForm";
 
 const initialFilters = {
-  search: "", // สำหรับช่องค้นหา ชื่อ, อีเมล, เบอร์โทร
-  deviceType: "ทั้งหมด", // สำหรับ Role (option2Name)
-  status: "ทั้งหมด", // สำหรับ Status (option1Name)
+  search: "", 
+  deviceType: "ทั้งหมด", 
+  status: "ทั้งหมด", 
 };
 
 function DeviceManagement() {
@@ -46,7 +46,6 @@ function DeviceManagement() {
     setIsEditModalOpen(false);
   };
 
-  //ดึงข้อมูลหลังบ้าน
   const deviceQueries = useQueries({
     queries: [
       {
@@ -63,17 +62,13 @@ function DeviceManagement() {
     const tokenInStorage = sessionStorage.getItem("token");
     if (location.state?.token && location.state.token !== tokenInStorage) {
       sessionStorage.setItem("token", location.state.token);
-      // 💡 เมื่อบันทึก Token ใหม่แล้ว React Query จะทำการ Refetch ให้อัตโนมัติ
-      // เนื่องจากทุก Query จะถูก Trigger เมื่อ Token ถูกบันทึกและ Component Rerender
     }
   }, [location.state]);
 
   const deviceQueryResult = deviceQueries[0];
-  //ดึงข้อมูลหลังบ้าน
 
   console.log("deviceQueryResult.data", deviceQueryResult.data);
 
-  //ระบบ filter
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({
       ...prev,
@@ -89,29 +84,23 @@ function DeviceManagement() {
     const { search, deviceType, status } = filters;
     let data = deviceQueryResult.data || [];
 
-    // 1. กรองด้วยช่องค้นหา (Search)
     if (search) {
       const lowerSearch = search.toLowerCase();
       data = data.filter((device) => {
-        // ค้นหาจาก DeviceID
         const deviceIdMatch = device.device_id
           ?.toLowerCase()
           .includes(lowerSearch);
 
-        // ค้นหาจาก Model
         const modelMatch = device.model?.toLowerCase().includes(lowerSearch);
 
-        // ค้นหาจาก Device Name
         const nameMatch = device.device_name
           ?.toLowerCase()
           .includes(lowerSearch);
 
-        // ค้นหาจาก Serial Number (เพิ่มใหม่ตาม struct)
         const snMatch = device.serial_number
           ?.toLowerCase()
           .includes(lowerSearch);
 
-        // ค้นหาจากชื่อผู้ที่ได้รับมอบหมาย (เพิ่มใหม่ตาม struct)
         const assignedMatch = device.assigned_to
           ?.toLowerCase()
           .includes(lowerSearch);
@@ -122,22 +111,17 @@ function DeviceManagement() {
       });
     }
 
-    // 2. กรองตามประเภท (Type)
-    // เช็คให้ชัวร์ว่าค่าจาก Frontend (deviceType) ตรงกับค่าใน DB (device.type)
     if (deviceType && deviceType !== "ทั้งหมด") {
       data = data.filter((device) => device.model === deviceType);
     }
 
-    // 3. กรองตามสถานะ (Status)
     if (status && status !== "ทั้งหมด") {
       data = data.filter((device) => device.status === status);
     }
 
     return data;
   }, [deviceQueryResult.data, filters]);
-  //ระบบ filter
 
-  //ระบบกรองสถานะอุปกรณ์
   const deviceStatusCount = (deviceQueryResult.data || []).reduce(
     (acc, device) => {
       const status = device.status || "unassigned";
@@ -163,7 +147,6 @@ function DeviceManagement() {
   };
 
   const deviceStatusData = [totalDevicesObject, ...deviceStatusList];
-  //ระบบกรองสถานะอุปกรณ์
 
   if (isSystemLoading) {
     return (
