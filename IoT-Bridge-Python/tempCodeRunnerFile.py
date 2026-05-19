@@ -1,0 +1,1 @@
+mongodb://admin_kmitl:kmitl123@100.118.210.62:27017/LoRa?authSource=LoRa
