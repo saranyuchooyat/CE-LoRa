@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  mqtt-bridge:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    network_mode: "host"
+
+  mongo-pusher:
+    build:
+      context: .
+      dockerfile: Dockerfile.mongo
+    restart: always
+    network_mode: "host"
