@@ -1,1 +1,0 @@
-"device_name": "J3_Smartwatch_01",

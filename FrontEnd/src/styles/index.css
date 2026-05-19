@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+@font-face {
+    font-family: Mitr;
+    src: url("../assets/fonts/Mitr-Regular.ttf");
+}
+
+@theme {
+    --color-main-green: #40916C;
+
+    --color-main-red: #FF4043;
+    --color-alert-bg: #FFE2E2;
+
+    --color-main-yellow: #FFB74D;
+    --color-warn-bg: #FFFFE2;
+
+    --color-main-blue: #0088FF;
+    --color-complete-bg: #B3E5FC;
+
+    --color-main-card: #b7e4c7;
+
+    --color-device-card: #EFEFEF;
+
+    --color-test-color: #F2F0EF;
+}
+
+@layer components {
+
+
+    .card {
+        @apply bg-[#95d5b2] w-full text-center mb-4 rounded-[15px] p-4 shadow-md
+    }
+
+    .card-noti {
+        @apply w-full h-fit text-start pl-3 rounded-[15px] border-l-[10px] cursor-pointer
+    }
+
+    .color-alert {
+        @apply border-main-red bg-alert-bg
+    }
+
+    .color-warn {
+        @apply border-main-yellow bg-warn-bg
+    }
+
+    .color-complete {
+        @apply border-main-blue bg-complete-bg
+    }
+
+    .menu-btn {
+        @apply bg-main-green/50 px-[20px] rounded-md mr-3 text-[16px] font-bold text-white/50 hover:bg-main-green hover:text-white cursor-pointer
+    }
+
+    .add-btn {
+        @apply bg-white mr-3 py-5 px-6 rounded-[10px] font-bold hover:text-white hover:bg-main-green cursor-pointer shadow-md
+    }
+
+    .submit-btn {
+        @apply bg-main-green/60 text-white px-6 py-2 rounded-[10px] font-bold hover:bg-main-green cursor-pointer shadow-md
+    }
+
+    .cancel-btn {
+        @apply bg-gray-200 px-6 py-2 rounded-[10px] font-bold hover:bg-gray-300 cursor-pointer shadow-md
+    }
+
+    .return-btn {
+        @apply flex items-center text-gray-600 hover:text-main-green font-bold bg-white px-4 py-2 rounded-lg shadow-sm border transition-all
+    }
+
+    .dropdown-btn {
+        @apply flex justify-start bg-gray-200 px-5 py-2 rounded-lg w-[200px] cursor-pointer
+    }
+
+    .dropdown-menu {
+        @apply absolute top-full mt-1 bg-white w-[300px] top-[45px] border-[1px] shadow-md text-start
+    }
+
+    .table-header {
+        @apply p-2 text-sm font-semibold tracking-wide text-left w-fit
+    }
+
+    .table-data {
+        @apply p-3 text-sm text-gray-700 text-left
+    }
+
+    .table-status {
+        @apply p-1.5 text-xs uppercase tracking-wider rounded-lg
+    }
+
+    .table-btn {
+        @apply cursor-pointer p-1 m-2 ml-0 text-gray-700 tracking-wider bg-gray-200 rounded-lg whitespace-nowrap
+    }
+}
+
+body {
+    font-family: Mitr;
+    background-color: #D8F3DC;
+}
+
+.background {
+    background-color: #EFF9F7;
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    margin-left: 20px;
+    margin-right: 20px;
+    overflow: hidden;
+
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    display: none;
+}
